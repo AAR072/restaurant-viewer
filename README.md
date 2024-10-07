@@ -1,22 +1,3 @@
 # Always commit when you are done a session or feature. Make sure you let everone know
 # Always get up to date with 'git pull' when starting a new session    
-.git/                      | (This should not be touched)    
-DO_NOT_TOUCH/              | (This should not be touched)    
-dist/                      | (This is auto generated. Do not touch)    
-src/                       | (Our code will go here)    
-    ├── scripts/           | (This contains all scripts with functions)     
-    │   ├── algorithms/    | (Ex folder for sorts)    
-    │   │   └── bogosort.ts| (Example sort function)    
-    │   └── structs/       |     
-    │       └── linkedlist.ts | (Example data structure)    
-    ├── styles/            | (Folder for css)    
-    │   └── button.css     | (Example css file)    
-    └── index.ts           | (This is our entry file)    
-    └── DO_NOT_TOUCH.ts    | (This should not be touched)    
-dev/                       | (Aakaash and Daniel can test here)    
-    ├── Aakaash/           | (Aakaash dev folder)    
-    │   └── aakaash.html   | (Html page to use when developing)     
-    └── Daniel/            | (Daniel dev folder)    
-        └── daniel.html    | (Html page to use when developing)    
-index.html                 | (Main index)    
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/uyBfndVC)
