@@ -10,7 +10,6 @@ export function storeSearch(
   searchPrice: number [] | undefined = undefined, 
   searchReview: number [] | undefined = undefined
 ): Data {
-  console.log("asdfasd")
   let t0 = performance.now();
   let startPointer = 0;
   let outputData: Data = {
@@ -49,7 +48,7 @@ export function storeSearch(
   }
 
   let t1 = performance.now();
-  console.log(t1 - t0);
+  console.log(`Searching took ${t1 - t0}`);
   return outputData; 
 }
 
