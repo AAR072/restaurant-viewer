@@ -14,7 +14,6 @@ function loadJSON(filePath: string): any {
 }
 
 
-
 //Don't remove this
 export interface Data {
   ID: string[];
@@ -25,7 +24,8 @@ export interface Data {
   x: number[];
   y: number[];
 }
-
+console.log("loading")
 const data: Data = loadJSON("../DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
 
-console.log(storeSearch(data, undefined, "Bistro / Rustic", undefined, undefined))
+console.log("done loading")
+console.log(storeSearch(data, undefined, undefined, undefined, undefined, undefined, [9,9.5], undefined))

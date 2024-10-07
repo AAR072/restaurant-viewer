@@ -5,8 +5,13 @@ export function storeSearch(
   searchID: string | undefined = undefined, 
   searchName: string | undefined = undefined,
   searchXPos: number | undefined = undefined,
-  searchYPos: number | undefined = undefined): Data {
-
+  searchYPos: number | undefined = undefined,
+  searchType: string | undefined = undefined,
+  searchPrice: number [] | undefined = undefined, 
+  searchReview: number [] | undefined = undefined
+): Data {
+  console.log("asdfasd")
+  let t0 = performance.now();
   let startPointer = 0;
   let outputData: Data = {
     ID: [],
@@ -26,7 +31,10 @@ export function storeSearch(
       hasMatchingParams(data.ID[i], searchID) &&
         hasMatchingParams(data.storeName[i], searchName) &&
         hasMatchingParams(data.x[i], searchXPos) &&
-        hasMatchingParams(data.y[i], searchYPos)
+        hasMatchingParams(data.y[i], searchYPos) &&
+        hasMatchingParams(data.type[i], searchType) &&
+        hasMatchingRange(data.cost[i], searchPrice) &&
+        hasMatchingRange(data.review[i], searchReview) 
     ){
       // update our output data 
       outputData.ID[startPointer] = data.ID[i];
@@ -40,6 +48,8 @@ export function storeSearch(
     }
   }
 
+  let t1 = performance.now();
+  console.log(t1 - t0);
   return outputData; 
 }
 
@@ -48,6 +58,16 @@ function hasMatchingParams(currentParam: string | number | undefined, targetPara
     return true;
   }
   if (currentParam === targetParam){
+    return true;
+  }
+  return false;
+}
+
+function hasMatchingRange(currentValue: number, targetRange: number [] | undefined): boolean{
+  if (targetRange === undefined){
+    return true;
+  }
+  if (currentValue >= targetRange[0] && currentValue <= targetRange[1] ){
     return true;
   }
   return false;
