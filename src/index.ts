@@ -1,4 +1,4 @@
-import { storeSearch } from "./scripts/algorithms/store-search";
+import { insertToNumberTree } from "./scripts/structs/bst";
 //TEMP CODE FOR TESTING 
 import { readFileSync } from 'fs';
 // Load JSON text from server hosted file and return JSON parsed object
@@ -13,7 +13,6 @@ function loadJSON(filePath: string): any {
   return null;
 }
 
-
 //Don't remove this
 export interface Data {
   ID: string[];
@@ -24,8 +23,18 @@ export interface Data {
   x: number[];
   y: number[];
 }
-console.log("loading")
+
+
 const data: Data = loadJSON("../DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
 
-console.log("done loading")
-console.log(storeSearch(data, undefined, undefined, undefined, undefined, undefined, [9,9.5], undefined))
+// Creating unbalanced BSTs for all params
+
+const xValtree: (number | null)[] = [];
+const yValtree: (number | null)[] = [];
+let t0 = performance.now()
+for (let i = 0; i < data.x.length; i++){
+  insertToNumberTree(xValtree, data.x[i]);
+  insertToNumberTree(yValtree, data.y[i])
+}
+let t1 = performance.now()
+console.log(t1-t0)
