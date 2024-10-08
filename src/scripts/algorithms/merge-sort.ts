@@ -1,7 +1,6 @@
 import { slice, floor } from "../util/utils";
 // This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
-// TODO: Make each node an array, where arr[0] is the values whe are sorting by, and arr[1] is the index of that value in the overall data
-function merge<T>(left: T[], right: T[], arr: T[]): T[] {
+function merge<T>(left: T[][], right: T[][], arr: T[][]): T[][] {
   let i = 0;
   let j = 0;
 
@@ -14,7 +13,7 @@ function merge<T>(left: T[], right: T[], arr: T[]): T[] {
       //If right is empty
       arr[k] = left[i]; //Dump in the values from left
       i++;
-    } else if (left[i] < right[j]) {
+    } else if (left[i][0] < right[j][0]) {
       arr[k] = left[i];
       i++;
     } else {
@@ -25,7 +24,7 @@ function merge<T>(left: T[], right: T[], arr: T[]): T[] {
 
   return arr;
 }
-export function mergeSort<T>(arr: T[]): T[] {
+export function mergeSort<T>(arr: T[][]): T[][] {
   //Base case
   if (arr.length <= 1) {
     return arr;
@@ -33,8 +32,8 @@ export function mergeSort<T>(arr: T[]): T[] {
 
   //Divide!
   let mid: number = floor(arr.length / 2)
-  let left: T[] = slice(arr,0, mid); //First half
-  let right: T[] = slice(arr, mid); //Second half
+  let left: T[][] = slice(arr,0, mid); //First half
+  let right: T[][] = slice(arr, mid); //Second half
 
   //Conquer!
   left = mergeSort(left);
