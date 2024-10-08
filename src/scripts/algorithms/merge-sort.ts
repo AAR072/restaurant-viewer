@@ -1,6 +1,6 @@
 import { slice, floor } from "../util/utils";
 // This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
-
+// TODO: Make each node an array, where arr[0] is the values whe are sorting by, and arr[1] is the index of that value in the overall data
 function merge<T>(left: T[], right: T[], arr: T[]): T[] {
   let i = 0;
   let j = 0;
