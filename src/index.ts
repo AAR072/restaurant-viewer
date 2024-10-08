@@ -25,16 +25,40 @@ export interface Data {
 }
 
 
-const data: Data = loadJSON("../DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
+export const data: Data = loadJSON("../DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
 
-// Creating unbalanced BSTs for all params
+// Creating unbalanced BSTs for all numerical params
 
-const xValtree: (number | null)[] = [];
-const yValtree: (number | null)[] = [];
-let t0 = performance.now()
-for (let i = 0; i < data.x.length; i++){
-  insertToNumberTree(xValtree, data.x[i]);
-  insertToNumberTree(yValtree, data.y[i])
-}
-let t1 = performance.now()
-console.log(t1-t0)
+// const xBST: number [] = [];
+// const yBST: number [] = [];
+// const costBST: number []= [];
+// const reviewBST: number [] = [];
+// let t0 = performance.now()
+// for (let i = 0; i < data.x.length; i++){
+//   insertToNumberTree(xBST, data.x[i]);
+//   insertToNumberTree(yBST, data.y[i]);
+//   insertToNumberTree(costBST, data.cost[i]);
+//   insertToNumberTree(reviewBST, data.review[i]);
+// }
+let root: number [] = new Array(50)
+insertToNumberTree(root, 3);
+console.log(root)
+insertToNumberTree(root, 2);
+console.log(root)
+insertToNumberTree(root, 4);
+console.log(root)
+insertToNumberTree(root, 1);
+console.log(root)
+console.log(insertToNumberTree(root, 5));
+// let root: number [] = [];
+// console.log(data.x[0]);
+// console.log(data.x[2]);
+// console.log(data.x[44]);
+// insertToNumberTree(root, data.x[0]);
+// insertToNumberTree(root, data.x[2]);
+// console.log(insertToNumberTree(root, data.x[44]));
+
+
+
+
+
