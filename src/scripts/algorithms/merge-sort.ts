@@ -1,0 +1,45 @@
+import { slice, floor } from "../util/utils";
+// This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
+
+function merge<T>(left: T[], right: T[], arr: T[]): T[] {
+  let i = 0;
+  let j = 0;
+
+  for (let k = 0; k < arr.length; k++) {
+    if (i >= left.length) {
+      //If left is empty
+      arr[k] = right[j]; //Dump in the values from right
+      j++;
+    } else if (j >= right.length) {
+      //If right is empty
+      arr[k] = left[i]; //Dump in the values from left
+      i++;
+    } else if (left[i] < right[j]) {
+      arr[k] = left[i];
+      i++;
+    } else {
+      arr[k] = right[j];
+      j++;
+    }
+  }
+
+  return arr;
+}
+export function mergeSort<T>(arr: T[]): T[] {
+  //Base case
+  if (arr.length <= 1) {
+    return arr;
+  }
+
+  //Divide!
+  let mid: number = floor(arr.length / 2)
+  let left: T[] = slice(arr,0, mid); //First half
+  let right: T[] = slice(arr, mid); //Second half
+
+  //Conquer!
+  left = mergeSort(left);
+  right = mergeSort(right);
+
+  //Combine!
+  return merge(left, right, arr);
+}
