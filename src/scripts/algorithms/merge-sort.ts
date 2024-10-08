@@ -1,4 +1,5 @@
 import { slice, floor } from "../util/utils";
+// TODO: Make slice even faster
 // This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
 function merge<T>(left: T[][], right: T[][], arr: T[][]): T[][] {
   let i = 0;
@@ -32,6 +33,7 @@ export function mergeSort<T>(arr: T[][]): T[][] {
 
   //Divide!
   let mid: number = floor(arr.length / 2)
+  // This slice is not the fastest way
   let left: T[][] = slice(arr,0, mid); //First half
   let right: T[][] = slice(arr, mid); //Second half
 
