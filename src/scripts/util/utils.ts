@@ -14,3 +14,9 @@ export function slice<T>(arr: T[], start: number, end?: number): T[] {
   }
   return outPut;
 }
+export function getMax(a: number, b: number): number {
+  return a < b ? b : a;
+}
+export function getMin(a: number, b: number): number {
+  return a > b ? b : a;
+}

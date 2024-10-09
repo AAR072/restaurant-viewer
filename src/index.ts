@@ -1,5 +1,6 @@
 //TEMP CODE FOR TESTING 
 import { readFileSync } from 'fs';
+import { mergeSortString } from './scripts/algorithms/merge-sort';
 // Load JSON text from server hosted file and return JSON parsed object
 function loadJSON(filePath: string): any {
   // Load json file;
@@ -25,4 +26,9 @@ export interface Data {
 
 
 export const data: Data = loadJSON("../DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
+console.log( mergeSortString(
+
+[["g"], ["m"], ["e"], ["o"], ["p"], ["w"], ["x"], ["b"], ["t"], ["q"], ["d"], ["u"], ["z"], ["j"], ["h"], ["f"], ["a"], ["c"], ["l"], ["r"], ["y"], ["s"], ["k"], ["i"], ["n"], ["v"]]
+
+))
 
