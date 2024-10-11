@@ -1,10 +1,8 @@
-export function floor(val: number): number {
-  if ((val * 10) % 10 === 5){
-    return val - 0.5;
-  }
-  return val;
+function floor(n: number) {
+  return n - n % 1;
 }
-export function slice<T>(arr: T[], start: number, end?: number): T[] {
+
+function slice<T>(arr: T[], start: number, end?: number): T[] {
   if (end === undefined) {
     end = arr.length;
   }
@@ -14,9 +12,11 @@ export function slice<T>(arr: T[], start: number, end?: number): T[] {
   }
   return outPut;
 }
-export function getMax(a: number, b: number): number {
+
+function getMax(a: number, b: number): number {
   return a < b ? b : a;
 }
-export function getMin(a: number, b: number): number {
+
+function getMin(a: number, b: number): number {
   return a > b ? b : a;
 }

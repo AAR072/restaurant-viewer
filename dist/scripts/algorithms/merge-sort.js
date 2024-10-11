@@ -4,7 +4,7 @@ exports.mergeNumber = mergeNumber;
 exports.mergeString = mergeString;
 exports.mergeSortNumber = mergeSortNumber;
 exports.mergeSortString = mergeSortString;
-const utils_1 = require("../util/utils");
+// import { slice, floor } from "../util/utils";
 console.log("jjj");
 // TODO: Make slice even faster
 // This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
@@ -64,10 +64,10 @@ function mergeSortNumber(arr) {
         return arr;
     }
     //Divide!
-    let mid = (0, utils_1.floor)(arr.length / 2);
+    let mid = floor(arr.length / 2);
     // This slice is not the fastest way
-    let left = (0, utils_1.slice)(arr, 0, mid); //First half
-    let right = (0, utils_1.slice)(arr, mid); //Second half
+    let left = slice(arr, 0, mid); //First half
+    let right = slice(arr, mid); //Second half
     //Conquer!
     left = mergeSortNumber(left);
     right = mergeSortNumber(right);
@@ -80,10 +80,10 @@ function mergeSortString(arr) {
         return arr;
     }
     //Divide!
-    let mid = (0, utils_1.floor)(arr.length / 2);
+    let mid = floor(arr.length / 2);
     // This slice is not the fastest way
-    let left = (0, utils_1.slice)(arr, 0, mid); //First half
-    let right = (0, utils_1.slice)(arr, mid); //Second half
+    let left = slice(arr, 0, mid); //First half
+    let right = slice(arr, mid); //Second half
     //Conquer!
     left = mergeSortString(left);
     right = mergeSortString(right);

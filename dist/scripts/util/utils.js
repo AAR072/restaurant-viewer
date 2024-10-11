@@ -1,14 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.floor = floor;
-exports.slice = slice;
-exports.getMax = getMax;
-exports.getMin = getMin;
-function floor(val) {
-    if ((val * 10) % 10 === 5) {
-        return val - 0.5;
-    }
-    return val;
+function floor(n) {
+    return n - n % 1;
 }
 function slice(arr, start, end) {
     if (end === undefined) {
