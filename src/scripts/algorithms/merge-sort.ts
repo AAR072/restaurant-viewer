@@ -1,93 +1,83 @@
-// import { slice, floor } from "../util/utils";
-console.log("jjj")
-// TODO: Make slice even faster
-// This code is adapted from https://mike.ma/ICS4U/unit_1_data_structures_and_algorithms/3._algorithms/3.4._merge_sort
-export function mergeNumber<T>(left: T[][], right: T[][], arr: T[][]): T[][] {
-  let i = 0;
-  let j = 0;
+enum Compare {
+  LESS = -1,
+  EQUAL = 0,
+  MORE = 1
+}
 
-  for (let k = 0; k < arr.length; k++) {
-    if (i >= left.length) {
-      //If left is empty
-      arr[k] = right[j]; //Dump in the values from right
-      j++;
-    } else if (j >= right.length) {
-      //If right is empty
-      arr[k] = left[i]; //Dump in the values from left
-      i++;
-    } else if (left[i][0] < right[j][0]) {
-      arr[k] = left[i];
-      i++;
+type CompareCallback = (a: number, b: number) => Compare
+
+// Sorting
+
+function merge<T>(arr: number[], low: number, mid: number, high: number, compare: CompareCallback) {
+  const leftLength = mid - low + 1;
+  const rightLength = high - mid;
+  const length = high - low + 1;
+
+  const left: number[] = new Array(leftLength);
+  const right: number[] = new Array(rightLength);
+
+  for (let i = 0; i < leftLength; i++) left[i] = arr[low + i];
+  for (let i = 0; i < rightLength; i++) right[i] = arr[mid + 1 + i];
+
+  let leftPoint = 0;
+  let rightPoint = 0;
+  let pointer = 0;
+
+  while (pointer < length) {
+    if (rightPoint >= rightLength || (leftPoint < leftLength && compare(left[leftPoint], right[rightPoint]) == Compare.LESS)) {
+      // fix and understand this ^^^
+      arr[low + pointer] = left[leftPoint];
+      leftPoint++;
+
     } else {
-      arr[k] = right[j];
-      j++;
+      arr[low + pointer] = right[rightPoint];
+      rightPoint++;
     }
+
+    pointer++;
+  }
+}
+
+function sort<T>(sorted: number[], left: number, right: number, compare: CompareCallback) {
+  if (left >= right) {
+    sorted[right] = right;
+
+    return;
   }
 
-  return arr;
+  const middle = floor(left + (right - left)/2);
+
+  sort<T>(sorted, left, middle, compare);
+  sort<T>(sorted, middle + 1, right, compare);
+  merge<T>(sorted, left, middle, right, compare);
 }
-export function mergeString(left: string[][], right: string[][], arr: string[][]): string[][] {
-  let i = 0;
-  let j = 0;
 
-  for (let k = 0; k < arr.length; k++) {
-    if (i >= left.length) {
-      //If left is empty
-      arr[k] = right[j]; //Dump in the values from right
-      j++;
-    } else if (j >= right.length) {
-      //If right is empty
-      arr[k] = left[i]; //Dump in the values from left
-      i++;
-    } else if (left[i][0].localeCompare(right[j][0]) < 0) {
-      arr[k] = left[i];
-      i++;
-    } else {
-      arr[k] = right[j];
-      j++;
-    }
-  }
+function sortArray<T>(arr: T[], compare: CompareCallback) {
+  const length = arr.length;
+  const sorted = new Array(length);
 
-  return arr;
+  sort(sorted, 0, length - 1, compare);
+
+  return sorted;
 }
-export function mergeSortNumber<T>(arr: T[][]): T[][] {
-  //Base case
-  if (arr.length <= 1) {
-    return arr;
-  }
 
-  //Divide!
-  let mid: number = floor(arr.length / 2)
-  // This slice is not the fastest way
-  let left: T[][] = slice(arr,0, mid); //First half
-  let right: T[][] = slice(arr, mid); //Second half
-
-  //Conquer!
-  left = mergeSortNumber(left);
-  right = mergeSortNumber(right);
-
-  //Combine!
-  return mergeNumber(left, right, arr);
+function sortNumbers(arr: number[]) {
+  return sortArray<number>(arr, (a: number, b: number) => {
+    const aVal = arr[a];
+    const bVal = arr[b];
+  
+    if (aVal > bVal) return Compare.MORE;
+    else if (aVal < bVal) return Compare.LESS;
+    else return Compare.EQUAL;
+  });
 }
-export function mergeSortString (arr: string[][]): string[][] {
-  //Base case
-  if (arr.length <= 1) {
-    return arr;
-  }
 
-  //Divide!
-  let mid: number = floor(arr.length / 2)
-  // This slice is not the fastest way
-  let left: string[][] = slice(arr,0, mid); //First half
-  let right: string[][] = slice(arr, mid); //Second half
-
-  //Conquer!
-  left = mergeSortString(left);
-  right = mergeSortString(right);
-
-  //Combine!
-  return mergeString(left, right, arr);
+function sortStrings(arr: string[]) {
+  return sortArray<string>(arr, (a: number, b: number) => {
+    const difference = arr[a].localeCompare(arr[b]);
+  
+    if (difference > 0) return Compare.MORE;
+    else if (difference < 0) return Compare.LESS;
+    else return Compare.EQUAL;
+  });
 }
-console.log("asdf")
-let joe = [["apple"],["banana"], ["cherry"]]
-console.log(mergeSortString(joe));
