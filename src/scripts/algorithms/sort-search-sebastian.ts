@@ -99,122 +99,188 @@ function sortStrings(arr: string[]) {
 
 // Searching
 
-function search<T>(arr: T[], filter: FilterCallback): number[] {
-  let length = floor(arr.length/2);
-  let pointer = length;
-  let results: number[] = [];
-  let resultPointer = 0;
+// function searchOld<T>(arr: T[], filter: FilterCallback): number[] {
+//   let length = floor(arr.length/2);
+//   let pointer = length;
+//   let results: number[] = [];
+//   let resultPointer = 0;
 
-  while (true) {
-    let middle = arr[pointer];
-    let check = filter(middle);
+//   while (true) {
+//     let middle = arr[pointer];
+//     let check = filter(middle);
 
-    if (check == Filter.VALID) {
-      results.push(pointer);
+//     if (check == Filter.VALID) {
+//       results.push(pointer);
 
-      for (let i = 1; i <= length; i++) {
-        let index = pointer + i;
-        let v = arr[index];
+//       for (let i = 1; i <= length; i++) {
+//         let index = pointer + i;
+//         let v = arr[index];
 
-        if (filter(v) != Filter.VALID) {
-          break;
-        }
+//         if (filter(v) != Filter.VALID) {
+//           break;
+//         }
 
-        results.push(index);
-      }
+//         results.push(index);
+//       }
 
-      for (let i = 1; i <= length; i++) {
-        let index = pointer - i;
-        let v = arr[index];
+//       for (let i = 1; i <= length; i++) {
+//         let index = pointer - i;
+//         let v = arr[index];
 
-        if (filter(v) != Filter.VALID) {
-          break;
-        }
+//         if (filter(v) != Filter.VALID) {
+//           break;
+//         }
 
-        results.push(index);
-      }
+//         results.push(index);
+//       }
 
-      break;
-    }
+//       break;
+//     }
 
-    length = floor(length/2);
+//     length = floor(length/2);
 
-    if (length <= 1) {
-      length = 1;
-    }
+//     if (length <= 1) {
+//       length = 1;
+//     }
 
-    if (check == Filter.UP) {
-      pointer += length;
+//     if (check == Filter.UP) {
+//       pointer += length;
 
-    } else if (check == Filter.DOWN) {
-      pointer -= length;
-    }
-  }
+//     } else if (check == Filter.DOWN) {
+//       pointer -= length;
+//     }
+//   }
 
-  return results;
-}
+//   return results;
+// }
 
-function searchTest(indices: number[], filter: FilterCallback): number[] {
-  let length = floor(indices.length/2);
-  let pointer = length;
-  let results: number[] = [];
-  let resultPointer = 0;
+function searchScan(indices: number[], found: number, low: number, high: number, filter: FilterCallback) {
+  let incrementLow = floor((found - low + 1)**0.5);
+  let lowStart = found - 1;
+  let incrementsLow = 0;
+
+  let incrementHigh = floor((high - found + 1)**0.5);
+  let highStart = found + 1;
+  let incrementsHigh = 0;
+
+  let extentLow = found;
+  let extentHigh = found;
   
   while (true) {
-    let middle = arr[pointer];
-    let check = filter(middle);
+    let lowIndex = lowStart - incrementsLow*incrementLow;
 
-    if (check == Filter.VALID) {
-      results.push(pointer);
+    if (lowIndex < low || filter(indices[lowIndex]) != Filter.VALID) {
+      if (incrementLow <= 1) {
+        extentLow = lowIndex + 1;
 
-      for (let i = 1; i <= length; i++) {
-        let index = pointer + i;
-        let v = arr[index];
+      } else {
+        let start = lowIndex + incrementLow;
+        if (start > lowStart) start = lowStart;
 
-        if (filter(v) != Filter.VALID) {
-          break;
+        let end = lowIndex;
+        if (end < low) end = low;
+
+        for (let i = start; i >= end; i--) {
+          if (filter(indices[lowIndex]) != Filter.VALID) {
+            extentLow = i + 1;
+          }
         }
-
-        results.push(index);
-      }
-
-      for (let i = 1; i <= length; i++) {
-        let index = pointer - i;
-        let v = arr[index];
-
-        if (filter(v) != Filter.VALID) {
-          break;
-        }
-
-        results.push(index);
       }
 
       break;
     }
 
-    length = floor(length/2);
-
-    if (length <= 1) {
-      length = 1;
-    }
-
-    if (check == Filter.UP) {
-      pointer += length;
-
-    } else if (check == Filter.DOWN) {
-      pointer -= length;
-    }
+    incrementsLow++;
   }
 
-  return results;
+  while (true) {
+    let highIndex = highStart + incrementsHigh*incrementHigh;
+
+    if (highIndex > high || filter(indices[highIndex]) != Filter.VALID) {
+      if (incrementLow <= 1) {
+        extentLow = highIndex - 1;
+
+      } else {
+        let start = highIndex - incrementHigh;
+        if (start < highStart) start = highStart;
+
+        let end = highIndex;
+        if (end > high) end = high;
+
+        for (let i = start; i <= end; i++) {
+          if (filter(indices[highIndex]) != Filter.VALID) {
+            extentHigh = i - 1;
+          }
+        }
+      }
+
+      break;
+    }
+
+    incrementsHigh++;
+  }
+
+  const length = extentHigh - extentLow + 1;
+
+  console.log(extentLow, found, extentHigh);
+
+  let pointer = 0;
+  let results = new Array(length);
+
+  for (let i = 0; i < length; i++) {
+
+  }
 }
 
-// Use two crystal balls algorithm once value is found to find limits
+searchScan([1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 0, 10, (a: number) => {
+  if (a >= 3 && a <= 8) return Filter.VALID;
+  else if (a > 3) return Filter.DOWN;
+  else if (a < 8) return Filter.UP;
+  else return Filter.INVALID;
+});
 
-let sorted = sortStrings(data.storeName);
+function search(indices: number[], filter: FilterCallback): number | void {
+  let low = 0;
+  let high = indices.length - 1;
+
+  while (low < high) {
+    let middle = floor(low + (high - low)/2);
+    let middleIndex = indices[middle];
+    let middleCheck = filter(middleIndex);
+
+    if (middleCheck == Filter.VALID) {
+      // const results = searchScan(indices, middle, low, high, filter)
+      return middleIndex;
+
+    } else if (middleCheck == Filter.UP) {
+      low = middle + 1;
+      high = high;
+
+    } else if (middleCheck == Filter.DOWN) {
+      low = low;
+      high = middle;
+
+    } else {
+      break;
+    }
+  }
+}
+
+// Testing
+
+let sorted = sortNumbers(data.cost);
+let found = search(sorted, (a: number) => {
+  let value = data.cost[a];
+
+  if (value >= 200 && value <= 210) return Filter.VALID;
+  else if (value > 210) return Filter.DOWN;
+  else if (value < 200) return Filter.UP;
+  else return Filter.INVALID;
+});
+// if (found) console.log(found, data.cost[found]);
+
 
 // let input = "aa";
-
 // let results = search<number>(sorted, (a: number) => {
 //   const value = data.storeName[a];
 //   const matched = value.substring(0, input.length);
@@ -229,6 +295,7 @@ let sorted = sortStrings(data.storeName);
 //   }
 // });
 
+
 function consoleLog<T>(reference: T[], indices: number[]) {
   let print = [];
   for (let i = 0; i < indices.length; i++) {
@@ -236,5 +303,4 @@ function consoleLog<T>(reference: T[], indices: number[]) {
   }
   console.log(print);
 }
-
-consoleLog(data.storeName, sorted);
+// consoleLog(data.storeName, sorted);
