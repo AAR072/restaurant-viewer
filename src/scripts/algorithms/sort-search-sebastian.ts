@@ -1,5 +1,3 @@
-import { data } from "../../index";
-
 enum Compare {
   LESS = -1,
   EQUAL = 0,
@@ -76,7 +74,7 @@ function sortArray<T>(arr: T[], compare: CompareCallback) {
   return sorted;
 }
 
-function sortNumbers(arr: number[]) {
+export function sortNumbers(arr: number[]) {
   return sortArray<number>(arr, (a: number, b: number) => {
     const aVal = arr[a];
     const bVal = arr[b];
@@ -87,7 +85,7 @@ function sortNumbers(arr: number[]) {
   });
 }
 
-function sortStrings(arr: string[]) {
+export function sortStrings(arr: string[]) {
   return sortArray<string>(arr, (a: number, b: number) => {
     const difference = arr[a].localeCompare(arr[b]);
   
@@ -99,146 +97,6 @@ function sortStrings(arr: string[]) {
 
 // Searching
 
-// function searchOld<T>(arr: T[], filter: FilterCallback): number[] {
-//   let length = floor(arr.length/2);
-//   let pointer = length;
-//   let results: number[] = [];
-//   let resultPointer = 0;
-
-//   while (true) {
-//     let middle = arr[pointer];
-//     let check = filter(middle);
-
-//     if (check == Filter.VALID) {
-//       results.push(pointer);
-
-//       for (let i = 1; i <= length; i++) {
-//         let index = pointer + i;
-//         let v = arr[index];
-
-//         if (filter(v) != Filter.VALID) {
-//           break;
-//         }
-
-//         results.push(index);
-//       }
-
-//       for (let i = 1; i <= length; i++) {
-//         let index = pointer - i;
-//         let v = arr[index];
-
-//         if (filter(v) != Filter.VALID) {
-//           break;
-//         }
-
-//         results.push(index);
-//       }
-
-//       break;
-//     }
-
-//     length = floor(length/2);
-
-//     if (length <= 1) {
-//       length = 1;
-//     }
-
-//     if (check == Filter.UP) {
-//       pointer += length;
-
-//     } else if (check == Filter.DOWN) {
-//       pointer -= length;
-//     }
-//   }
-
-//   return results;
-// }
-
-function searchScan(indices: number[], found: number, low: number, high: number, filter: FilterCallback) {
-  let incrementLow = floor((found - low + 1)**0.5);
-  let lowStart = found - 1;
-  let incrementsLow = 0;
-
-  let incrementHigh = floor((high - found + 1)**0.5);
-  let highStart = found + 1;
-  let incrementsHigh = 0;
-
-  let extentLow = found;
-  let extentHigh = found;
-  
-  while (true) {
-    let lowIndex = lowStart - incrementsLow*incrementLow;
-
-    if (lowIndex < low || filter(indices[lowIndex]) != Filter.VALID) {
-      if (incrementLow <= 1) {
-        extentLow = lowIndex + 1;
-
-      } else {
-        let start = lowIndex + incrementLow;
-        if (start > lowStart) start = lowStart;
-
-        let end = lowIndex;
-        if (end < low) end = low;
-
-        for (let i = start; i >= end; i--) {
-          if (filter(indices[lowIndex]) != Filter.VALID) {
-            extentLow = i + 1;
-          }
-        }
-      }
-
-      break;
-    }
-
-    incrementsLow++;
-  }
-
-  while (true) {
-    let highIndex = highStart + incrementsHigh*incrementHigh;
-
-    if (highIndex > high || filter(indices[highIndex]) != Filter.VALID) {
-      if (incrementLow <= 1) {
-        extentLow = highIndex - 1;
-
-      } else {
-        let start = highIndex - incrementHigh;
-        if (start < highStart) start = highStart;
-
-        let end = highIndex;
-        if (end > high) end = high;
-
-        for (let i = start; i <= end; i++) {
-          if (filter(indices[highIndex]) != Filter.VALID) {
-            extentHigh = i - 1;
-          }
-        }
-      }
-
-      break;
-    }
-
-    incrementsHigh++;
-  }
-
-  const length = extentHigh - extentLow + 1;
-
-  console.log(extentLow, found, extentHigh);
-
-  let pointer = 0;
-  let results = new Array(length);
-
-  for (let i = 0; i < length; i++) {
-
-  }
-}
-
-searchScan([1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 0, 10, (a: number) => {
-  if (a >= 3 && a <= 8) return Filter.VALID;
-  else if (a > 3) return Filter.DOWN;
-  else if (a < 8) return Filter.UP;
-  else return Filter.INVALID;
-});
-
 function search(indices: number[], filter: FilterCallback): number | void {
   let low = 0;
   let high = indices.length - 1;
@@ -246,7 +104,12 @@ function search(indices: number[], filter: FilterCallback): number | void {
   while (low < high) {
     let middle = floor(low + (high - low)/2);
     let middleIndex = indices[middle];
+
+    let prev = middle - 1;
+    let prevIndex = indices[prev];
+
     let middleCheck = filter(middleIndex);
+    let prevCheck = filter(prevIndex);
 
     if (middleCheck == Filter.VALID) {
       // const results = searchScan(indices, middle, low, high, filter)
@@ -268,18 +131,6 @@ function search(indices: number[], filter: FilterCallback): number | void {
 
 // Testing
 
-let sorted = sortNumbers(data.cost);
-let found = search(sorted, (a: number) => {
-  let value = data.cost[a];
-
-  if (value >= 200 && value <= 210) return Filter.VALID;
-  else if (value > 210) return Filter.DOWN;
-  else if (value < 200) return Filter.UP;
-  else return Filter.INVALID;
-});
-// if (found) console.log(found, data.cost[found]);
-
-
 // let input = "aa";
 // let results = search<number>(sorted, (a: number) => {
 //   const value = data.storeName[a];
@@ -294,13 +145,3 @@ let found = search(sorted, (a: number) => {
 //     else return Filter.INVALID;
 //   }
 // });
-
-
-function consoleLog<T>(reference: T[], indices: number[]) {
-  let print = [];
-  for (let i = 0; i < indices.length; i++) {
-    print[i] = reference[indices[i]];
-  }
-  console.log(print);
-}
-// consoleLog(data.storeName, sorted);
