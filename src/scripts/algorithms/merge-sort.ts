@@ -52,7 +52,7 @@ function sort<T>(sorted: number[], left: number, right: number, compare: Compare
   merge<T>(sorted, left, middle, right, compare);
 }
 
-function sortArray<T>(arr: T[], compare: CompareCallback) {
+function sortArray<T>(arr: T[], compare: CompareCallback): number[] {
   const length = arr.length;
   const sorted = new Array(length);
 
@@ -61,7 +61,7 @@ function sortArray<T>(arr: T[], compare: CompareCallback) {
   return sorted;
 }
 
-function sortNumbers(arr: number[]) {
+function sortNumbers(arr: number[]): number[] {
   return sortArray<number>(arr, (a: number, b: number) => {
     const aVal = arr[a];
     const bVal = arr[b];
@@ -72,7 +72,7 @@ function sortNumbers(arr: number[]) {
   });
 }
 
-function sortStrings(arr: string[]) {
+function sortStrings(arr: string[]): number[] {
   return sortArray<string>(arr, (a: number, b: number) => {
     const difference = arr[a].localeCompare(arr[b]);
   

@@ -7,18 +7,17 @@ enum Filter {
 type FilterCallback = (i: number) => Filter
 
 function filterSplice(indices: number[], min: number, max: number): number[] {
-  console.log(min, max);
   const length = max - min + 1;
   const results = new Array(length);
 
   for (let i = 0; i < length; i++) {
-    results[0] = indices[min + i];
+    results[i] = indices[min + i];
   }
 
   return results;
 }
 
-function search(indices: number[], filter: FilterCallback, secondary?: boolean, low: number = 0, high: number = indices.length - 1): number[] | number | null {
+function search(indices: number[], filter: FilterCallback, secondary: boolean = false, low: number = 0, high: number = indices.length - 1): number[] | number | null {
   let extentHigh = high;
 
   while (low < high) {
@@ -38,12 +37,12 @@ function search(indices: number[], filter: FilterCallback, secondary?: boolean, 
     if (middleCheck == Filter.VALID) {
       if (borderCheck != Filter.VALID) {
         if (secondary) {
-          return middleIndex;
+          return middle;
 
         } else {
-          const maxIndex: number | null = search(indices, filter, true, middleIndex, extentHigh) as number | null;
+          const maximum: number | null = search(indices, filter, true, middle, extentHigh) as number | null;
 
-          return filterSplice(indices, middleIndex, maxIndex == null ? middleIndex : maxIndex);
+          return filterSplice(indices, middle, maximum == null ? extentHigh : maximum);
         }
 
       } else {
@@ -57,10 +56,8 @@ function search(indices: number[], filter: FilterCallback, secondary?: boolean, 
 
     } else if (middleCheck == Filter.UP) {
       low = middle + 1;
-      high = high;
 
     } else {
-      low = low;
       high = middle;
     }
   }
@@ -69,38 +66,34 @@ function search(indices: number[], filter: FilterCallback, secondary?: boolean, 
   else return new Array(0);
 }
 
-function filterNumbers(data: number[], sortedIndices: number[], min: number, max: number) {
+function filterNumbers(data: number[], sortedIndices: number[], min: number, max: number): number[] {
   return search(sortedIndices, (i: number) => {
     let value = data[i];
 
     if (value >= min && value <= max) return Filter.VALID;
     else if (value > max) return Filter.DOWN;
     else return Filter.UP;
-  });
+  }) as number[];
 }
 
-function filterStrings(data: string[], sortedIndices: number[], searchInput: string) {
+function filterStrings(data: string[], sortedIndices: number[], searchInput: string): number[] {
   const len = searchInput.length;
 
   return search(sortedIndices, (index: number) => {
     const value = data[index];
+    const comparison = value.localeCompare(searchInput);
 
-    let matched = true;
+    if (comparison == 0) return Filter.VALID;
     
     for (let i = 0; i < len; i++) {
-      if (value[i].toLowerCase() != searchInput[i].toLowerCase()) {
-        matched = false;
-
-        break;
+      if (value[i] == null || value[i].toLowerCase() != searchInput[i].toLowerCase()) {
+        const comparison = value.localeCompare(searchInput);
+  
+        if (comparison > 0) return Filter.DOWN;
+        else return Filter.UP;
       }
     }
-  
-    if (matched) return Filter.VALID;
-    else {
-      const comparison = value.localeCompare(searchInput);
-  
-      if (comparison > 0) return Filter.UP;
-      else return Filter.DOWN;
-    }
-  });
+
+    return Filter.VALID;
+  }) as number[];
 }
