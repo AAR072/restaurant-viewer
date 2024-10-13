@@ -1,4 +1,4 @@
-function floor(n: number) {
+export function floor(n: number) {
   return n - n % 1;
 }
 

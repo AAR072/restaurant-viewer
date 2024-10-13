@@ -1,3 +1,5 @@
+import { floor } from "../util/utils";
+
 enum Filter {
   VALID = 0,
   UP = 1,
@@ -6,9 +8,9 @@ enum Filter {
 
 type FilterCallback = (i: number) => Filter
 
-function filterSplice(indices: number[], min: number, max: number): number[] {
+function filterSplice(indices: Uint32Array, min: number, max: number): Uint32Array {
   const length = max - min + 1;
-  const results = new Array(length);
+  const results = new Uint32Array(length);
 
   for (let i = 0; i < length; i++) {
     results[i] = indices[min + i];
@@ -17,7 +19,7 @@ function filterSplice(indices: number[], min: number, max: number): number[] {
   return results;
 }
 
-function search(indices: number[], filter: FilterCallback, secondary: boolean = false, low: number = 0, high: number = indices.length - 1): number[] | number | null {
+function search(indices: Uint32Array, filter: FilterCallback, secondary: boolean = false, low: number = 0, high: number = indices.length - 1): Uint32Array | number | null {
   let extentHigh = high;
 
   while (low < high) {
@@ -63,20 +65,20 @@ function search(indices: number[], filter: FilterCallback, secondary: boolean = 
   }
 
   if (secondary) return null;
-  else return new Array(0);
+  else return new Uint32Array(0);
 }
 
-function filterNumbers(data: number[], sortedIndices: number[], min: number, max: number): number[] {
+export function filterNumbers(data: number[], sortedIndices: Uint32Array, min: number, max: number): Uint32Array {
   return search(sortedIndices, (i: number) => {
     let value = data[i];
 
     if (value >= min && value <= max) return Filter.VALID;
     else if (value > max) return Filter.DOWN;
     else return Filter.UP;
-  }) as number[];
+  }) as Uint32Array;
 }
 
-function filterStrings(data: string[], sortedIndices: number[], searchInput: string): number[] {
+export function filterStrings(data: string[], sortedIndices: Uint32Array, searchInput: string): Uint32Array {
   const len = searchInput.length;
 
   return search(sortedIndices, (index: number) => {
@@ -95,5 +97,5 @@ function filterStrings(data: string[], sortedIndices: number[], searchInput: str
     }
 
     return Filter.VALID;
-  }) as number[];
+  }) as Uint32Array;
 }

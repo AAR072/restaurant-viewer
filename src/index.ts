@@ -1,4 +1,6 @@
-//Don't remove this
+import { sortNumbers, sortStrings } from "./scripts/algorithms/merge-sort";
+import { filterNumbers, filterStrings } from "./scripts/algorithms/binary-search";
+
 interface Data {
   ID: string[];
   storeName: string[];
@@ -10,21 +12,19 @@ interface Data {
 }
 
 interface SortedIndices {
-  ID: number[];
-  storeName: number[];
+  ID: Uint32Array;
+  storeName: Uint32Array;
   typeList: number[];
   type: number[][];
-  cost: number[];
-  review: number[];
-  x: number[];
-  y: number[];
+  cost: Uint32Array;
+  review: Uint32Array;
+  x: Uint32Array;
+  y: Uint32Array;
 }
 
-// store types as an array of existing types and a 2d array for 
+const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data;
 
-const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large.
-
-const sorted = {
+const sorted: SortedIndices = {
   ID: sortStrings(data.ID),
   storeName: sortStrings(data.storeName),
   typeList: [],
@@ -35,9 +35,9 @@ const sorted = {
   y: sortNumbers(data.y)
 }
 
-const filteredReviews = filterNumbers(data.review, sorted.review, 4.9, 5) as number[];
+const filtered = filterNumbers(data.x, sorted.x, 2, 2);
 
-function printStuff(reference: any[], indices: number[]) {
+function printStuff(reference: any[], indices: Uint32Array) {
   let p = new Array(indices.length);
 
   for (let i = 0; i < indices.length; i++) {
@@ -47,4 +47,6 @@ function printStuff(reference: any[], indices: number[]) {
   console.log(p);
 }
 
-printStuff(data.review, filteredReviews);
+printStuff(data.x, filtered);
+
+console.log(data);

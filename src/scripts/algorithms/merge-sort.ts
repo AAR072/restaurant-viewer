@@ -1,3 +1,5 @@
+import { floor } from "../util/utils";
+
 enum Compare {
   LESS = -1,
   EQUAL = 0,
@@ -8,7 +10,7 @@ type CompareCallback = (a: number, b: number) => Compare
 
 // Sorting
 
-function merge<T>(arr: number[], low: number, mid: number, high: number, compare: CompareCallback) {
+function merge<T>(arr: Uint32Array, low: number, mid: number, high: number, compare: CompareCallback) {
   const leftLength = mid - low + 1;
   const rightLength = high - mid;
   const length = high - low + 1;
@@ -38,7 +40,7 @@ function merge<T>(arr: number[], low: number, mid: number, high: number, compare
   }
 }
 
-function sort<T>(sorted: number[], left: number, right: number, compare: CompareCallback) {
+function sort<T>(sorted: Uint32Array, left: number, right: number, compare: CompareCallback) {
   if (left >= right) {
     sorted[right] = right;
 
@@ -52,16 +54,16 @@ function sort<T>(sorted: number[], left: number, right: number, compare: Compare
   merge<T>(sorted, left, middle, right, compare);
 }
 
-function sortArray<T>(arr: T[], compare: CompareCallback): number[] {
+function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
   const length = arr.length;
-  const sorted = new Array(length);
+  const sorted = new Uint32Array(length);
 
   sort(sorted, 0, length - 1, compare);
 
   return sorted;
 }
 
-function sortNumbers(arr: number[]): number[] {
+export function sortNumbers(arr: number[]): Uint32Array {
   return sortArray<number>(arr, (a: number, b: number) => {
     const aVal = arr[a];
     const bVal = arr[b];
@@ -72,7 +74,7 @@ function sortNumbers(arr: number[]): number[] {
   });
 }
 
-function sortStrings(arr: string[]): number[] {
+export function sortStrings(arr: string[]): Uint32Array {
   return sortArray<string>(arr, (a: number, b: number) => {
     const difference = arr[a].localeCompare(arr[b]);
   

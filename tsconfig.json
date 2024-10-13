@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESnext",
-    "module": "CommonJS",
+    "module": "ES6",
     "outDir": "dist", //optionally use “” to not use an output folder
     "sourceMap": true,
     "strict": true,
