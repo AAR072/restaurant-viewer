@@ -1,4 +1,3 @@
-// ###############################
 // THIS CODE WILL CAUSE THE PROGRAM TO ERROR IF YOU RUN LIVE SERVER. WE WILL DELETE THIS IMMEDIATELY AFTER PLAYING AROUND WITH IT
 enum Compare {
   LESS = -1,
@@ -123,35 +122,55 @@ function filterSplice(indices: number[], min: number, max: number): number[] {
 
   return results;
 }
-// ###############################
 // END OF PROBLEMATIC CODE
-
-// the magic
 function binarySearchNumber(arr: number[], data: number [], val: number, isFindingLower: boolean ): number {
   let low: number = 0;
   let high: number = arr.length - 1;
   let mid: number = 0;
   if (isFindingLower) {
     while (low < high) {
-      mid = Math.floor((low + high) / 2);
+      mid = floor((low + high) / 2);
       if (data[arr[mid]] < val) low = mid + 1;
       else high = mid;
     }
   } else {
     while (low < high) {
-      mid = Math.floor((low + high + 1) / 2);
+      mid = floor((low + high + 1) / 2);
       if (data[arr[mid]] > val) high = mid - 1;
       else low = mid;
     }
   }
   return low;
 }
-// range wrapper
+function binarySearchString(arr: number[], data: string [], val: string, isFindingLower: boolean ): number {
+  let low: number = 0;
+  let high: number = arr.length - 1;
+  let mid: number = 0;
+  if (isFindingLower) {
+    while (low < high) {
+      mid = floor((low + high) / 2);
+      if (data[arr[mid]].localeCompare(val) < 0) low = mid + 1;
+      else high = mid;
+    }
+  } else {
+    while (low < high) {
+      mid = floor((low + high + 1) / 2);
+      if (data[arr[mid]] > val) high = mid - 1;
+      else low = mid;
+    }
+  }
+  return low;
+}
 function binarySearchNumberRange(arr: number[], data: number [], range: number []): number []{
   // we assume the input is [lower, upper]
   return [binarySearchNumber(arr, data, range[0], true), binarySearchNumber(arr, data, range[1], false)]
 }
-// Some basic testing
+function binarySearchStringRange(arr: number[], data: string [], range: string []): number []{
+  // we assume the input is [lower, upper]
+  return [binarySearchString(arr, data, range[0], true), binarySearchString(arr, data, range[1], false)]
+}
+
+
 // our sorted array that holds indices
 let testSORTED = [3,0,1,2,4]
 // our original data
@@ -175,3 +194,74 @@ let spliced = filterSplice(sortedXVals, joeout[0], joeout[1]);
 const t2 = performance.now()
 console.log(`It took ${t1-t0}MS to sort the array, ${t2-t1}MS to search and splice. The output is:`)
 console.log(spliced)
+
+// interface SortedIndicesButNormal {
+//   ID: number[];
+//   storeName: number[];
+//   typeList: number[];
+//   type: number[][];
+//   cost: number[];
+//   review: number[];
+//   x: number[];
+//   y: number[];
+// }
+// let sortedDATA: SortedIndicesButNormal = {
+//   ID: sortStrings(data.ID),
+//   storeName: sortStrings(data.storeName),
+//   type: sortStrings(data.type),
+//   cost: [],
+//   review: [],
+//   x: [],
+//   y: []
+// };
+// sortedDATA.type =
+// sortedDATA.push(sortStrings(data.cost));
+function storeSearch(
+  data: Data, 
+  searchID: string | undefined = undefined, 
+  searchName: string | undefined = undefined,
+  searchXPos: number | undefined = undefined,
+  searchYPos: number | undefined = undefined,
+  searchType: string | undefined = undefined,
+  searchPrice: number [] | undefined = undefined, 
+  searchReview: number [] | undefined = undefined,
+
+): Data {
+  let t0 = performance.now();
+  let startPointer = 0;
+  let outputData: Data = {
+    ID: [],
+    storeName: [],
+    type: [],
+    cost: [],
+    review: [],
+    x: [],
+    y: []
+  };
+
+  // loop through our array, and find all values that match. We will put those in our output array
+
+  let t1 = performance.now();
+  console.log(t1 - t0);
+  return outputData; 
+}
+
+function hasMatchingParams(currentParam: string | number | undefined, targetParam: string | number | undefined): boolean{
+  if (targetParam === undefined){
+    return true;
+  }
+  if (currentParam === targetParam){
+    return true;
+  }
+  return false;
+}
+
+function hasMatchingRange(currentValue: number, targetRange: number [] | undefined): boolean{
+  if (targetRange === undefined){
+    return true;
+  }
+  if (currentValue >= targetRange[0] && currentValue <= targetRange[1] ){
+    return true;
+  }
+  return false;
+}
