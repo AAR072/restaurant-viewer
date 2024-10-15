@@ -1,10 +1,4 @@
-enum Compare {
-  LESS = -1,
-  EQUAL = 0,
-  MORE = 1
-}
-
-type CompareCallback = (a: number, b: number) => Compare
+type CompareCallback = (a: number, b: number) => number
 
 // Sorting
 
@@ -24,7 +18,7 @@ function merge<T>(arr: Uint32Array, low: number, mid: number, high: number, comp
   let pointer = 0;
 
   while (pointer < length) {
-    if (rightPoint >= rightLength || (leftPoint < leftLength && compare(left[leftPoint], right[rightPoint]) == Compare.LESS)) {
+    if (rightPoint >= rightLength || (leftPoint < leftLength && compare(left[leftPoint], right[rightPoint]) < 0)) {
       // fix and understand this ^^^
       arr[low + pointer] = left[leftPoint];
       leftPoint++;
@@ -63,21 +57,12 @@ function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
 
 function sortNumbers(arr: number[]): Uint32Array {
   return sortArray<number>(arr, (a: number, b: number) => {
-    const aVal = arr[a];
-    const bVal = arr[b];
-  
-    if (aVal > bVal) return Compare.MORE;
-    else if (aVal < bVal) return Compare.LESS;
-    else return Compare.EQUAL;
+    return arr[a] - arr[b];
   });
 }
 
 function sortStrings(arr: string[]): Uint32Array {
   return sortArray<string>(arr, (a: number, b: number) => {
-    const difference = arr[a].localeCompare(arr[b]);
-  
-    if (difference > 0) return Compare.MORE;
-    else if (difference < 0) return Compare.LESS;
-    else return Compare.EQUAL;
+    return arr[a].localeCompare(arr[b]);
   });
 }

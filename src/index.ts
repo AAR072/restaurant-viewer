@@ -33,7 +33,7 @@ const sorted: SortedIndices = {
 }
 
 let t1 = performance.now();
-const filtered = filterNumbers(data.review, sorted.review, 5, 5);
+const filtered = filterNumbers(data.review, sorted.review, 4, 5);
 let t2 = performance.now();
 
 console.log("Performance:", t2 - t1);
@@ -49,5 +49,4 @@ function printStuff(reference: any[], indices: Uint32Array) {
 }
 
 printStuff(data.review, filtered);
-
 printStuff(data.review, sorted.review);
