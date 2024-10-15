@@ -1,6 +1,3 @@
-import { sortNumbers, sortStrings } from "./scripts/algorithms/merge-sort";
-import { filterNumbers, filterStrings } from "./scripts/algorithms/binary-search";
-
 interface Data {
   ID: string[];
   storeName: string[];
@@ -35,7 +32,11 @@ const sorted: SortedIndices = {
   y: sortNumbers(data.y)
 }
 
-const filtered = filterNumbers(data.x, sorted.x, 2, 2);
+let t1 = performance.now();
+const filtered = filterStrings(data.storeName, sorted.storeName, "a");
+let t2 = performance.now();
+
+console.log("Performance:", t2 - t1);
 
 function printStuff(reference: any[], indices: Uint32Array) {
   let p = new Array(indices.length);
@@ -47,6 +48,6 @@ function printStuff(reference: any[], indices: Uint32Array) {
   console.log(p);
 }
 
-printStuff(data.x, filtered);
+printStuff(data.storeName, filtered);
 
-console.log(data);
+printStuff(data.storeName, sorted.storeName);

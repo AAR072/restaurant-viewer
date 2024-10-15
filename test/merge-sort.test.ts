@@ -1,4 +1,4 @@
-import { sortNumbers, sortStrings } from './../src/scripts/algorithms/merge-sort'; // Adjust the path accordingly
+import { sortNumbers, sortStrings } from './../src/scripts/algorithms/merge-sort';
 
 function convertIndices(reference: any[], indices: Uint32Array) {
   let c = new Array(indices.length);

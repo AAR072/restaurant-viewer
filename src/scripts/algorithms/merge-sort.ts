@@ -1,5 +1,3 @@
-import { floor } from "../util/utils";
-
 enum Compare {
   LESS = -1,
   EQUAL = 0,
@@ -63,7 +61,7 @@ function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
   return sorted;
 }
 
-export function sortNumbers(arr: number[]): Uint32Array {
+function sortNumbers(arr: number[]): Uint32Array {
   return sortArray<number>(arr, (a: number, b: number) => {
     const aVal = arr[a];
     const bVal = arr[b];
@@ -74,7 +72,7 @@ export function sortNumbers(arr: number[]): Uint32Array {
   });
 }
 
-export function sortStrings(arr: string[]): Uint32Array {
+function sortStrings(arr: string[]): Uint32Array {
   return sortArray<string>(arr, (a: number, b: number) => {
     const difference = arr[a].localeCompare(arr[b]);
   
