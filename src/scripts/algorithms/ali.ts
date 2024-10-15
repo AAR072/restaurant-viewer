@@ -109,8 +109,7 @@ export interface Data {
 }
 
 
-const data: Data = loadJSON(".//DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large
-console.log("LD")
+const data: Data = loadJSON("./DO_NOT_TOUCH/data.json") as Data; //Don't delete this line. All your data is here. It does take a few seconds for Replit to load the data because it's so large
 // RUN THIS FILE WITH TS-NODE ONLY
 function filterSplice(indices: number[], min: number, max: number): number[] {
   const length = max - min + 1;
@@ -170,32 +169,31 @@ function binarySearchStringRange(arr: number[], data: string [], range: string [
   return [binarySearchString(arr, data, range[0], true), binarySearchString(arr, data, range[1], false)]
 }
 
+// // our sorted array that holds indices
+// let testSORTED = [3,0,1,2,4]
+// // our original data
+// let testDATA = [2,3,4,1,4];
+// // get range of values for 2 <= x <= 4
+// let out = binarySearchNumberRange(testSORTED, testDATA, [2,4])
+// // returns [1,4] which is [index of leftmost 2, index of rightmost 4]
+// console.log(filterSplice(testSORTED, out[0], out[1]))
+// // this should output [the indicies data but all in range]
 
-// our sorted array that holds indices
-let testSORTED = [3,0,1,2,4]
-// our original data
-let testDATA = [2,3,4,1,4];
-// get range of values for 2 <= x <= 4
-let out = binarySearchNumberRange(testSORTED, testDATA, [2,4])
-// returns [1,4] which is [index of leftmost 2, index of rightmost 4]
-console.log(filterSplice(testSORTED, out[0], out[1]))
-// this should output [the indicies data but all in range]
+// // we can create another version for strings
 
-// we can create another version for strings
+// // then to filter by multiple stuff, we do this multiple times, then check which numbers are common in every array, then ouput just those numbers.
 
-// then to filter by multiple stuff, we do this multiple times, then check which numbers are common in every array, then ouput just those numbers.
+// // lets run it on our data now;
+// const t0 = performance.now()
+// let sortedXVals = sortNumbers(data.x)
+// const t1 = performance.now()
+// let joeout = binarySearchNumberRange(sortedXVals, data.x, [0,0])
+// let spliced = filterSplice(sortedXVals, joeout[0], joeout[1]);
+// const t2 = performance.now()
+// console.log(`It took ${t1-t0}MS to sort the array, ${t2-t1}MS to search and splice. The output is:`)
+// console.log(spliced)
 
-// lets run it on our data now;
-const t0 = performance.now()
-let sortedXVals = sortNumbers(data.x)
-const t1 = performance.now()
-let joeout = binarySearchNumberRange(sortedXVals, data.x, [0,0])
-let spliced = filterSplice(sortedXVals, joeout[0], joeout[1]);
-const t2 = performance.now()
-console.log(`It took ${t1-t0}MS to sort the array, ${t2-t1}MS to search and splice. The output is:`)
-console.log(spliced)
-
-// interface SortedIndicesButNormal {
+// // interface SortedIndicesButNormal {
 //   ID: number[];
 //   storeName: number[];
 //   typeList: number[];
@@ -245,6 +243,37 @@ function storeSearch(
   console.log(t1 - t0);
   return outputData; 
 }
+
+function getIntersection(input: number[][]): number[]{
+  let hashTable: number [] = [];
+  let outputPtr = 0;
+  let output: number [] = [];
+  for (let i = 0; i < input.length; i++){
+    for (let j = 0; j < input[i].length; j++){
+     if(hashTable[input[i][j]] === undefined){
+        hashTable[input[i][j]] = 1;
+        continue;
+      } 
+        hashTable[input[i][j]]++;
+    }
+  }
+  const target = input.length;
+  for(let i = 0; i < input[0].length; i++){
+
+    if(hashTable[i] === target){
+      output[outputPtr] = i;
+      outputPtr++;
+    }
+  }
+  return output;
+}
+console.log(getIntersection([
+  [1,2,3],
+  [0,1,2],
+  [1,4,5]
+]));
+
+
 
 function hasMatchingParams(currentParam: string | number | undefined, targetParam: string | number | undefined): boolean{
   if (targetParam === undefined){
