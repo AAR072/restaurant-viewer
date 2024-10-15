@@ -260,7 +260,7 @@ function getIntersection(input: number[][]): number[]{
   const target = input.length;
   for(let i = 0; i < input[0].length; i++){
 
-    if(hashTable[i] === target){
+    if(hashTable[input[0][i]] === target){
       output[outputPtr] = i;
       outputPtr++;
     }

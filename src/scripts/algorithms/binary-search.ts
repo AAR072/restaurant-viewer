@@ -74,7 +74,64 @@ function filterStrings(data: string[], sortedIndices: Uint32Array, searchInput: 
   });
 }
 
-function getIntersections(...data: Uint32Array[]): number[] {
+function aliIntersection(...input: number[][]): number[]{
+  let hashTable: number [] = [];
+  let outputPtr = 0;
+  let output: number [] = [];
+  for (let i = 0; i < input.length; i++){
+    for (let j = 0; j < input[i].length; j++){
+     if(hashTable[input[i][j]] === undefined){
+        hashTable[input[i][j]] = 1;
+        continue;
+      } 
+        hashTable[input[i][j]]++;
+    }
+  }
+  const target = input.length;
+  const first = input[0]
+  for(let i = 0; i < first.length; i++){
+    let v = first[i];
+    if(hashTable[v] === target){
+      output[outputPtr] = v;
+      outputPtr++;
+    }
+  }
+  return output;
+}
+
+function shittyIntersection(...data: number[][]): number[] {
+  const dataSetCount = data.length;
+  const baseData = data[0];
+  const baseLength = baseData.length;
+
+  const hashTable: number[] = [];
+
+  const duplicates = [];
+  let dupePointer = 0;
+
+  for (let i = 0; i < dataSetCount; i++){
+    for (let j = 1; j < data[i].length; j++) {
+      if (data[i][j] == null) data[i][j] = 1;
+      else data[i][j]++;
+    }
+  }
+
+
+  const target = dataSetCount - 1;
+
+  for (let i = 0; i < baseLength; i++) {
+    const value = baseData[i];
+
+    if (hashTable[value] === target){
+      duplicates[dupePointer] = i;
+      dupePointer++;
+    }
+  }
+
+  return duplicates;
+}
+
+function sebIntersection(...data: number[][]): number[] {
   const existing: number[] = [];
   const setCount = data.length;
 
@@ -102,10 +159,10 @@ function getIntersections(...data: Uint32Array[]): number[] {
 }
 
 let t11 = performance.now();
-console.log(getIntersections(
-  new Uint32Array([0, 1, 2]),
-  new Uint32Array([1, 2, 3]),
-  new Uint32Array([2, 3, 4])
+console.log(aliIntersection(
+  [45, 46, 47],
+  [46, 47, 48],
+  [33, 22, 46]
 ));
 let t22 = performance.now();
-console.log("Above performance ^^^", t22 - t11);
+console.log("Performance 1 ^^^", t22 - t11);
