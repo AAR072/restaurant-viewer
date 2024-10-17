@@ -21,13 +21,12 @@ class HashTable {
 
 function getIntersections(data: Uint32Array[]): Uint32Array {
   const dataSetCount = data.length;
+  const requiredCount = dataSetCount - 1;
+
   const firstSet = data[0];
   const firstLength = firstSet.length;
 
-  const duplicateCount = new Array(100000);
-
-  const duplicates = [];
-  let dupePointer = 0;
+  const hashTable = new Array(100000);
 
   for (let i = 1; i < dataSetCount; i++) {
     const dataSet = data[i];
@@ -36,17 +35,18 @@ function getIntersections(data: Uint32Array[]): Uint32Array {
     for (let j = 0; j < setLength; j++) {
       const value = dataSet[j];
 
-      if (!duplicateCount[value]) duplicateCount[value] = 1;
-      else duplicateCount[value]++;
+      if (!hashTable[value]) hashTable[value] = 1;
+      else hashTable[value]++;
     }
   }
 
-  const requiredCount = dataSetCount - 1;
+  const duplicates: number[] = [];
+  let dupePointer = 0;
 
   for (let i = 0; i < firstLength; i++) {
     const value = firstSet[i];
 
-    if (duplicateCount[value] == requiredCount) {
+    if (hashTable[value] == requiredCount) {
       duplicates[dupePointer++] = value;
     }
   }

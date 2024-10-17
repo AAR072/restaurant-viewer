@@ -34,6 +34,8 @@ function getFiltered(indices: Uint32Array, filter: FilterCallback): Uint32Array 
   return (min >= 0 && max >= 0) ? getSubArray(indices, min, max) : new Uint32Array(0);
 }
 
+// Add method to filter numbers only specifying greater than x or less than x AND keep range filter
+
 function filterNumbers(data: number[], sortedIndices: Uint32Array, min: number, max: number): Uint32Array {
   return getFiltered(sortedIndices, (i: number) => {
     let value = data[i];
