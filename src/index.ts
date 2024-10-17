@@ -33,12 +33,28 @@ const sorted: SortedIndices = {
 }
 
 let t1 = performance.now();
-const filtered = filterNumbers(data.review, sorted.review, 4, 5);
+sorted.cost = sortNumbers(data.cost);
+
 let t2 = performance.now();
+const filtered = filterNumbers(data.review, sorted.review, 4, 5);
 
-console.log("Performance:", t2 - t1);
+let t3 = performance.now();
+const filtered2 = filterNumbers(data.cost, sorted.cost, 0, 10);
 
-function printStuff(reference: any[], indices: Uint32Array) {
+let t4 = performance.now();
+const intersections = getIntersections([filtered, filtered2]);
+
+let t5 = performance.now();
+const resorted = sortBy(intersections, sorted.storeName);
+let t6 = performance.now();
+
+console.log("Sort performance:", t2 - t1);
+console.log("Search performance 1:", t3 - t2);
+console.log("Search performance 2:", t4 - t3);
+console.log("Intersection performance:", t5 - t4);
+console.log("Resort performance:", t6 - t5);
+
+function printStuff(reference: any[], indices: Uint32Array | number[]) {
   let p = new Array(indices.length);
 
   for (let i = 0; i < indices.length; i++) {
@@ -48,5 +64,9 @@ function printStuff(reference: any[], indices: Uint32Array) {
   console.log(p);
 }
 
-printStuff(data.review, filtered);
 printStuff(data.review, sorted.review);
+printStuff(data.cost, sorted.cost);
+printStuff(data.review, filtered);
+printStuff(data.cost, filtered2);
+printStuff(data.review, intersections);
+printStuff(data.storeName, resorted);

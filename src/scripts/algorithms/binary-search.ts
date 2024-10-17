@@ -1,25 +1,17 @@
 type FilterCallback = (i: number) => number
 
-function filterSplice(indices: Uint32Array, min: number, max: number): Uint32Array {
-  const length = max - min + 1;
-  const results = new Uint32Array(length);
-
-  for (let i = 0; i < length; i++) {
-    results[i] = indices[min + i];
-  }
-
-  return results;
+// Returns sub array of existing array, starting and ending at new indices
+function getSubArray(indices: Uint32Array, min: number, max: number): Uint32Array {
+  return new Uint32Array(indices.buffer, min*Uint32Array.BYTES_PER_ELEMENT, max - min + 1);
 }
 
+// Returns the lowest/highest value which matches the applied filter
 function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: boolean): number {
   let low = 0;
   let high = indices.length - 1;
 
   while (low < high) {
-    let sum = low + high;
-    if (isMaximum) sum += 1;
-
-    const middle = floor(sum/2);
+    const middle = (low + high + (isMaximum ? 1 : 0)) >>> 1;
     const result = filter(indices[middle]);
 
     if (isMaximum) {
@@ -31,26 +23,22 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
     }
   }
 
-  if (filter(indices[low]) == 0) return low;
-  else return -1;
+  return filter(indices[low]) == 0 ? low : -1;
 }
 
+// Returns a spliced array of the values in the indices array that do match the filter
 function getFiltered(indices: Uint32Array, filter: FilterCallback): Uint32Array {
   const min = binarySearch(indices, filter, false);
   const max = binarySearch(indices, filter, true);
 
-  if (min < 0 || max < 0 || min > max) return new Uint32Array(0);
-
-  return filterSplice(indices, min, max);
+  return (min >= 0 && max >= 0) ? getSubArray(indices, min, max) : new Uint32Array(0);
 }
 
 function filterNumbers(data: number[], sortedIndices: Uint32Array, min: number, max: number): Uint32Array {
   return getFiltered(sortedIndices, (i: number) => {
     let value = data[i];
 
-    if (value >= min && value <= max) return 0;
-    else if (value > max) return 1;
-    else return -1;
+    return value < min ? -1 : (value > max ? 1 : 0);
   });
 }
 
@@ -73,96 +61,3 @@ function filterStrings(data: string[], sortedIndices: Uint32Array, searchInput: 
     return 0;
   });
 }
-
-function aliIntersection(...input: number[][]): number[]{
-  let hashTable: number [] = [];
-  let outputPtr = 0;
-  let output: number [] = [];
-  for (let i = 0; i < input.length; i++){
-    for (let j = 0; j < input[i].length; j++){
-     if(hashTable[input[i][j]] === undefined){
-        hashTable[input[i][j]] = 1;
-        continue;
-      } 
-        hashTable[input[i][j]]++;
-    }
-  }
-  const target = input.length;
-  const first = input[0]
-  for(let i = 0; i < first.length; i++){
-    let v = first[i];
-    if(hashTable[v] === target){
-      output[outputPtr] = v;
-      outputPtr++;
-    }
-  }
-  return output;
-}
-
-function shittyIntersection(...data: number[][]): number[] {
-  const dataSetCount = data.length;
-  const baseData = data[0];
-  const baseLength = baseData.length;
-
-  const hashTable: number[] = [];
-
-  const duplicates = [];
-  let dupePointer = 0;
-
-  for (let i = 0; i < dataSetCount; i++){
-    for (let j = 1; j < data[i].length; j++) {
-      if (data[i][j] == null) data[i][j] = 1;
-      else data[i][j]++;
-    }
-  }
-
-
-  const target = dataSetCount - 1;
-
-  for (let i = 0; i < baseLength; i++) {
-    const value = baseData[i];
-
-    if (hashTable[value] === target){
-      duplicates[dupePointer] = i;
-      dupePointer++;
-    }
-  }
-
-  return duplicates;
-}
-
-function sebIntersection(...data: number[][]): number[] {
-  const existing: number[] = [];
-  const setCount = data.length;
-
-  for (let i = 0; i < setCount; i++) {
-    for (let j = 0; j < data[i].length; j++) {
-      const val = data[i][j];
-      const current = existing[val];
-
-      if (current == null) existing[val] = 0;
-      else existing[val]++;
-    }
-  }
-
-  const common: number[] = [];
-  let pointer = 0;
-
-  existing.forEach((value: number, index: number) => {
-    if (value == setCount - 1) {
-      common[pointer] = index;
-      pointer++;
-    }
-  });
-
-  return common;
-}
-
-let t11 = performance.now();
-console.log(aliIntersection(
-  [45, 46, 47],
-  [46, 47, 48],
-  [33, 22, 46]
-));
-let t22 = performance.now();
-console.log("Performance 1 ^^^", t22 - t11);

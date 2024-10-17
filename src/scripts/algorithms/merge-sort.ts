@@ -1,49 +1,54 @@
 type CompareCallback = (a: number, b: number) => number
 
-// Sorting
-
-function merge<T>(arr: Uint32Array, low: number, mid: number, high: number, compare: CompareCallback) {
+function merge(arr: Uint32Array, low: number, mid: number, high: number, compare: CompareCallback) {
   const leftLength = mid - low + 1;
   const rightLength = high - mid;
-  const length = high - low + 1;
+  const length = leftLength + rightLength;
 
-  const left: number[] = new Array(leftLength);
-  const right: number[] = new Array(rightLength);
+  const temp = new Array(length);
 
-  for (let i = 0; i < leftLength; i++) left[i] = arr[low + i];
-  for (let i = 0; i < rightLength; i++) right[i] = arr[mid + 1 + i];
+  for (let i = 0; i < leftLength; i++) temp[i] = arr[low + i];
+  for (let i = 0; i < rightLength; i++) temp[leftLength + i] = arr[mid + 1 + i];
 
   let leftPoint = 0;
   let rightPoint = 0;
   let pointer = 0;
 
-  while (pointer < length) {
-    if (rightPoint >= rightLength || (leftPoint < leftLength && compare(left[leftPoint], right[rightPoint]) < 0)) {
-      // fix and understand this ^^^
-      arr[low + pointer] = left[leftPoint];
+  while (leftPoint < leftLength && rightPoint < rightLength) {
+    const left = temp[leftPoint];
+    const right = temp[leftLength + rightPoint];
+
+    if (compare(left, right) < 0) {
+      arr[low + pointer++] = left;
       leftPoint++;
 
     } else {
-      arr[low + pointer] = right[rightPoint];
+      arr[low + pointer++] = right;
       rightPoint++;
     }
+  }
 
-    pointer++;
+  while (leftPoint < leftLength) {
+    arr[low + pointer++] = temp[leftPoint++];
+  }
+
+  while (rightPoint < rightLength) {
+    arr[low + pointer++] = temp[leftLength + rightPoint++];
   }
 }
 
-function sort<T>(sorted: Uint32Array, left: number, right: number, compare: CompareCallback) {
+function sort(sorted: Uint32Array, left: number, right: number, compare: CompareCallback) {
   if (left >= right) {
     sorted[right] = right;
 
     return;
   }
 
-  const middle = floor(left + (right - left)/2);
+  const middle = (left + right) >>> 1;
 
-  sort<T>(sorted, left, middle, compare);
-  sort<T>(sorted, middle + 1, right, compare);
-  merge<T>(sorted, left, middle, right, compare);
+  sort(sorted, left, middle, compare);
+  sort(sorted, middle + 1, right, compare);
+  merge(sorted, left, middle, right, compare);
 }
 
 function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {

@@ -148,13 +148,13 @@ function binarySearchString(arr: number[], data: string [], val: string, isFindi
   if (isFindingLower) {
     while (low < high) {
       mid = floor((low + high) / 2);
-      if (data[arr[mid]].localeCompare(val) < 0) low = mid + 1;
+      if (data[arr[mid]].localeCompare(val) <= 0) low = mid + 1;
       else high = mid;
     }
   } else {
     while (low < high) {
       mid = floor((low + high + 1) / 2);
-      if (data[arr[mid]] > val) high = mid - 1;
+      if (data[arr[mid]].localeCompare(val) >= 0) high = mid - 1;
       else low = mid;
     }
   }
@@ -168,6 +168,11 @@ function binarySearchStringRange(arr: number[], data: string [], range: string [
   // we assume the input is [lower, upper]
   return [binarySearchString(arr, data, range[0], true), binarySearchString(arr, data, range[1], false)]
 }
+
+console.log(binarySearchStringRange([1, 0], [
+  "Nami Local Brewery",
+  "Nami Cantina Express"
+], ["Nami", "Nami"]));
 
 // // our sorted array that holds indices
 // let testSORTED = [3,0,1,2,4]
@@ -267,11 +272,11 @@ function getIntersection(input: number[][]): number[]{
   }
   return output;
 }
-console.log(getIntersection([
-  [1,2,3],
-  [0,1,2],
-  [1,4,5]
-]));
+// console.log(getIntersection([
+//   [1,2,3],
+//   [0,1,2],
+//   [1,4,5]
+// ]));
 
 
 
