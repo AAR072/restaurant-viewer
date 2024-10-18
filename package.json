@@ -7,7 +7,7 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/uyBfndVC)",
   "dependencies": {
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.4",
@@ -16,5 +16,8 @@
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
+  },
+  "directories": {
+    "test": "test"
   }
 }

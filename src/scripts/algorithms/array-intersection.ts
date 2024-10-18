@@ -19,7 +19,7 @@ class HashTable {
   }
 }
 
-function getIntersections(data: Uint32Array[]): Uint32Array {
+function getIntersections(...data: Uint32Array[]): Uint32Array {
   const dataSetCount = data.length;
   const requiredCount = dataSetCount - 1;
 
