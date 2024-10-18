@@ -66,12 +66,13 @@ function createResInfoElement(order: number, index: number) {
   search_results.appendChild(div);
 }
 
+let pageSize = 10;
+
 class SearchResult {
   public results: Uint32Array;
   public resultCount: number;
   public defaultSort: DataField;
   public page: number = 0;
-  public pageSize: number = 10;
   public pageCount: number;
   public descending: boolean = false;
 
@@ -79,7 +80,7 @@ class SearchResult {
     this.results = results;
     this.resultCount = results.length;
     this.defaultSort = defaultSort;
-    this.pageCount = Math.ceil(this.resultCount/this.pageSize);
+    this.pageCount = Math.ceil(this.resultCount/pageSize);
     this.loadPageInfo();
     this.loadResults();
     this.loadOrder();
@@ -97,8 +98,8 @@ class SearchResult {
   loadResults() {
     search_results.innerHTML = "";
 
-    for (let i = 0; i < this.pageSize; i++) {
-      const change = this.page*this.pageSize + i;
+    for (let i = 0; i < pageSize; i++) {
+      const change = this.page*pageSize + i;
       const current = this.descending ? this.resultCount - 1 - change : change;
   
       if (current >= this.resultCount || current < 0) break;
@@ -190,10 +191,9 @@ xy_search_button.addEventListener("click", () => {
   currentSearchResult = new SearchResult(finalResults, "x");
 });
 
-// let t1 = performance.now();
-// sorted.cost = sortNumbers(data.cost);
-
-// let t2 = performance.now();
+let t1 = performance.now();
+sorted.cost = sortNumbers(data.cost);
+let t2 = performance.now();
 // const filtered = filterNumbers(data.review, sorted.review, 4, 5);
 
 // let t3 = performance.now();
@@ -206,24 +206,24 @@ xy_search_button.addEventListener("click", () => {
 // const resorted = sortBy(intersections, sorted.storeName);
 // let t6 = performance.now();
 
-// console.log("Sort performance:", t2 - t1);
+console.log("Sort performance:", t2 - t1);
 // console.log("Search performance 1:", t3 - t2);
 // console.log("Search performance 2:", t4 - t3);
 // console.log("Intersection performance:", t5 - t4);
 // console.log("Resort performance:", t6 - t5);
 
-// function printStuff(reference: any[], indices: Uint32Array | number[]) {
-//   let p = new Array(indices.length);
+function printStuff(reference: any[], indices: Uint32Array | number[]) {
+  let p = new Array(indices.length);
 
-//   for (let i = 0; i < indices.length; i++) {
-//     p[i] = reference[indices[i]];
-//   }
+  for (let i = 0; i < indices.length; i++) {
+    p[i] = reference[indices[i]];
+  }
 
-//   console.log(p);
-// }
+  console.log(p);
+}
 
 // printStuff(data.review, sorted.review);
-// printStuff(data.cost, sorted.cost);
+printStuff(data.cost, sorted.cost);
 // printStuff(data.review, filtered);
 // printStuff(data.cost, filtered2);
 // printStuff(data.review, intersections);
