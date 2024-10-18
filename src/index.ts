@@ -8,8 +8,6 @@ interface Data {
   y: number[];
 }
 
-type DataField = keyof(Data);
-
 interface SortedIndices {
   ID: Uint32Array;
   storeName: Uint32Array;
@@ -19,6 +17,8 @@ interface SortedIndices {
   x: Uint32Array;
   y: Uint32Array;
 }
+
+type SortDataField = "storeName" | "cost" | "review";
 
 const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data;
 
@@ -40,6 +40,7 @@ const x_search_input = document.getElementById("x-search-input") as HTMLInputEle
 const y_search_input = document.getElementById("y-search-input") as HTMLInputElement;
 const xy_search_button = document.getElementById("xy-search-button") as HTMLButtonElement;
 
+const page_size_input = document.getElementById("page-size") as HTMLInputElement;
 const next_page_button = document.getElementById("next-page") as HTMLButtonElement;
 const prev_page_button = document.getElementById("prev-page") as HTMLButtonElement;
 const page_number_input = document.getElementById("page-number-input") as HTMLInputElement;
@@ -66,27 +67,42 @@ function createResInfoElement(order: number, index: number) {
   search_results.appendChild(div);
 }
 
-let pageSize = 10;
-
 class SearchResult {
+  static pageSize: number = 10;
+
   public results: Uint32Array;
   public resultCount: number;
-  public defaultSort: DataField;
+  public sorted: Uint32Array;
+  public defaultSort: string;
   public page: number = 0;
   public pageCount: number;
   public descending: boolean = false;
 
-  constructor(results: Uint32Array, defaultSort: DataField) {
+  constructor(results: Uint32Array, defaultSort: string) {
     this.results = results;
     this.resultCount = results.length;
     this.defaultSort = defaultSort;
-    this.pageCount = Math.ceil(this.resultCount/pageSize);
+    this.pageCount = Math.ceil(this.resultCount/SearchResult.pageSize);
     this.loadPageInfo();
     this.loadResults();
     this.loadOrder();
   }
 
+  changePageSize(n: number) {
+    n = clamp(n, 1, 100);
+
+    if (n == SearchResult.pageSize) return;
+
+    SearchResult.pageSize = n;
+    this.page = 0;
+    this.pageCount = Math.ceil(this.resultCount/SearchResult.pageSize);
+
+    this.loadPageInfo();
+    this.loadResults();
+  }
+
   loadPageInfo() {
+    page_size_input.value = String(SearchResult.pageSize);
     page_number_input.value = String(this.page + 1);
     page_count.innerText = String(this.pageCount == 0 ? 1 : this.pageCount);
   }
@@ -98,8 +114,8 @@ class SearchResult {
   loadResults() {
     search_results.innerHTML = "";
 
-    for (let i = 0; i < pageSize; i++) {
-      const change = this.page*pageSize + i;
+    for (let i = 0; i < SearchResult.pageSize; i++) {
+      const change = this.page*SearchResult.pageSize + i;
       const current = this.descending ? this.resultCount - 1 - change : change;
   
       if (current >= this.resultCount || current < 0) break;
@@ -130,6 +146,10 @@ class SearchResult {
     this.loadResults();
     this.loadOrder();
   }
+
+  sortBy() {
+
+  }
 }
 
 let currentSearchResult: SearchResult = new SearchResult(sorted.storeName, "storeName");
@@ -140,6 +160,16 @@ essentially every index is the actual restaurant index and every value is the or
 (reverse of current sorted indices)
 then get layout order for info divs through that array
 */
+
+page_size_input.addEventListener("keypress", (event: KeyboardEvent) => {
+  if (event.key == "Enter" && currentSearchResult) {
+    let input = Number(page_size_input.value);
+    
+    if (isNaN(input)) return;
+    
+    currentSearchResult.changePageSize(input);
+  }
+});
 
 next_page_button.addEventListener("click", () => {
   if (currentSearchResult) currentSearchResult.increment(1);
