@@ -60,6 +60,16 @@ function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
   return sorted;
 }
 
+function getOrderMap(sorted: Uint32Array) {
+  const orderMap = new Array(100000);
+
+  for (let i = 0; i < 100000; i++) {
+    orderMap[sorted[i]] = i;
+  }
+
+  return orderMap;
+}
+
 function sortNumbers(arr: number[]): Uint32Array {
   return sortArray<number>(arr, (a: number, b: number) => {
     return arr[a] - arr[b];

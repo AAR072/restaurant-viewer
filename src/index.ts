@@ -8,6 +8,8 @@ interface Data {
   y: number[];
 }
 
+type DataField = keyof(Data);
+
 interface SortedIndices {
   ID: Uint32Array;
   storeName: Uint32Array;
@@ -30,7 +32,6 @@ const sorted: SortedIndices = {
   y: sortNumbers(data.y)
 }
 
-const search_results = document.getElementById("search-results") as HTMLDivElement;
 const id_search_input = document.getElementById("id-search-input") as HTMLInputElement;
 const id_search_button = document.getElementById("id-search-button") as HTMLButtonElement;
 const name_search_input = document.getElementById("name-search-input") as HTMLInputElement;
@@ -41,6 +42,11 @@ const xy_search_button = document.getElementById("xy-search-button") as HTMLButt
 
 const next_page_button = document.getElementById("next-page") as HTMLButtonElement;
 const prev_page_button = document.getElementById("prev-page") as HTMLButtonElement;
+const page_number_input = document.getElementById("page-number-input") as HTMLInputElement;
+const page_count = document.getElementById("page-count") as HTMLSpanElement;
+
+const search_order = document.getElementById("search-results-order") as HTMLButtonElement;
+const search_results = document.getElementById("search-results") as HTMLDivElement;
 
 function createResInfoElement(order: number, index: number) {
   const div = document.createElement("div");
@@ -61,48 +67,71 @@ function createResInfoElement(order: number, index: number) {
 }
 
 class SearchResult {
+  public results: Uint32Array;
+  public resultCount: number;
+  public defaultSort: DataField;
   public page: number = 0;
   public pageSize: number = 10;
+  public pageCount: number;
+  public descending: boolean = false;
 
-  constructor(
-    public results: Uint32Array,
-    public resultCount: number = results.length
-  ) {
-    this.load();
+  constructor(results: Uint32Array, defaultSort: DataField) {
+    this.results = results;
+    this.resultCount = results.length;
+    this.defaultSort = defaultSort;
+    this.pageCount = Math.ceil(this.resultCount/this.pageSize);
+    this.loadPageInfo();
+    this.loadResults();
+    this.loadOrder();
   }
 
-  load() {
+  loadPageInfo() {
+    page_number_input.value = String(this.page + 1);
+    page_count.innerText = String(this.pageCount == 0 ? 1 : this.pageCount);
+  }
+
+  loadOrder() {
+    search_order.innerText = this.descending ? "Descending" : "Ascending";
+  }
+
+  loadResults() {
     search_results.innerHTML = "";
 
     for (let i = 0; i < this.pageSize; i++) {
-      const current = this.page*this.pageSize + i;
+      const change = this.page*this.pageSize + i;
+      const current = this.descending ? this.resultCount - 1 - change : change;
   
-      if (current >= this.resultCount) break;
+      if (current >= this.resultCount || current < 0) break;
   
       createResInfoElement(current, this.results[current]);
     }
   }
 
-  getPageCount() {
-    return (this.resultCount - this.resultCount % this.pageSize)/this.pageSize;
+  increment(amount: number) {
+    this.page = circleMod(this.page + amount, this.pageCount);
+
+    this.loadPageInfo();
+    this.loadResults();
   }
 
-  nextPage() {
-    if (this.page < this.getPageCount()) {
-      this.page++;
-      this.load();
-    }
+  setPage(n: number) {
+    n = clamp(n, 0, this.pageCount - 1);
+
+    if (n == this.page) return;
+
+    this.page = n;
+    this.loadPageInfo();
+    this.loadResults();
   }
 
-  prevPage() {
-    if (this.page > 0) {
-      this.page--;
-      this.load();
-    }
+  toggleOrder() {
+    this.descending = !this.descending;
+    this.loadResults();
+    this.loadOrder();
   }
 }
 
-let currentSearchResult: SearchResult
+let currentSearchResult: SearchResult = new SearchResult(sorted.storeName, "storeName");
 
 /*
 possible idea, create "html sort" arrays for each data type
@@ -112,11 +141,23 @@ then get layout order for info divs through that array
 */
 
 next_page_button.addEventListener("click", () => {
-  if (currentSearchResult) currentSearchResult.nextPage();
+  if (currentSearchResult) currentSearchResult.increment(1);
 });
 
 prev_page_button.addEventListener("click", () => {
-  if (currentSearchResult) currentSearchResult.prevPage();
+  if (currentSearchResult) currentSearchResult.increment(-1);
+});
+
+page_number_input.addEventListener("keypress", (event: KeyboardEvent) => {
+  if (event.key == "Enter" && currentSearchResult) {
+    const input = Number(page_number_input.value);
+
+    if (!isNaN(input)) currentSearchResult.setPage(input - 1);
+  }
+});
+
+search_order.addEventListener("click", () => {
+  if (currentSearchResult) currentSearchResult.toggleOrder();
 });
 
 id_search_button.addEventListener("click", () => {
@@ -125,7 +166,7 @@ id_search_button.addEventListener("click", () => {
   const results = filterStrings(data.ID, sorted.ID, input);
   const sortedResults = sortBy(results, sorted.storeName);
 
-  currentSearchResult = new SearchResult(sortedResults);
+  currentSearchResult = new SearchResult(sortedResults, "ID");
 });
 
 name_search_button.addEventListener("click", () => {
@@ -133,7 +174,7 @@ name_search_button.addEventListener("click", () => {
 
   const results = filterStrings(data.storeName, sorted.storeName, input);
 
-  currentSearchResult = new SearchResult(results);
+  currentSearchResult = new SearchResult(results, "storeName");
 });
 
 xy_search_button.addEventListener("click", () => {
@@ -146,7 +187,7 @@ xy_search_button.addEventListener("click", () => {
   const yResults = filterNumbers(data.y, sorted.y, yInput, yInput);
   const finalResults = getIntersections(xResuslts, yResults);
 
-  currentSearchResult = new SearchResult(finalResults);
+  currentSearchResult = new SearchResult(finalResults, "x");
 });
 
 // let t1 = performance.now();

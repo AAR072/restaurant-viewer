@@ -57,7 +57,7 @@ function getIntersections(...data: Uint32Array[]): Uint32Array {
 // Sorts array of indices based on order of given sorted indices array
 function sortBy(indices: Uint32Array, sortedIndices: Uint32Array): Uint32Array {
   const length = indices.length;
-  const existing: boolean[] = [];
+  const existing: boolean[] = new Array(100000);
 
   for (let i = 0; i < length; i++) {
     existing[indices[i]] = true;
