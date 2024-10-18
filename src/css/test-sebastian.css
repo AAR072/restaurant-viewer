@@ -13,6 +13,13 @@ body {
   flex: 1;
 }
 
+.group-div {
+  background-color: cornsilk;
+  border: 1px solid black;
+  margin: 10px;
+  padding: 10px;
+}
+
 canvas {
   background-color: red;
   height: 100%;

@@ -51,7 +51,7 @@ function sort(sorted: Uint32Array, left: number, right: number, compare: Compare
   merge(sorted, left, middle, right, compare);
 }
 
-function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
+function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compare: CompareCallback): Uint32Array {
   const length = arr.length;
   const sorted = new Uint32Array(length);
 
@@ -60,14 +60,14 @@ function sortArray<T>(arr: T[], compare: CompareCallback): Uint32Array {
   return sorted;
 }
 
-function sortNumbers(arr: number[]): Uint32Array {
-  return sortArray<number>(arr, (a: number, b: number) => {
+function sortNumbers(arr: number[] | Uint32Array | Float32Array): Uint32Array {
+  return sortArray(arr, (a: number, b: number) => {
     return arr[a] - arr[b];
   });
 }
 
 function sortStrings(arr: string[]): Uint32Array {
-  return sortArray<string>(arr, (a: number, b: number) => {
+  return sortArray(arr, (a: number, b: number) => {
     return arr[a].localeCompare(arr[b]);
   });
 }

@@ -8,7 +8,7 @@ interface Data {
   y: number[];
 }
 
-interface SortedIndices {
+interface SortedData {
   ID: Uint32Array;
   storeName: Uint32Array;
   type: {[key: string]: number[]};
@@ -18,11 +18,15 @@ interface SortedIndices {
   y: Uint32Array;
 }
 
+interface SortMap {
+
+}
+
 type SortDataField = "storeName" | "cost" | "review";
 
 const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data;
 
-const sorted: SortedIndices = {
+const sorted: SortedData = {
   ID: sortStrings(data.ID),
   storeName: sortStrings(data.storeName),
   type: {},
@@ -31,6 +35,68 @@ const sorted: SortedIndices = {
   x: sortNumbers(data.x),
   y: sortNumbers(data.y)
 }
+
+class Sorter {
+  // do sort methods here and log/display them
+}
+
+class App {
+  public data: Data;
+  public sorted: SortedData;
+  public sortMap: SortMap;
+
+  public locationX: number = 0;
+  public locationY: number = 0;
+  public distance: Float32Array = new Float32Array(100000);
+  public sortedDistance: Uint32Array;
+
+  constructor(data: Data) {
+    this.data = data;
+
+    this.sorted = {
+      ID: sortStrings(data.ID),
+      storeName: sortStrings(data.storeName),
+      type: {},
+      cost: sortNumbers(data.cost),
+      review: sortNumbers(data.review),
+      x: sortNumbers(data.x),
+      y: sortNumbers(data.y)
+    };
+
+    this.sortMap = {
+      storeName: getOrderMap(this.sorted.storeName)
+    };
+
+    let t1 = performance.now();
+    let test = getOrderMap(this.sorted.cost);
+    let t2 = performance.now();
+    console.log("ORDER MAP PERFORMANCE", t2 - t1);
+
+    this.updateDistance();
+  }
+
+  updateDistance() {
+    for (let i = 0; i < 100000; i++) {
+      const xDist = this.locationX - data.x[i];
+      const yDist = this.locationY - data.y[i];
+
+      this.distance[i] = Math.sqrt(xDist**2 + yDist**2);
+    }
+
+    console.log(this.data.x, this.data.y, this.distance);
+
+    this.sortedDistance = sortNumbers(this.distance);
+  }
+
+  changeLocation(x: number, y: number) {
+    this.locationX = x;
+    this.locationY = y;
+
+    this.updateDistance();
+  }
+}
+
+new App(data);
 
 const id_search_input = document.getElementById("id-search-input") as HTMLInputElement;
 const id_search_button = document.getElementById("id-search-button") as HTMLButtonElement;
@@ -85,7 +151,6 @@ class SearchResult {
     this.pageCount = Math.ceil(this.resultCount/SearchResult.pageSize);
     this.loadPageInfo();
     this.loadResults();
-    this.loadOrder();
   }
 
   changePageSize(n: number) {
@@ -107,11 +172,8 @@ class SearchResult {
     page_count.innerText = String(this.pageCount == 0 ? 1 : this.pageCount);
   }
 
-  loadOrder() {
-    search_order.innerText = this.descending ? "Descending" : "Ascending";
-  }
-
   loadResults() {
+    search_order.innerText = this.descending ? "Descending" : "Ascending";
     search_results.innerHTML = "";
 
     for (let i = 0; i < SearchResult.pageSize; i++) {
@@ -144,7 +206,6 @@ class SearchResult {
   toggleOrder() {
     this.descending = !this.descending;
     this.loadResults();
-    this.loadOrder();
   }
 
   sortBy() {
@@ -220,6 +281,10 @@ xy_search_button.addEventListener("click", () => {
 
   currentSearchResult = new SearchResult(finalResults, "x");
 });
+
+class DisplayMap {
+
+}
 
 let t1 = performance.now();
 sorted.cost = sortNumbers(data.cost);
