@@ -1,4 +1,5 @@
 type FilterCallback = (i: number) => number
+
 /**
  * Returns a subarray of an existing array, starting and ending at new indices.
  *

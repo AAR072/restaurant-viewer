@@ -1,4 +1,5 @@
 type CompareCallback = (a: number, b: number) => number
+
 /**
  * Merges two halves of a subarray of `arr` based on the comparison logic provided by `compare`.
  *
