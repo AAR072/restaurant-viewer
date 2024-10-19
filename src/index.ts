@@ -345,22 +345,56 @@ class SearchResult {
    */
   createRestaurauntInfo(order: number, index: number) {
     const div = document.createElement("div"); // Create a new div for the restaurant info.
-    const p = document.createElement("p"); // Create a new paragraph element for details.
+    
+    // Create a new paragraph element for details
+    const p = document.createElement("p");
+    
+    // Create individual spans for each piece of information
+    const resultSpan = document.createElement("span");
+    resultSpan.innerText = `Result #${order + 1}`;
+    resultSpan.classList.add("font-bold", "text-xl", "block", "mb-2"); // Bold and larger text
 
-    // Format and set the inner text with restaurant details.
-    p.innerText = `
-    Result #${order + 1}\n
-    ID: ${this.app.data.ID[index]}\n
-    Name: ${this.app.data.storeName[index]}\n
-    Type: ${this.app.data.type[index]}\n
-    Cost: $${this.app.data.cost[index].toFixed(2)}\n
-    Review: ${this.app.data.review[index].toFixed(1)}\n
-    Position: (x: ${this.app.data.x[index]}, y: ${this.app.data.y[index]})
-    `;
+    const idSpan = document.createElement("span");
+    idSpan.innerText = `ID: ${this.app.data.ID[index]}`;
+    idSpan.classList.add("font-medium", "text-gray-300", "block"); // Medium font weight with light gray
+
+    const nameSpan = document.createElement("span");
+    nameSpan.innerText = `Name: ${this.app.data.storeName[index]}`;
+    nameSpan.classList.add("font-semibold", "text-gray-200", "block"); // Semibold font weight
+
+    const typeSpan = document.createElement("span");
+    typeSpan.innerText = `Type: ${this.app.data.type[index]}`;
+    typeSpan.classList.add("font-light", "text-gray-400", "block"); // Light font weight
+
+    const costSpan = document.createElement("span");
+    costSpan.innerText = `Cost: $${this.app.data.cost[index].toFixed(2)}`;
+    costSpan.classList.add("font-bold", "text-green-400", "block"); // Bold with green text
+
+    const reviewSpan = document.createElement("span");
+    reviewSpan.innerText = `Review: ${this.app.data.review[index].toFixed(1)}`;
+    reviewSpan.classList.add("font-semibold", "text-blue-400", "block"); // Semibold with blue text
+
+    const positionSpan = document.createElement("span");
+    positionSpan.innerText = `Position: (x: ${this.app.data.x[index]}, y: ${this.app.data.y[index]})`;
+    positionSpan.classList.add("font-medium", "text-gray-300", "block"); // Medium font weight
+
+    // Append spans to the paragraph
+    p.appendChild(resultSpan);
+    p.appendChild(idSpan);
+    p.appendChild(nameSpan);
+    p.appendChild(typeSpan);
+    p.appendChild(costSpan);
+    p.appendChild(reviewSpan);
+    p.appendChild(positionSpan);
+
+    // Add classes for the main div
+    div.classList.add("bg-gray-800", "border", "border-gray-700", "rounded", "p-4", "mb-4", "shadow-md");
 
     div.appendChild(p); // Append paragraph to div.
     search_results.appendChild(div); // Append div to results container.
-  }
+}
+
+
 
   /**
    * Loads the results for the current page and updates the UI.
