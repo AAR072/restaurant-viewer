@@ -11,48 +11,66 @@
   <div class="outer-container">
     <div class="inner-container">
       <div class="group-div">
+        <h2>Search</h2>
+
         <input id="id-search-input" placeholder="ID"/>
         <button id="id-search-button" type="button">Search</button>
         <br>
+
         <input id="name-search-input" placeholder="Name"/>
         <button id="name-search-button" type="button">Search</button>
         <br>
+
         <input id="x-search-input" placeholder="X"/>
         <input id="y-search-input" placeholder="Y"/>
         <button id="xy-search-button" type="button">Search</button>
       </div>
 
       <div class="group-div">
-        <label for="filter-type">Filter Type: </label>
-        <select id="filter-type" name="type">
-          <option value="">None</option>
-          <option value="burger">Burger</option>
-        </select>
+        <h2>Filter</h2>
 
+        <label for="type-filter">Cuisine Type:</label>
+        <select id="type-filter" name="type">
+          <option value="">Any</option>
+        </select>
         <br>
 
-        <select name="">
-          <option value="type">Type</option>
-          <option value="price">Price</option>
-          <option value="review">Review</option>
-          <option value="distance"></option>
+        <label for="price-filter">Price:</label><span></span>
+        <select name="price-filter">
+          <option value="">None</option>
+          <option value="less">Less Than</option>
+          <option value="range">In Range</option>
+        </select>
+        <br>
+
+        <label for="review-filter">Review Filter</label>
+        <select name="review-filter">
+          <option value="">None</option>
+          <option value="greater">Greater Than</option>
+          <option value="range">In Range</option>
         </select>
       </div>
       
       <div class="group-div">
+        <h2>Sort</h2>
+
         <label for="sort-select">Sort By</label>
         <select id="sort-select" name="Sort By" value="storeName">
           <option value="storeName">Name</option>
           <option value="price">Price</option>
           <option value="review">Review</option>
         </select>
-        <br>
-        <button id="search-results-order"></button>
+        <button id="search-results-order">Ascending</button>
       </div>
 
       <div class="group-div">
-        <label for="page-size">Page Size: </label><input id="page-size" placeholder="(1 - 100)"/>
-        <p>Page <input id="page-number-input"/>/<span id="page-count"></span></p>
+        <h2>Browse</h2>
+
+        <label for="page-size">Page Size: </label>
+        <input id="page-size" placeholder="(1 - 100)" value="0"/>
+        
+        <p>Page <input id="page-number-input" value="0"/>/<span id="page-count">0</span></p>
+
         <button id="next-page">Next Page</button>
         <button id="prev-page">Previous Page</button>
       </div>

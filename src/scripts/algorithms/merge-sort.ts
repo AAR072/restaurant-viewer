@@ -51,33 +51,36 @@ function sort(sorted: Uint32Array, left: number, right: number, compare: Compare
   merge(sorted, left, middle, right, compare);
 }
 
-function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compare: CompareCallback): Uint32Array {
+function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compare: CompareCallback, sorted?: Uint32Array): Uint32Array {
   const length = arr.length;
-  const sorted = new Uint32Array(length);
+
+  if (sorted == null) sorted = new Uint32Array(length);
 
   sort(sorted, 0, length - 1, compare);
 
   return sorted;
 }
 
-function sortNumbers(arr: number[] | Uint32Array | Float32Array): Uint32Array {
-  return sortArray(arr, (a: number, b: number) => {
-    return arr[a] - arr[b];
-  });
+function sortNumbers(data: number[] | Uint32Array | Float32Array, outSorted?: Uint32Array): Uint32Array {
+  return sortArray(data, (a: number, b: number) => {
+    return data[a] - data[b];
+  }, outSorted);
 }
 
-function sortStrings(arr: string[]): Uint32Array {
-  return sortArray(arr, (a: number, b: number) => {
-    return arr[a].localeCompare(arr[b]);
-  });
+function sortStrings(data: string[], outSorted?: Uint32Array): Uint32Array {
+  return sortArray(data, (a: number, b: number) => {
+    return data[a].localeCompare(data[b]);
+  }, outSorted);
 }
 
-function getOrderMap(sorted: Uint32Array) {
-  const orderMap = new Array(100000);
+function getSortOrders(sorted: Uint32Array, outOrders?: Uint32Array) {
+  const length = sorted.length;
 
-  for (let i = 0; i < 100000; i++) {
-    orderMap[sorted[i]] = i;
+  if (outOrders == null) outOrders = new Uint32Array(length);
+
+  for (let i = 0; i < length; i++) {
+    outOrders[sorted[i]] = i;
   }
 
-  return orderMap;
+  return outOrders;
 }
