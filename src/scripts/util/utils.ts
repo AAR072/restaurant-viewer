@@ -15,11 +15,13 @@ function floor(n: number) {
  *
  * @param {number} n - The number to compute the modulo of.
  * @param {number} base - The base to use for the modulo operation.
- * @return {number} - The result of `n` modulo `base`, adjusted for negative values to remain positive.
+ * @return {number} The result of `n` modulo `base`, adjusted for negative values to remain positive.
  * 
  * @timecomplexity O(1) - The modulo and comparison operations are constant time.
  */
 function circleMod(n: number, base: number) {
+  if (base == 0) return 0;
+
   n %= base;
 
   return n < 0 ? n + base : n;

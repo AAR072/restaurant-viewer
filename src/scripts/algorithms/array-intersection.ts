@@ -49,7 +49,7 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     }
   }
 
-  if (sortBy) {
+  if (sortBy && duplicates.length > 1) {
     const length = duplicates.length;
     const sorted = new Uint32Array(length);
     let sortedPointer = 0;

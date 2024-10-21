@@ -331,7 +331,7 @@ class SearchResult {
 
   static fromCoords(app: App, x: number, y: number): SearchResult {
     const resultsX = filterNumbers(app.data.x, app.sorted.x, x, x);
-    const resultsY = filterNumbers(app.data.y, app.sorted.y, x, x);
+    const resultsY = filterNumbers(app.data.y, app.sorted.y, y, y);
     const sortedIntersections = getIntersections([resultsX, resultsY], App.restaurantCount, app.sorted.storeName);
 
     return new SearchResult(app, sortedIntersections);
