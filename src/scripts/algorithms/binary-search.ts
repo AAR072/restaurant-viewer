@@ -29,6 +29,7 @@ function getSubArray(indices: Uint32Array, min: number, max: number): Uint32Arra
  * @timecomplexity O(log n) - The function performs a binary search, dividing the search space in half with each iteration.
  */
 function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: boolean): number {
+  const t0 = performance.now();
   let low = 0;
   let high = indices.length - 1;
 
@@ -44,7 +45,8 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
       else high = middle;
     }
   }
-
+  const t1 = performance.now();
+  console.log(`Preformed Binary Search in ${t1-t0}ms`)
   return filter(indices[low]) == 0 ? low : -1;
 }
 
