@@ -1,7 +1,7 @@
 type CompareCallback = (a: number, b: number) => number
 
 /**
- * Merges two halves of a subarray of `arr` based on the comparison logic provided by `compare`.
+ * Merges two halves of array `arr` based on the comparison logic provided by `compare`.
  *
  * @param {Uint32Array} arr - The array being sorted.
  * @param {number} low - The starting index of the first half.
@@ -63,6 +63,7 @@ function merge(arr: Uint32Array, low: number, mid: number, high: number, compare
 function sort(sorted: Uint32Array, left: number, right: number, compare: CompareCallback) {
   if (left >= right) {
     sorted[right] = right;
+
     return;
   }
 
@@ -79,7 +80,7 @@ function sort(sorted: Uint32Array, left: number, right: number, compare: Compare
  * @param {(number | string)[] | Uint32Array | Float32Array} arr - The array of data to sort.
  * @param {CompareCallback} compare - A callback that compares two elements.
  * @param {Uint32Array} [sorted] - An optional array to store the sorted indices.
- * @return {Uint32Array} - A new `Uint32Array` containing the sorted indices of `arr`.
+ * @returns {Uint32Array} A new `Uint32Array` containing the sorted indices of `arr`.
  * 
  * @timecomplexity O(n log n) - The function calls `sort`, which uses merge sort (O(n log n)).
  */
@@ -98,7 +99,7 @@ function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compar
  *
  * @param {number[] | Uint32Array | Float32Array} data - The array of numbers to sort.
  * @param {Uint32Array} [outSorted] - An optional array to store the sorted indices.
- * @return {Uint32Array} - A `Uint32Array` containing the sorted indices of `data`.
+ * @returns {Uint32Array} A `Uint32Array` containing the sorted indices of `data`.
  * 
  * @timecomplexity O(n log n) - The function uses `sortArray`, which internally calls merge sort (O(n log n)).
  */
@@ -113,7 +114,7 @@ function sortNumbers(data: number[] | Uint32Array | Float32Array, outSorted?: Ui
  *
  * @param {string[]} data - The array of strings to sort.
  * @param {Uint32Array} [outSorted] - An optional array to store the sorted indices.
- * @return {Uint32Array} - A `Uint32Array` containing the sorted indices of `data`.
+ * @returns {Uint32Array} A `Uint32Array` containing the sorted indices of `data`.
  * 
  * @timecomplexity O(n log n) - The function uses `sortArray`, which internally calls merge sort (O(n log n)).
  */
@@ -129,7 +130,7 @@ function sortStrings(data: string[], outSorted?: Uint32Array): Uint32Array {
  *
  * @param {Uint32Array} sorted - The array of sorted indices.
  * @param {Uint32Array} [outOrders] - An optional array to store the sorted order.
- * @return {Uint32Array} - An array where each value corresponds to the position of the element in the sorted order.
+ * @returns {Uint32Array} A `Uint32Array` where each value corresponds to the position of the element in the sorted order.
  * 
  * @timecomplexity O(n) - This function performs a single loop through the `sorted` array (O(n)).
  */
