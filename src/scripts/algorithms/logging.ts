@@ -1,5 +1,6 @@
 /**
  * Logs a task and appends the task details to a specified div element on the page.
+ * Each task will be removed from the DOM after 5 seconds.
  *
  * @param {string} name - The name of the task to be logged.
  * @param {number} time - The time spent on the task, in milliseconds.
@@ -42,4 +43,9 @@ function logTask(name: string, time: number, timestamp: number, description: str
 
     // Append the taskDiv to the target div
     targetDiv.appendChild(taskDiv);
+
+    // Remove the task after 5 seconds
+    setTimeout(() => {
+        targetDiv.removeChild(taskDiv);
+    }, 5000);
 }

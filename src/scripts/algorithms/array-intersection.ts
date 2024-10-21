@@ -8,6 +8,7 @@
  * @timecomplexity O(n * m) - Where `n` is the length of the largest array and `m` is the number of arrays. We iterate through all elements of each array (O(n * m)) and use a hash table for lookup (O(1)).
  */
 function getIntersections(data: (Uint32Array | number[])[], indexRange: number, sortBy?: Uint32Array): Uint32Array {
+  const t0 = performance.now();
   const dataSetCount = data.length;
   const requiredCount = dataSetCount - 1;
 
@@ -59,13 +60,36 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
 
       if (hashTable[value]) sorted[sortedPointer++] = value;
     }
-
+    const t1 = performance.now();
+    logTask(
+      "Get Intersections", 
+      t1-t0, Date.now(), 
+      `Found intersection in an array and sorted with custom parameters`, 
+      "taskContainer"
+    );
     return sorted;
   }
-
+  const t2 = performance.now();
+  logTask(
+    "Get Intersections", 
+    t2-t0, Date.now(), 
+    `Found intersection in an array`, 
+    "taskContainer"
+  );
   return new Uint32Array(duplicates);
 }
 
+/**
+ * Sorts the elements of the `indices` array according to the order defined by `sortedIndices`. 
+ * It returns a new `Uint32Array` with elements of `indices` sorted based on their appearance in `sortedIndices`.
+ *
+ * @param {Uint32Array | number[]} indices - The array of indices to be sorted.
+ * @param {number} indexRange - The size of the range that elements in `indices` and `sortedIndices` can take. This value helps initialize the hash table.
+ * @param {Uint32Array} sortedIndices - The reference array which defines the desired order of the `indices` array elements.
+ * @returns {Uint32Array} A new `Uint32Array` with elements of `indices` sorted based on `sortedIndices`.
+ * 
+ * @timecomplexity O(n + m) - Where `n` is the length of the `indices` array and `m` is the length of `sortedIndices`. The hash table lookup for each element is O(1).
+ */
 function sortBy(indices: Uint32Array | number[], indexRange: number, sortedIndices: Uint32Array): Uint32Array {
   const length = indices.length;
   const hashTable: boolean[] = new Array(indexRange);

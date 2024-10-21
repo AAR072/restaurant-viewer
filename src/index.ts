@@ -1,25 +1,25 @@
 // We link all our html elements here.
 // #region html elements
-const id_search_input = document.getElementById("id-search-input") as HTMLInputElement;
-const id_search_button = document.getElementById("id-search-button") as HTMLButtonElement;
-const name_search_input = document.getElementById("name-search-input") as HTMLInputElement;
-const name_search_button = document.getElementById("name-search-button") as HTMLButtonElement;
-const x_search_input = document.getElementById("x-search-input") as HTMLInputElement;
-const y_search_input = document.getElementById("y-search-input") as HTMLInputElement;
-const xy_search_button = document.getElementById("xy-search-button") as HTMLButtonElement;
+const ID_SEARCH_INPUT = document.getElementById("id-search-input") as HTMLInputElement;
+const ID_SEARCH_BUTTON = document.getElementById("id-search-button") as HTMLButtonElement;
+const NAME_SEARCH_INPUT = document.getElementById("name-search-input") as HTMLInputElement;
+const NAME_SEARCH_BUTTON = document.getElementById("name-search-button") as HTMLButtonElement;
+const X_SEARCH_INPUT = document.getElementById("x-search-input") as HTMLInputElement;
+const Y_SEARCH_INPUT = document.getElementById("y-search-input") as HTMLInputElement;
+const XY_SEARCH_BUTTON = document.getElementById("xy-search-button") as HTMLButtonElement;
 
-const type_select = document.getElementById("type-filter") as HTMLSelectElement;
+const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
 
-const sort_select = document.getElementById("sort-select") as HTMLSelectElement;
-const sort_direction = document.getElementById("sort-direction") as HTMLButtonElement;
+const SORT_SELECT = document.getElementById("sort-select") as HTMLSelectElement;
+const SORT_DIRECTION = document.getElementById("sort-direction") as HTMLButtonElement;
 
-const page_size_input = document.getElementById("page-size") as HTMLInputElement;
-const next_page_button = document.getElementById("next-page") as HTMLButtonElement;
-const prev_page_button = document.getElementById("prev-page") as HTMLButtonElement;
-const page_number_input = document.getElementById("page-number-input") as HTMLInputElement;
-const page_count = document.getElementById("page-count") as HTMLSpanElement;
+const PAGE_SIZE_INPUT = document.getElementById("page-size") as HTMLInputElement;
+const NEXT_PAGE_BUTTON = document.getElementById("next-page") as HTMLButtonElement;
+const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonElement;
+const PAGE_NUMBER_INPUT = document.getElementById("page-number-input") as HTMLInputElement;
+const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
-const search_results = document.getElementById("search-results") as HTMLDivElement;
+const SEARCH_RESULTS = document.getElementById("search-results") as HTMLDivElement;
 // #endregion
 
 // Our input database which is used when initializing our data
@@ -135,7 +135,7 @@ class App {
     option.innerText = name;
     option.value = name;
 
-    type_select.appendChild(option);
+    TYPE_SELECT.appendChild(option);
   }
 
   /**
@@ -203,29 +203,29 @@ class App {
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
   initInput() {
-    id_search_button.addEventListener("click", () => {
-      this.currentSearch = SearchResult.fromID(this, id_search_input.value);
+    ID_SEARCH_BUTTON.addEventListener("click", () => {
+      this.currentSearch = SearchResult.fromID(this, ID_SEARCH_INPUT.value);
     });
 
-    name_search_button.addEventListener("click", () => {
-      this.currentSearch = SearchResult.fromName(this, name_search_input.value);
+    NAME_SEARCH_BUTTON.addEventListener("click", () => {
+      this.currentSearch = SearchResult.fromName(this, NAME_SEARCH_INPUT.value);
     });
 
-    xy_search_button.addEventListener("click", () => {
-      const xInput = Number(x_search_input.value);
-      const yInput = Number(y_search_input.value);
+    XY_SEARCH_BUTTON.addEventListener("click", () => {
+      const xInput = Number(X_SEARCH_INPUT.value);
+      const yInput = Number(Y_SEARCH_INPUT.value);
 
       if (isNaN(xInput) || isNaN(yInput)) return;
 
       this.currentSearch = SearchResult.fromCoords(this, xInput, yInput);
     });
 
-    type_select.addEventListener("input", () => {
-      this.currentSearch.setTypeFilter(type_select.value);
+    TYPE_SELECT.addEventListener("input", () => {
+      this.currentSearch.setTypeFilter(TYPE_SELECT.value);
     });
 
-    sort_select.addEventListener("input", () => {
-      const value = sort_select.value as SortFieldType;
+    SORT_SELECT.addEventListener("input", () => {
+      const value = SORT_SELECT.value as SortFieldType;
 
       if (value == "review") this.currentSearch.toggleDirection(); // set to descending
       else this.currentSearch.toggleDirection(); // otherwise set to ascending
@@ -233,27 +233,27 @@ class App {
       this.currentSearch.changeSort(value as SortFieldType);
     });
 
-    sort_direction.addEventListener("click", () => {
+    SORT_DIRECTION.addEventListener("click", () => {
       this.currentSearch.toggleDirection();
     });
 
-    page_size_input.addEventListener("input", () => {
-      let input = Number(page_size_input.value);
+    PAGE_SIZE_INPUT.addEventListener("input", () => {
+      let input = Number(PAGE_SIZE_INPUT.value);
       
       if (!isNaN(input)) this.currentSearch.changePageSize(input);
     });
 
-    next_page_button.addEventListener("click", () => {
+    NEXT_PAGE_BUTTON.addEventListener("click", () => {
       this.currentSearch.incrementPage(1);
     });
 
-    prev_page_button.addEventListener("click", () => {
+    PREV_PAGE_BUTTON.addEventListener("click", () => {
       this.currentSearch.incrementPage(-1);
     });
 
-    page_number_input.addEventListener("keypress", (event: KeyboardEvent) => {
+    PAGE_NUMBER_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
       if (event.key == "Enter") {
-        const input = Number(page_number_input.value);
+        const input = Number(PAGE_NUMBER_INPUT.value);
 
         if (!isNaN(input)) this.currentSearch.setPage(input - 1);
       }
@@ -540,7 +540,7 @@ class SearchResult {
     div.classList.add("bg-gray-800", "border", "border-gray-700", "rounded", "p-4", "mb-4", "shadow-md");
 
     div.appendChild(p); // Append paragraph to div.
-    search_results.appendChild(div); // Append div to results container.
+    SEARCH_RESULTS.appendChild(div); // Append div to results container.
   }
 
   /**
@@ -549,12 +549,12 @@ class SearchResult {
    * @timecomplexity O(n) - Where n is the page size. The method loops through the page size to load results, hence linear time.
    */
   public displayUpdate() {
-    page_size_input.value = String(SearchResult.pageSize); // Update page size input.
-    page_number_input.value = String(this.page + 1); // Update current page number (1-based index).
-    page_count.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
+    PAGE_SIZE_INPUT.value = String(SearchResult.pageSize); // Update page size input.
+    PAGE_NUMBER_INPUT.value = String(this.page + 1); // Update current page number (1-based index).
+    PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
 
-    sort_direction.innerText = this.descending ? "Descending" : "Ascending"; // Update sort order display.
-    search_results.innerHTML = ""; // Clear previous results.
+    SORT_DIRECTION.innerText = this.descending ? "Descending" : "Ascending"; // Update sort order display.
+    SEARCH_RESULTS.innerHTML = ""; // Clear previous results.
 
     // Loop through the number of results per page and load them.
     for (let i = 0; i < SearchResult.pageSize; i++) {

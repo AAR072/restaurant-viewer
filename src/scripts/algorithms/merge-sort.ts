@@ -85,12 +85,17 @@ function sort(sorted: Uint32Array, left: number, right: number, compare: Compare
  * @timecomplexity O(n log n) - The function calls `sort`, which uses merge sort (O(n log n)).
  */
 function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compare: CompareCallback, sorted?: Uint32Array): Uint32Array {
+  const t0 = performance.now();
   const length = arr.length;
 
   if (sorted == null) sorted = new Uint32Array(length);
 
   sort(sorted, 0, length - 1, compare);
 
+  const t1 = performance.now();
+  const date = Date.now();
+  const description = `Sorted an array of ${typeof arr[0]}s`; 
+  logTask("Sorted Array", t1-t0, date, description, "taskContainer");
   return sorted;
 }
 
