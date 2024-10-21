@@ -39,14 +39,23 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
 
     if (isMaximum) {
       if (result > 0) high = middle - 1;
-      else low = middle;
+        else low = middle;
     } else {
       if (result < 0) low = middle + 1;
-      else high = middle;
+        else high = middle;
     }
   }
   const t1 = performance.now();
-  console.log(`Preformed Binary Search in ${t1-t0}ms`)
+
+  const date = new Date();
+
+  // Building a description that includes the parameters of the binary search
+  const searchDescription = `
+Searched for ${isMaximum ? 'maximum' : 'minimum'} index that matches the filter.
+`;
+
+  logTask("Binary Search", t1 - t0, date.getTime(), searchDescription, "taskContainer");
+
   return filter(indices[low]) == 0 ? low : -1;
 }
 
