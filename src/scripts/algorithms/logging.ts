@@ -23,11 +23,12 @@ function logTask(name: string, time: number, timestamp: number, description: str
 
     // Create a new div element to represent the task
     const taskDiv = document.createElement('div');
-    taskDiv.style.border = '1px solid #ccc';
+    taskDiv.style.border = '1px solid #444';  // Use a darker border color
     taskDiv.style.padding = '10px';
     taskDiv.style.marginBottom = '10px';
     taskDiv.style.borderRadius = '5px';
-    taskDiv.style.backgroundColor = '#f9f9f9';
+    taskDiv.style.backgroundColor = '#2e2e2e';  // Match the dark background of the theme
+    taskDiv.style.color = '#fff';  // Ensure text is white for readability
 
     // Format the timestamp (optional, to make it more readable)
     const date = new Date(timestamp);
@@ -35,7 +36,7 @@ function logTask(name: string, time: number, timestamp: number, description: str
 
     // Add task details inside the taskDiv
     taskDiv.innerHTML = `
-        <h4>${name}</h4>
+        <h4 style="color: #4caf50;">${name}</h4>  <!-- Green heading to match button color -->
         <p>Time spent: ${time} milliseconds</p>
         <p>Description: ${description}</p>
         <p>Logged at: ${formattedTimestamp}</p>

@@ -492,56 +492,68 @@ class SearchResult {
    * 
    * @timecomplexity O(1) - The method creates UI elements and formats strings, all of which are constant time operations.
    */
-  public createRestaurauntInfo(order: number, index: number) {
-    const div = document.createElement("div"); // Create a new div for the restaurant info.
+public createRestaurauntInfo(order: number, index: number) {
+    // Create a new div for the restaurant info
+    const div = document.createElement("div");
+    
+    // Add bubble-like styles to the main div
+    div.style.border = '1px solid #444';  // Dark border
+    div.style.borderRadius = '15px';  // Rounded corners for the bubble effect
+    div.style.padding = '15px';  // Increased padding for a more spacious look
+    div.style.marginBottom = '10px';  // Space between bubbles
+    div.style.backgroundColor = '#2e2e2e';  // Dark background to match theme
+    div.style.color = '#fff';  // White text for readability
+    div.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';  // Slight shadow for elevation
 
-    // Create a new paragraph element for details
-    const p = document.createElement("p");
-
-    // Create individual spans for each piece of information
+    // Create individual paragraphs for each piece of information
     const resultSpan = document.createElement("p");
     resultSpan.innerText = `Result #${order + 1}`;
-    resultSpan.classList.add("font-bold", "text-xl", "block", "mb-2"); // Bold and larger text
+    resultSpan.style.fontWeight = 'bold';
+    resultSpan.style.fontSize = '1.25rem';  // Adjust font size
+    resultSpan.style.marginBottom = '0.5rem';  // Space below the heading
 
     const idSpan = document.createElement("p");
     idSpan.innerText = `ID: ${this.app.data.ID[index]}`;
-    idSpan.classList.add("font-medium", "text-gray-300", "block"); // Medium font weight with light gray
+    idSpan.style.fontWeight = '500';  // Medium font weight
+    idSpan.style.color = '#ccc';  // Light gray color
 
     const nameSpan = document.createElement("p");
     nameSpan.innerText = `Name: ${this.app.data.storeName[index]}`;
-    nameSpan.classList.add("font-semibold", "text-gray-200", "block"); // Semibold font weight
+    nameSpan.style.fontWeight = '600';  // Semibold font weight
+    nameSpan.style.color = '#e0e0e0';  // Slightly lighter gray
 
     const typeSpan = document.createElement("p");
     typeSpan.innerText = `Type: ${this.app.data.type[index]}`;
-    typeSpan.classList.add("font-light", "text-gray-400", "block"); // Light font weight
+    typeSpan.style.fontWeight = '300';  // Light font weight
+    typeSpan.style.color = '#b0b0b0';  // Lighter gray for less emphasis
 
     const costSpan = document.createElement("p");
     costSpan.innerText = `Cost: $${this.app.data.cost[index].toFixed(2)}`;
-    costSpan.classList.add("font-bold", "text-green-400", "block"); // Bold with green text
+    costSpan.style.fontWeight = 'bold';  // Bold font weight
+    costSpan.style.color = '#4caf50';  // Green color for cost
 
     const reviewSpan = document.createElement("p");
     reviewSpan.innerText = `Review: ${this.app.data.review[index].toFixed(1)}`;
-    reviewSpan.classList.add("font-semibold", "text-blue-400", "block"); // Semibold with blue text
+    reviewSpan.style.fontWeight = '600';  // Semibold font weight
+    reviewSpan.style.color = '#2196F3';  // Blue color for reviews
 
     const positionSpan = document.createElement("p");
     positionSpan.innerText = `Position: (x: ${this.app.data.x[index]}, y: ${this.app.data.y[index]})`;
-    positionSpan.classList.add("font-medium", "text-gray-300", "block"); // Medium font weight
+    positionSpan.style.fontWeight = '500';  // Medium font weight
+    positionSpan.style.color = '#ccc';  // Light gray color
 
-    // Append spans to the paragraph
-    p.appendChild(resultSpan);
-    p.appendChild(idSpan);
-    p.appendChild(nameSpan);
-    p.appendChild(typeSpan);
-    p.appendChild(costSpan);
-    p.appendChild(reviewSpan);
-    p.appendChild(positionSpan);
+    // Append spans to the div
+    div.appendChild(resultSpan);
+    div.appendChild(idSpan);
+    div.appendChild(nameSpan);
+    div.appendChild(typeSpan);
+    div.appendChild(costSpan);
+    div.appendChild(reviewSpan);
+    div.appendChild(positionSpan);
 
-    // Add classes for the main div
-    div.classList.add("bg-gray-800", "border", "border-gray-700", "rounded", "p-4", "mb-4", "shadow-md");
-
-    div.appendChild(p); // Append paragraph to div.
-    SEARCH_RESULTS.appendChild(div); // Append div to results container.
-  }
+    // Append the styled div to the results container
+    SEARCH_RESULTS.appendChild(div);
+}
 
   /**
    * Loads the results for the current page and updates the UI.
