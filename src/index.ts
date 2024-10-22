@@ -21,7 +21,6 @@ const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
 const SEARCH_RESULTS = document.getElementById("search-results") as HTMLDivElement;
 // #endregion
-
 // Our input database which is used when initializing our data
 interface Data {
   ID: string[];
@@ -286,7 +285,7 @@ type SortFieldType = "storeName" | "cost" | "review";
 class SearchResult {
   static pageSize: number = 10; // Default number of results per page.
   static minPageSize: number = 1; // Minimum page size.
-  static maxPageSize: number = 100; // Maximum page size.
+  static maxPageSize: number = 100; // Maximum page size. 
 
   public includesAll: boolean; // Whether or not the results include all of the values.
 
