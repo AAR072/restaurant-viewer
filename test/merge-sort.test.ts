@@ -14,7 +14,9 @@ describe('mergeSort', () => {
   test('should sort an array of numbers', () => {
     const input = [4, 2, 5, 1, 3];
     const expectedOutput = [1, 2, 3, 4, 5];
-    expect(convertIndices(input, sortNumbers(input))).toEqual(expectedOutput);
+    expect(convertIndices(input, sortArray(input, (a: number, b: number) => {
+      return input[a] - input[b];
+    }))).toEqual(expectedOutput);
   });
 
   test('should handle an empty array', () => {
