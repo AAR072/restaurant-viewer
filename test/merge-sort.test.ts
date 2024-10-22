@@ -54,4 +54,10 @@ describe('mergeSort', () => {
     const expectedOutput = new Array(1000000).map((_, i) => i + 1);
     expect(convertIndices(randomNumbers, sortNumbers(randomNumbers))).toEqual(expectedOutput);
   });
+
+  test('should sort strings alphabetically', () => {
+    const letters = ["c", "z", "d", "g", "a"];
+    const expected = ["a", "c", "d", "g", "z"];
+    expect(convertIndices(letters, sortStrings(letters))).toEqual(expected);
+  });
 });
