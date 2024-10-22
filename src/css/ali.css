@@ -1,3 +1,44 @@
+/* Skeleton Loader Styles */
+.skeleton-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between skeletons */
+}
+
+.skeleton-bubble {
+    background-color: #444; /* Dark background for the skeleton */
+    border-radius: 15px; /* Rounded corners */
+    height: 100px; /* Height of the skeleton item */
+    width: 100%; /* Full width */
+    animation: pulse 1.5s infinite; /* Animation for the loading effect */
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}
+
+/* Optional: Add a specific style for each bubble to vary heights */
+.skeleton-bubble:nth-child(1) {
+    height: 80px; /* First item shorter */
+}
+.skeleton-bubble:nth-child(2) {
+    height: 60px; /* Second item shorter */
+}
+.skeleton-bubble:nth-child(3) {
+    height: 100px; /* Normal height */
+}
+.skeleton-bubble:nth-child(4) {
+    height: 70px; /* Last item shorter */
+}
+
 :root {
   --background-color: #181818;
   --sidebar-background: #232323;
@@ -12,6 +53,7 @@
 }
 
 * {
+  font-family: "Ubuntu", sans-serif;
   margin: 0;
   padding: 0;
   /* box-sizing: border-box; */
