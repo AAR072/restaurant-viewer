@@ -6,7 +6,7 @@
  * 
  * @timecomplexity O(1) - The operation involves simple arithmetic and modulus, both of which are constant time operations.
  */
-function floor(n: number) {
+function floor(n: number): number {
   return n - n % 1;
 }
 
@@ -19,7 +19,7 @@ function floor(n: number) {
  * 
  * @timecomplexity O(1) - The modulo and comparison operations are constant time.
  */
-function circleMod(n: number, base: number) {
+function circleMod(n: number, base: number): number {
   if (base == 0) return 0;
 
   n %= base;
@@ -38,7 +38,7 @@ function circleMod(n: number, base: number) {
  * 
  * @timecomplexity O(1) - Only a few comparisons and assignments are done, all of which are constant time.
  */
-function clamp(n: number, min: number, max: number) {
+function clamp(n: number, min: number, max: number): number {
   if (n < min) n = min;
   if (n > max) n = max;
 
@@ -69,26 +69,4 @@ function getMax(a: number, b: number): number {
  */
 function getMin(a: number, b: number): number {
   return a > b ? b : a;
-}
-
-/**
- * Extracts a section of an array from the `start` index to the `end` index (exclusive). If `end` is not provided, it slices to the end of the array.
- *
- * @template T
- * @param {T[]} arr - The array to slice.
- * @param {number} start - The starting index (inclusive).
- * @param {number} [end] - The ending index (exclusive). Defaults to the length of the array if not provided.
- * @return {T[]} - A new array containing the extracted elements.
- * 
- * @timecomplexity O(n) - Where `n` is the number of elements from `start` to `end`. A loop runs from `start` to `end`, which scales linearly with the number of elements.
- */
-function slice<T>(arr: T[], start: number, end?: number): T[] {
-  if (end === undefined) {
-    end = arr.length;
-  }
-  let outPut: T[] = [];
-  for (let i = start; i < end; i++) {
-    outPut.push(arr[i]);
-  }
-  return outPut;
 }

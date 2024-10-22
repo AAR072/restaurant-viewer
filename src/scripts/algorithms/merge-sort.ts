@@ -94,7 +94,7 @@ function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compar
 
   const t1 = performance.now();
   const date = Date.now();
-  const description = `Sorted an array of ${typeof arr[0]}s`; 
+  const description = `Sorted an array of ${typeof arr[0]}s`;
   logTask("Sorted Array", t1-t0, date, description, "taskContainer");
   return sorted;
 }
