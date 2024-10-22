@@ -13,6 +13,7 @@
  * // This will create a new task box inside the element with id "taskContainer"
  */
 function logTask(name: string, time: number, timestamp: number, description: string, divId: string) {
+    const checkbox = document.getElementById("clear-performance") as HTMLInputElement;
     // Find the target div using the divId
     const targetDiv = document.getElementById(divId);
 
@@ -46,7 +47,9 @@ function logTask(name: string, time: number, timestamp: number, description: str
     targetDiv.appendChild(taskDiv);
 
     // Remove the task after 5 seconds
+    if (checkbox.checked) {
     setTimeout(() => {
-        targetDiv.removeChild(taskDiv);
+        targetDiv.innerHTML = "";
     }, 5000);
+  }
 }
