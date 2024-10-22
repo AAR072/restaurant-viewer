@@ -13,39 +13,43 @@
  * // This will create a new task box inside the element with id "taskContainer"
  */
 function logTask(name: string, time: number, timestamp: number, description: string, divId: string) {
-    // Find the target div using the divId
-    const targetDiv = document.getElementById(divId);
+  const checkbox = document.getElementById("clear-performance") as HTMLInputElement;
+  // Find the target div using the divId
+  const targetDiv = document.getElementById(divId);
 
-    if (!targetDiv) {
-        console.error(`Div with id ${divId} not found.`);
-        return;
-    }
+  if (!targetDiv) {
+    console.error(`Div with id ${divId} not found.`);
+    return;
+  }
 
-    // Create a new div element to represent the task
-    const taskDiv = document.createElement('div');
-    taskDiv.style.border = '1px solid #ccc';
-    taskDiv.style.padding = '10px';
-    taskDiv.style.marginBottom = '10px';
-    taskDiv.style.borderRadius = '5px';
-    taskDiv.style.backgroundColor = '#f9f9f9';
+  // Create a new div element to represent the task
+  const taskDiv = document.createElement('div');
+  taskDiv.style.border = '1px solid #444';  // Use a darker border color
+  taskDiv.style.padding = '10px';
+  taskDiv.style.marginBottom = '10px';
+  taskDiv.style.borderRadius = '5px';
+  taskDiv.style.backgroundColor = '#2e2e2e';  // Match the dark background of the theme
+  taskDiv.style.color = '#fff';  // Ensure text is white for readability
 
-    // Format the timestamp (optional, to make it more readable)
-    const date = new Date(timestamp);
-    const formattedTimestamp = date.toLocaleString();
+  // Format the timestamp to include seconds and milliseconds
+  const date = new Date(timestamp);
+  const formattedTimestamp = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}.${String(date.getMilliseconds()).padStart(3, '0')}`;
 
-    // Add task details inside the taskDiv
-    taskDiv.innerHTML = `
-        <h4>${name}</h4>
-        <p>Time spent: ${time} milliseconds</p>
-        <p>Description: ${description}</p>
-        <p>Logged at: ${formattedTimestamp}</p>
-    `;
+  // Add task details inside the taskDiv
+  taskDiv.innerHTML = `
+<h4 style="color: #4caf50;">${name}</h4>  <!-- Green heading to match button color -->
+<p>Time spent: ${time} milliseconds</p>
+<p>Description: ${description}</p>
+<p>Logged at: ${formattedTimestamp}</p>
+`;
 
-    // Append the taskDiv to the target div
-    targetDiv.appendChild(taskDiv);
+  // Append the taskDiv to the target div
+  targetDiv.appendChild(taskDiv);
 
-    // Remove the task after 5 seconds
+  // Remove the task after 5 seconds
+  if (checkbox.checked) {
     setTimeout(() => {
-        targetDiv.removeChild(taskDiv);
+      targetDiv.innerHTML = "";
     }, 5000);
+  }
 }

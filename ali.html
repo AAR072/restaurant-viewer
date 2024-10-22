@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Template with Existing Structure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/ali.css">
+</head>
+<body>
+
+<div class="container">
+    <!-- Sidebar for filters -->
+      <div class="sidebar">
+        <h2>Filters</h2>
+        <!-- Filter Section -->
+        <div class="filter-section">
+          <label for="type-filter">Cuisine Type:</label>
+          <br>
+          <select id="type-filter" name="type">
+            <option value="">Any</option>
+          </select>
+          <br>
+          <br>
+          <label for="cost-filter">Cost:</label>
+          <br>
+          <select id="cost-filter" name="cost">
+            <option value="">Any</option>
+            <option value="low">Cheap (under $10)</option>
+            <option value="less">Mid-Range ($20 - $40)</option>
+            <option value="range">High-End (above $40)</option>
+            <option value="custom">Custom</option>
+          </select>
+          <div>
+            <input id="cost-min" type="text"/>
+            <input type="range" value="0" min="0" max="1000"/>
+            <input id="cost-max" type="text"/>
+          </div>
+          <label for="review-filter">Review:</label>
+          <select id="review-filter" name="review">
+            <option value="">Any</option>
+            <option value="1">1+</option>
+            <option value="2">2+</option>
+            <option value="3">3+</option>
+            <option value="4">4+</option>
+            <option value="4.5">4.5+</option>
+            <option value="custom">Custom</option>
+          </select>
+          <div>
+            <input id="review-min" type="text"/>
+            <input type="range" value="0" min="0" max="1000"/>
+            <input id="review-max" type="text"/>
+          </div>
+        </div>
+
+      </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2>Search</h2>
+            <input id="id-search-input" placeholder="ID"/>
+            <button id="id-search-button" type="button">Search</button>
+            <br>
+            <input id="name-search-input" placeholder="Name"/>
+            <button id="name-search-button" type="button">Search</button>
+            <br>
+            <input id="x-search-input" placeholder="X"/>
+            <input id="y-search-input" placeholder="Y"/>
+            <button id="xy-search-button" type="button">Search</button>
+            <br>
+          <button id="search-clear" class="error-button">Clear Search</button>
+        </div>
+
+        <!-- Sort Section -->
+        <div class="sort-section">
+            <h2>Sort</h2>
+            <label for="sort-select">Sort By</label>
+            <select id="sort-select" name="Sort By">
+                <option value="storeName">Alphabetical Order</option>
+                <option value="cost">Price</option>
+                <option value="review">Review</option>
+            </select>
+            <button id="sort-direction">Ascending</button>
+        </div>
+
+        <!-- Performance Section -->
+        <div class="performance-section">
+            <h2>Performance</h2>
+           <label style="color:var(--warning-color);" for="clear-performance">Debug: Auto clean</label><br>
+            <input type="checkbox" id="clear-performance">
+            <div id="taskContainer"></div>
+        </div>
+
+        <!-- Browse Section -->
+        <div class="browse-section">
+            <h2>Browse</h2>
+            <div>
+                <label for="page-size">Page Size:</label>
+                <input id="page-size" type="text" placeholder="(1 - 100)" value="0"/>
+            </div>
+            <div>
+                <label for="page-number-input">Page:</label>
+                <input id="page-number-input" type="text" value="0"/>
+                <span>/</span>
+                <span id="page-count">0</span>
+            </div>
+            <button id="prev-page">Previous Page</button>
+            <button id="next-page">Next Page</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="search-results" class="results">
+          <div class="skeleton-loader">
+            <div class="skeleton-bubble"></div>
+            <div class="skeleton-bubble"></div>
+            <div class="skeleton-bubble"></div>
+            <div class="skeleton-bubble"></div>
+          </div>
+        </div>
+    </div>
+</div>
+
+<!-- Do not move the line below -->
+<script src="./dist/DO_NOT_TOUCH.js"></script>
+<!-- Do not move the line above -->
+<script src="./dist/scripts/util/utils.js"></script>
+<script src="./dist/scripts/algorithms/merge-sort.js"></script>
+<script src="./dist/scripts/algorithms/binary-search.js"></script>
+<script src="./dist/scripts/algorithms/array-intersection.js"></script>
+<script src="./dist/scripts/algorithms/logging.js"></script>
+<script src="./dist/index.js"></script>
+</body>
+</html>
