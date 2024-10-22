@@ -64,8 +64,7 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     logTask(
       "Get Intersections", 
       t1-t0, Date.now(), 
-      `Found intersection in an array and sorted with custom parameters`, 
-      "taskContainer"
+      `Found intersection in an array and sorted with custom parameters`
     );
     return sorted;
   }
@@ -73,8 +72,7 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
   logTask(
     "Get Intersections", 
     t2-t0, Date.now(), 
-    `Found intersection in an array`, 
-    "taskContainer"
+    `Found intersection in an array`
   );
   return new Uint32Array(duplicates);
 }

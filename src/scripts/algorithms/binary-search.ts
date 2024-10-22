@@ -54,7 +54,7 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
 Searched for ${isMaximum ? 'maximum' : 'minimum'} index that matches the filter.
 `;
 
-  logTask("Binary Search", t1 - t0, date.getTime(), searchDescription, "taskContainer");
+  logTask("Binary Search", t1 - t0, date.getTime(), searchDescription);
 
   return filter(indices[low]) == 0 ? low : -1;
 }

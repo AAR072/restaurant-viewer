@@ -73,10 +73,12 @@ body {
 
 /* Sidebar for filters */
 .sidebar {
+  height: 100%;
   width: 250px;
   background-color: var(--sidebar-background);
   padding: 20px;
   border-radius: 8px;
+  overflow-y: scroll;
 }
 
 .sidebar h2 {
@@ -99,6 +101,8 @@ body {
 .main-content {
   flex: 1;
   margin-left: 20px;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 /* Search and Filter Section */
@@ -114,6 +118,7 @@ body {
 }
 
 .search-section input,
+.search-section select,
 .filter-section input,
 .filter-section select,
 .sort-section select,

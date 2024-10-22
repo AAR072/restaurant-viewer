@@ -1,12 +1,8 @@
 // We link all our html elements here.
 // #region html elements
-const ID_SEARCH_INPUT = document.getElementById("id-search-input") as HTMLInputElement;
-const ID_SEARCH_BUTTON = document.getElementById("id-search-button") as HTMLButtonElement;
-const NAME_SEARCH_INPUT = document.getElementById("name-search-input") as HTMLInputElement;
-const NAME_SEARCH_BUTTON = document.getElementById("name-search-button") as HTMLButtonElement;
-const X_SEARCH_INPUT = document.getElementById("x-search-input") as HTMLInputElement;
-const Y_SEARCH_INPUT = document.getElementById("y-search-input") as HTMLInputElement;
-const XY_SEARCH_BUTTON = document.getElementById("xy-search-button") as HTMLButtonElement;
+const SEARCH_TYPE_SELECT = document.getElementById("search-type") as HTMLSelectElement;
+const SEARCH_INPUT = document.getElementById("search-input") as HTMLInputElement;
+const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
 
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
 
@@ -144,7 +140,7 @@ class App {
    * @timecomplexity O(n) - The method loops through `App.restaurantCount`, performing constant time operations for each restaurant.
    */
   loadTypes() {
-    const typePointers: {[key: string]: number} = {};
+    const typePointers: { [key: string]: number } = {};
 
     for (let i = 0; i < App.restaurantCount; i++) {
       const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names.
@@ -202,21 +198,27 @@ class App {
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
   initInput() {
-    ID_SEARCH_BUTTON.addEventListener("click", () => {
-      this.currentSearch = SearchResult.fromID(this, ID_SEARCH_INPUT.value);
-    });
+    SEARCH_BUTTON.addEventListener("click", () => {
+      const type = SEARCH_TYPE_SELECT.value;
+      const input = SEARCH_INPUT.value;
 
-    NAME_SEARCH_BUTTON.addEventListener("click", () => {
-      this.currentSearch = SearchResult.fromName(this, NAME_SEARCH_INPUT.value);
-    });
+      if (type == "id") {
+        this.currentSearch = SearchResult.fromID(this, input);
 
-    XY_SEARCH_BUTTON.addEventListener("click", () => {
-      const xInput = Number(X_SEARCH_INPUT.value);
-      const yInput = Number(Y_SEARCH_INPUT.value);
+      } else if (type == "coords") {
+        const coords = input.replace(" ", "").split(",");
+        const xCoord = Number(coords[0]);
+        const yCoord = Number(coords[1]);
 
-      if (isNaN(xInput) || isNaN(yInput)) return;
+        if (xCoord == null || yCoord)
 
-      this.currentSearch = SearchResult.fromCoords(this, xInput, yInput);
+          if (!isNaN(xCoord) && !isNaN(yCoord)) {
+            this.currentSearch = SearchResult.fromCoords(this, xCoord, yCoord);
+          }
+
+      } else {
+        this.currentSearch = SearchResult.fromName(this, input);
+      }
     });
 
     TYPE_SELECT.addEventListener("input", () => {
@@ -236,11 +238,19 @@ class App {
       this.currentSearch.toggleDirection();
     });
 
-    PAGE_SIZE_INPUT.addEventListener("input", () => {
+    const changePageSize = () => {
       let input = Number(PAGE_SIZE_INPUT.value);
-      
+
       if (!isNaN(input)) this.currentSearch.changePageSize(input);
+    }
+
+    PAGE_SIZE_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
+      if (event.key == "Enter") changePageSize();
     });
+
+    PAGE_SIZE_INPUT.addEventListener("blur", () => {
+      changePageSize();
+    })
 
     NEXT_PAGE_BUTTON.addEventListener("click", () => {
       this.currentSearch.incrementPage(1);
@@ -313,6 +323,10 @@ class SearchResult {
    */
   constructor(public app: App, public results: Uint32Array) {
     this.updateFinal();
+  }
+
+  static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
+    
   }
 
   static fromName(app: App, name: string): SearchResult {
@@ -411,7 +425,7 @@ class SearchResult {
 
   public updatePageCount() {
     this.page = 0;
-    this.pageCount = Math.ceil(this.finalCount/SearchResult.pageSize);
+    this.pageCount = Math.ceil(this.finalCount / SearchResult.pageSize);
   }
 
   public updateFinal() {
@@ -440,7 +454,7 @@ class SearchResult {
 
     if (this.sort == "storeName") {
       data[dataPointer++] = this.results;
-      
+
       if (filteredType) data[dataPointer++] = filteredType;
       if (filteredCost) data[dataPointer++] = filteredCost;
       if (filteredReview) data[dataPointer++] = filteredReview;
@@ -455,7 +469,7 @@ class SearchResult {
     } else if (this.sort == "review" && filteredReview) {
       data[dataPointer++] = filteredReview;
       data[dataPointer++] = this.results;
-      
+
       if (filteredCost) data[dataPointer++] = filteredCost;
       if (filteredType) data[dataPointer++] = filteredType;
 
@@ -491,10 +505,10 @@ class SearchResult {
    * 
    * @timecomplexity O(1) - The method creates UI elements and formats strings, all of which are constant time operations.
    */
-public createRestaurauntInfo(order: number, index: number) {
+  public createRestaurauntInfo(order: number, index: number) {
     // Create a new div for the restaurant info
     const div = document.createElement("div");
-    
+
     // Add bubble-like styles to the main div
     div.style.border = '1px solid #444';  // Dark border
     div.style.borderRadius = '15px';  // Rounded corners for the bubble effect
@@ -552,7 +566,7 @@ public createRestaurauntInfo(order: number, index: number) {
 
     // Append the styled div to the results container
     SEARCH_RESULTS.appendChild(div);
-}
+  }
 
   /**
    * Loads the results for the current page and updates the UI.
