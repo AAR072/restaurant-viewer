@@ -5,6 +5,7 @@ const SEARCH_ID_INPUT = document.getElementById("search-id") as HTMLInputElement
 const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
 const SEARCH_Y_INPUT = document.getElementById("search-y") as HTMLInputElement;
 const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
+const SEARCH_CLEAR_BUTTON = document.getElementById("search-clear") as HTMLButtonElement;
 
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
 
@@ -186,33 +187,25 @@ class App {
 
       const total: Uint32Array[] = [];
       let totalPointer = 0;
-      let needsSort = true;
+      let alreadySorted = false;
 
       if (nameInput != "") {
         total[totalPointer++] = filterStrings(this.data.storeName, this.sorted.storeName, nameInput);
-        needsSort = false;
+        alreadySorted = true;
       }
 
-      if (idInput != "") {
-        total[totalPointer++] = filterStrings(this.data.ID, this.sorted.ID, idInput);
-      }
-
-      if (!isNaN(xInput)) {
-        total[totalPointer++] = filterNumbers(this.data.x, this.sorted.x, xInput, xInput);
-      }
-
-      if (!isNaN(yInput)) {
-        total[totalPointer++] = filterNumbers(this.data.y, this.sorted.y, yInput, yInput);
-      }
+      if (idInput != "") total[totalPointer++] = filterStrings(this.data.ID, this.sorted.ID, idInput);
+      if (!isNaN(xInput)) total[totalPointer++] = filterNumbers(this.data.x, this.sorted.x, xInput, xInput);
+      if (!isNaN(yInput)) total[totalPointer++] = filterNumbers(this.data.y, this.sorted.y, yInput, yInput);
 
       let results
 
       if (totalPointer == 1) {
-        if (needsSort) results = sortBy(total[0], App.restaurantCount, this.sorted.storeName);
-        else results = total[0];
+        if (alreadySorted) results = total[0];
+        else results = sortBy(total[0], App.restaurantCount, this.sorted.storeName);
 
       } else if (totalPointer > 1) {
-        results = getIntersections(total, App.restaurantCount, needsSort ? this.sorted.storeName : undefined);
+        results = getIntersections(total, App.restaurantCount, alreadySorted ? undefined : this.sorted.storeName);
 
       } else {
         results = new Uint32Array(0);

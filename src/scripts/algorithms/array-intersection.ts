@@ -25,16 +25,13 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     const dataSet = data[i];
     const setLength = dataSet.length;
 
-    if (setLength == 0) {
-      return new Uint32Array(0);
-    }
+    if (setLength == 0) return new Uint32Array(0);
 
     for (let j = 0; j < setLength; j++) {
       const value = dataSet[j];
 
-      if (!hashTable[value]) { 
-        hashTable[value] = 1;
-      } else hashTable[value]++;
+      if (hashTable[value]) hashTable[value]++;
+      else hashTable[value] = 1;
     }
   }
 
@@ -47,33 +44,37 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
 
     if (hashTable[value] == requiredCount) {
       duplicates[dupePointer++] = value;
+      hashTable[value]++;
     }
   }
 
-  if (sortBy && duplicates.length > 1) {
-    const length = duplicates.length;
-    const sorted = new Uint32Array(length);
+  if (sortBy && dupePointer > 1) {
+    const sorted = new Uint32Array(dupePointer);
     let sortedPointer = 0;
     
     for (let i = 0; i < indexRange; i++) {
       const value = sortBy[i];
 
-      if (hashTable[value]) sorted[sortedPointer++] = value;
+      if (hashTable[value] == dataSetCount) sorted[sortedPointer++] = value;
     }
+
     const t1 = performance.now();
     logTask(
       "Get Intersections", 
       t1-t0, Date.now(), 
       `Found intersection in an array and sorted with custom parameters`
     );
+
     return sorted;
   }
+
   const t2 = performance.now();
   logTask(
     "Get Intersections", 
     t2-t0, Date.now(), 
     `Found intersection in an array`
   );
+
   return new Uint32Array(duplicates);
 }
 
