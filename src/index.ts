@@ -33,18 +33,10 @@ interface Data {
 // Our database after it is sorted
 interface SortedData {
   ID: Uint32Array; // Sorted array of IDs.
-
   storeName: Uint32Array; // Sorted array of store names.
-  nameOrder: Uint32Array; // Order array to map back the original indices of the sorted store names.
-
   type: { [key: string]: number[] }; // Dictionary to hold types and their corresponding indices.
-
   cost: Uint32Array; // Sorted array of costs.
-  costOrder: Uint32Array; // Order array to map back the original indices of the sorted costs.
-
   review: Uint32Array; // Sorted array of reviews.
-  reviewOrder: Uint32Array; // Order array to map back the original indices of the sorted reviews.
-
   x: Uint32Array; // Sorted array of x coordinates.
   y: Uint32Array; // Sorted array of y coordinates.
 
@@ -92,18 +84,10 @@ class App {
     // Initialize the sorted data with sorted arrays and corresponding order arrays.
     this.sorted = {
       ID: sortStrings(data.ID), // Sort IDs.
-
       storeName: sortStrings(data.storeName), // Sort store names.
-      nameOrder: new Uint32Array(App.restaurantCount), // Array to hold original indices of sorted store names.
-
       type: {}, // Initialize type dictionary.
-
       cost: sortNumbers(data.cost), // Sort costs.
-      costOrder: new Uint32Array(App.restaurantCount), // Array to hold original indices of sorted costs.
-
       review: sortNumbers(data.review), // Sort reviews.
-      reviewOrder: new Uint32Array(App.restaurantCount), // Array to hold original indices of sorted reviews.
-
       x: sortNumbers(data.x), // Sort x coordinates.
       y: sortNumbers(data.y), // Sort y coordinates.
 
@@ -111,11 +95,6 @@ class App {
       distSorted: new Uint32Array(App.restaurantCount), // Array for sorted distances.
       distOrder: new Uint32Array(App.restaurantCount) // Array to hold original indices of sorted distances.
     };
-
-    // Populate order arrays based on sorted data.
-    getSortOrders(this.sorted.storeName, this.sorted.nameOrder);
-    getSortOrders(this.sorted.cost, this.sorted.costOrder);
-    getSortOrders(this.sorted.review, this.sorted.reviewOrder);
 
     this.loadTypes();
 
@@ -175,7 +154,6 @@ class App {
     }
 
     sortNumbers(this.sorted.distData, this.sorted.distSorted);
-    getSortOrders(this.sorted.distSorted, this.sorted.distOrder);
   }
 
   /**
@@ -201,26 +179,46 @@ class App {
    */
   initInput() {
     SEARCH_BUTTON.addEventListener("click", () => {
-      const type = SEARCH_TYPE_SELECT.value;
-      const input = SEARCH_INPUT.value;
+      const nameInput = SEARCH_NAME_INPUT.value;
+      const idInput = SEARCH_ID_INPUT.value;
+      const xInput = parseInt(SEARCH_X_INPUT.value);
+      const yInput = parseInt(SEARCH_Y_INPUT.value);
 
-      if (type == "id") {
-        this.currentSearch = SearchResult.fromID(this, input);
+      const total: Uint32Array[] = [];
+      let totalPointer = 0;
+      let needsSort = true;
 
-      } else if (type == "coords") {
-        const coords = input.replace(" ", "").split(",");
-        const xCoord = Number(coords[0]);
-        const yCoord = Number(coords[1]);
+      if (nameInput != "") {
+        total[totalPointer++] = filterStrings(this.data.storeName, this.sorted.storeName, nameInput);
+        needsSort = false;
+      }
 
-        if (xCoord == null || yCoord)
+      if (idInput != "") {
+        total[totalPointer++] = filterStrings(this.data.ID, this.sorted.ID, idInput);
+      }
 
-          if (!isNaN(xCoord) && !isNaN(yCoord)) {
-            this.currentSearch = SearchResult.fromCoords(this, xCoord, yCoord);
-          }
+      if (!isNaN(xInput)) {
+        total[totalPointer++] = filterNumbers(this.data.x, this.sorted.x, xInput, xInput);
+      }
+
+      if (!isNaN(yInput)) {
+        total[totalPointer++] = filterNumbers(this.data.y, this.sorted.y, yInput, yInput);
+      }
+
+      let results
+
+      if (totalPointer == 1) {
+        if (needsSort) results = sortBy(total[0], App.restaurantCount, this.sorted.storeName);
+        else results = total[0];
+
+      } else if (totalPointer > 1) {
+        results = getIntersections(total, App.restaurantCount, needsSort ? this.sorted.storeName : undefined);
 
       } else {
-        this.currentSearch = SearchResult.fromName(this, input);
+        results = new Uint32Array(0);
       }
+
+      this.currentSearch = new SearchResult(this, results);
     });
 
     TYPE_SELECT.addEventListener("input", () => {
@@ -328,7 +326,7 @@ class SearchResult {
   }
 
   static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
-    
+
   }
 
   static fromName(app: App, name: string): SearchResult {
@@ -593,10 +591,6 @@ class SearchResult {
       this.createRestaurauntInfo(current, this.final[current]); // Load the restaurant info.
     }
   }
-}
-
-class DisplayMap {
-
 }
 
 new App(data);

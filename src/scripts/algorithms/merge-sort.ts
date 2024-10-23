@@ -128,25 +128,3 @@ function sortStrings(data: string[], outSorted?: Uint32Array): Uint32Array {
     return data[a].localeCompare(data[b]);
   }, outSorted);
 }
-
-/**
- * Converts a sorted array of indices into an order array where each element's
- * value indicates its position in the sorted array.
- *
- * @param {Uint32Array} sorted - The array of sorted indices.
- * @param {Uint32Array} [outOrders] - An optional array to store the sorted order.
- * @returns {Uint32Array} A `Uint32Array` where each value corresponds to the position of the element in the sorted order.
- * 
- * @timecomplexity O(n) - This function performs a single loop through the `sorted` array (O(n)).
- */
-function getSortOrders(sorted: Uint32Array, outOrders?: Uint32Array) {
-  const length = sorted.length;
-
-  if (outOrders == null) outOrders = new Uint32Array(length);
-
-  for (let i = 0; i < length; i++) {
-    outOrders[sorted[i]] = i;
-  }
-
-  return outOrders;
-}
