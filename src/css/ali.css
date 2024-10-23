@@ -101,6 +101,7 @@ body {
 .main-content {
   flex: 1;
   margin-left: 20px;
+  margin-right: 20px;
   height: 100%;
   overflow-y: scroll;
 }
