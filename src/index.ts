@@ -1,7 +1,9 @@
 // We link all our html elements here.
 // #region html elements
-const SEARCH_TYPE_SELECT = document.getElementById("search-type") as HTMLSelectElement;
-const SEARCH_INPUT = document.getElementById("search-input") as HTMLInputElement;
+const SEARCH_NAME_INPUT = document.getElementById("search-name") as HTMLInputElement;
+const SEARCH_ID_INPUT = document.getElementById("search-id") as HTMLInputElement;
+const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
+const SEARCH_Y_INPUT = document.getElementById("search-y") as HTMLInputElement;
 const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
 
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;

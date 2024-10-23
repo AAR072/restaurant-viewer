@@ -65,12 +65,12 @@
       <!-- Search Section -->
       <div class="search-section">
         <h2>Search</h2>
-        <input id="search-name" type="text"/>
+        <input id="search-name" type="text" placeholder="Name"/>
         <br>
-        <input id="search-id" type="text"/>
+        <input id="search-id" type="text" placeholder="Id"/>
         <br>
-        <input id="search-x" type="text"/>
-        <input id="search-z" type="text"/>
+        <input id="search-x" type="text" placeholder="X"/>
+        <input id="search-z" type="text" placeholder="Y"/>
         <br>
         <button id="search-button" type="button">Search</button>
         <br>
@@ -115,8 +115,10 @@
     <!-- Performance Section -->
     <div class="sidebar performance-section">
       <h2>Performance</h2>
-      <label style="color:var(--warning-color);" for="clear-performance">Debug: Auto clean</label><br>
-      <input type="checkbox" id="clear-performance">
+      <label style="color:var(--warning-color);" for="disable-performance-clear">Disable Auto Clear:</label>
+      <input id="disable-performance-clear" type="checkbox">
+      <br>
+      <button id="clear-performance-log">Clear All</button>
       <div id="taskContainer"></div>
     </div>
   </div>
@@ -128,7 +130,7 @@
   <script src="./dist/scripts/algorithms/merge-sort.js"></script>
   <script src="./dist/scripts/algorithms/binary-search.js"></script>
   <script src="./dist/scripts/algorithms/array-intersection.js"></script>
-  <script src="./dist/scripts/algorithms/logging.js"></script>
+  <script src="./dist/scripts/algorithms/performance-log.js"></script>
   <script src="./dist/index.js"></script>
 </body>
 
