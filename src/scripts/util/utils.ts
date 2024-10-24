@@ -10,6 +10,13 @@ function floor(n: number): number {
   return n - n % 1;
 }
 
+function round(n: number): number {
+  const remainder = n % 1;
+
+  if (remainder > 0.5) return n - remainder + 1;
+  else return n - remainder;
+}
+
 /**
  * Computes `n` modulo `base` with circular behavior for negative numbers (always returns a positive remainder).
  *
