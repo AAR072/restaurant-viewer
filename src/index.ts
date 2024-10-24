@@ -586,4 +586,4 @@ class SearchResult {
   }
 }
 
-new App(data);
+const app = new App(data);
