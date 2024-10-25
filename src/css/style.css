@@ -3,6 +3,66 @@ body {
   padding: 0;
 }
 
+div{
+  height:100%;
+  width: 100%;
+}
+
+img{
+  width: 100%;
+  max-height: auto;
+}
+
+.container {
+  height: 100%; 
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  }
+
+.main-menu {
+  flex: 1;
+}
+
+.performanceUpdates{
+  position:fixed;
+  height: 25px;
+  bottom:10;
+  right:10;
+  outline-style:solid;
+  outline-color:invert;
+  width: 150px;
+  background-color:aliceblue;
+  border-radius: 10px;
+}
+
+.performanceText{
+  position:fixed;
+  height: 25px;
+  bottom:-10;
+  right:120;
+}
+
+.inputs{
+  position:fixed;
+  width:15%;
+  background-color:aqua ;
+}
+.inputItems{
+  position:fixed;
+  width:13.6%;
+  background-color:rgb(255, 0, 0) ;
+  margin:0.6%;
+  align-self: center;
+}
+
+.display{
+  float:right;
+  background-color: antiquewhite;
+  width:85%;
+}
+
+
 .outer-container {
   display: flex;
   width: 100%;
