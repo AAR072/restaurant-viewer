@@ -7,56 +7,46 @@ const TASK_CONTAINER = document.getElementById("taskContainer") as HTMLDivElemen
 // add clear all button
 // queue timeouts as well so that they can be cleared
 
-interface LogItem {
-  count: number;
-  element: HTMLDivElement;
-  startTime: number,
-  clearDuration: number,
-  timeoutId?: number;
-}
 
-const logQueueSize: number = 20;
-const logQueue: LogItem[] = new Array(logQueueSize);
+const LOG_QUEUE_SIZE: number = 20;
+const LOG_CLEAR_INTERVAL = 2000;
+
+const logQueue: LogItem[] = new Array(LOG_QUEUE_SIZE);
 let logQueueStart = 0;
 let logQueueLength = 0;
 
-const logDuration = 2000;
-
-function getQueueIndex(count: number): number {
-  return (logQueueStart + count) % logQueueSize;
+interface LogItem {
+  count: number;
+  element: HTMLDivElement;
 }
 
-function setTimer(item: LogItem) {
-  let timeoutId
-
-  if (DISABLE_CLEAR_CHECKBOX.checked == false) {
-    item.startTime = Date.now();
-
-    timeoutId = window.setTimeout(() => {
-      clearTask();
-    }, item.clearDuration);
-
-  } else if (item.timeoutId) {
-    window.clearTimeout(item.timeoutId);
-
-    item.clearDuration = logDuration - (Date.now() - item.startTime);
-  }
-
-  item.timeoutId = timeoutId;
+function getQueueIndex(count: number): number {
+  return (logQueueStart + count) % LOG_QUEUE_SIZE;
 }
 
 function clearTask() {
   const item = logQueue[logQueueStart];
   delete logQueue[logQueueStart];
 
-  logQueueStart = (logQueueStart + 1) % logQueueSize;
+  logQueueStart = (logQueueStart + 1) % LOG_QUEUE_SIZE;
   logQueueLength--;
 
   if (item) {
-    item.element.remove();
+    item.element.style.height = item.element.offsetHeight + "px";
+    item.element.classList.add("perflog-fade-out");
 
-    if (item.timeoutId) window.clearTimeout(item.timeoutId);
+    window.setTimeout(() => {
+      item.element.remove();
+    }, LOG_CLEAR_INTERVAL);
   }
+}
+
+let clearIntervalId: number | null;
+
+function startAutoClearTimer() {
+  clearTask();
+
+  clearIntervalId = window.setInterval(clearTask, LOG_CLEAR_INTERVAL);
 }
 
 /**
@@ -97,21 +87,28 @@ function logTask(name: string, time: number, timestamp: number, description: str
 
   const logItem: LogItem = {
     count: logQueueLength,
-    element: taskDiv,
-    startTime: currentTime,
-    clearDuration: logDuration
+    element: taskDiv
   };
+
+  while (logQueueLength >= LOG_QUEUE_SIZE - 1) {
+    clearTask();
+  }
 
   logQueue[getQueueIndex(logQueueLength++)] = logItem;
 
-  setTimer(logItem);
+  if (!clearIntervalId) startAutoClearTimer();
 }
 
 DISABLE_CLEAR_CHECKBOX.addEventListener("input", () => {
-  for (let i = 0; i < logQueueLength; i++) {
-    const item = logQueue[getQueueIndex(i)];
+  if (DISABLE_CLEAR_CHECKBOX.checked) {
+    if (clearIntervalId) {
+      window.clearInterval(clearIntervalId);
 
-    setTimer(item);
+      clearIntervalId = null;
+    }
+
+  } else {
+    startAutoClearTimer();
   }
 });
 

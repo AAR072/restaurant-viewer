@@ -1,3 +1,7 @@
+function properMod(n: number, b: number) {
+  return n < 0 ? n % b + b : n % b;
+}
+
 /**
  * Returns the largest integer less than or equal to the given number `n` (essentially, a custom floor function).
  *
@@ -7,7 +11,7 @@
  * @timecomplexity O(1) - The operation involves simple arithmetic and modulus, both of which are constant time operations.
  */
 function floor(n: number): number {
-  return n - n % 1;
+  return n - properMod(n, 1);
 }
 
 function round(n: number): number {

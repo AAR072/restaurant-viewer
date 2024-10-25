@@ -7,16 +7,15 @@ interface Chunk {
 }
 
 class DisplayMap {
-  static CHUNK_SIZE = 50;
+  static CHUNK_SIZE = 100;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
   public range: number = 50;
 
-  public loadedX: number;
-  public loadedY: number;
-  public loadedRange: number
-  public loaded: Uint32Array;
+  public lastLoadX: number;
+  public lastLoadY: number;
+  public lastLoadRange: number
 
   public minX: number = 0;
   public minY: number = 0;
@@ -24,113 +23,120 @@ class DisplayMap {
   public maxY: number = 0;
 
   public chunks: Uint32Array[];
-  public currentChunks: {[key: number]: {
-    [key: number]: Chunk
-  }} = {};
+  public chunkColumns: number;
+  public chunkRows: number;
+  public chunkCount: number;
+
+  public activeChunks: number[];
 
   constructor(public app: App) {
     this.minX = app.data.x[app.sorted.x[0]];
     this.minY = app.data.y[app.sorted.y[0]];
     this.maxX = app.data.x[app.sorted.x[App.restaurantCount - 1]];
     this.maxY = app.data.y[app.sorted.y[App.restaurantCount - 1]];
-    this.cameraX = (this.minX + this.maxX)/2;
-    this.cameraY = (this.minY + this.maxY)/2;
+    // this.cameraX = (this.minX + this.maxX)/2;
+    // this.cameraY = (this.minY + this.maxY)/2;
 
     console.log(this.minX, this.minY, this.maxX, this.maxY);
 
-    // this.loadChunks();
-    // this.paint();
-    // this.initInput();
-    this.testLoadChunks();
+    this.preloadChunks();
+    this.updateDisplay();
+    this.initInput();
   }
 
-  public createChunk(x: number, y: number) {
-    const chunkX = x*DisplayMap.CHUNK_SIZE;
-    const chunkY = y*DisplayMap.CHUNK_SIZE;
-    const chunkHalf = DisplayMap.CHUNK_SIZE/2;
-    const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkX - chunkHalf, chunkX + chunkHalf);
-    const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkY - chunkHalf, chunkY + chunkHalf);
-    const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
-    const chunkHash = String(x) + String(y);
+  //   public createChunk(x: number, y: number) {
+  //     const chunkX = x*DisplayMap.CHUNK_SIZE;
+  //     const chunkY = y*DisplayMap.CHUNK_SIZE;
+  //     const chunkHalf = DisplayMap.CHUNK_SIZE/2;
+  //     const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkX - chunkHalf, chunkX + chunkHalf);
+  //     const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkY - chunkHalf, chunkY + chunkHalf);
+  //     const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
+  //     const chunkHash = String(x) + String(y);
 
-    this.currentChunks[chunkX][chunkY] = {
-      x: chunkX,
-      y: chunkY,
-      restaurants: inRange
-    }
-  }
+  //     this.currentChunks[chunkX][chunkY] = {
+  //       x: chunkX,
+  //       y: chunkY,
+  //       restaurants: inRange
+  //     }
+  //   }
 
-  public testLoadChunks() {
+  public preloadChunks() {
     const xRange = this.maxX - this.minX;
     const yRange = this.maxY - this.minY;
-    const chunkColumns = Math.ceil(xRange/DisplayMap.CHUNK_SIZE);
-    const chunkRows = Math.ceil(yRange/DisplayMap.CHUNK_SIZE);
-    const startChunkX = this.minX;
-    const startChunkY = this.minY;
 
-    for (let x = 0; x < chunkColumns; x++) {
-      for (let y = 0; y < chunkRows; y++) {
-        const chunkCount = x*chunkRows + y;
+    this.chunkColumns = Math.ceil(xRange / DisplayMap.CHUNK_SIZE);
+    this.chunkRows = Math.ceil(yRange / DisplayMap.CHUNK_SIZE);
+    this.chunkCount = this.chunkRows*this.chunkColumns;
 
-        const cY = chunkCount % chunkRows;
-        const cX = (chunkCount - cY)/chunkRows;
+    this.chunks = new Array(this.chunkCount);
 
-        const chunkMinX = startChunkX + cX;
-        const chunkMinY = startChunkY + cY;
-        const chunkMaxX = chunkMinX + DisplayMap.CHUNK_SIZE;
-        const chunkMaxY = chunkMinY + DisplayMap.CHUNK_SIZE;
+    for (let x = 0; x < this.chunkColumns; x++) {
+      for (let y = 0; y < this.chunkRows; y++) {
+        const chunkCount = x*this.chunkRows + y;
 
-        const xInRange = filterNumbers
+        const cY = chunkCount % this.chunkRows;
+        const cX = (chunkCount - cY)/this.chunkRows;
+
+        const chunkMinX = this.minX + cX*DisplayMap.CHUNK_SIZE;
+        const chunkMinY = this.minY + cY*DisplayMap.CHUNK_SIZE;
+        const chunkMaxX = chunkMinX + DisplayMap.CHUNK_SIZE - 1; // -1 so as to not include restaurants shared by the next chunk
+        const chunkMaxY = chunkMinY + DisplayMap.CHUNK_SIZE - 1;
+
+        const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
+        const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
+        const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
+
+        this.chunks[chunkCount] = inRange;
       }
     }
   }
 
-  public loadChunks() {
-    const currentChunkX = round(this.cameraX/DisplayMap.CHUNK_SIZE);
-    const currentChunkY = round(this.cameraY/DisplayMap.CHUNK_SIZE);
-    const chunksRange = Math.ceil(this.range/DisplayMap.CHUNK_SIZE);
-    console.log(chunksRange);
+  //   public loadChunks() {
+  //     const currentChunkX = round(this.cameraX/DisplayMap.CHUNK_SIZE);
+  //     const currentChunkY = round(this.cameraY/DisplayMap.CHUNK_SIZE);
+  //     const chunksRange = Math.ceil(this.range/DisplayMap.CHUNK_SIZE);
+  //     console.log(chunksRange);
 
-    // for (let i in this.currentChunks) {
-    //   const chunk = this.currentChunks[i];
+  //     // for (let i in this.currentChunks) {
+  //     //   const chunk = this.currentChunks[i];
 
-    //   if (Math.abs(currentChunkX - chunk.x) > chunksRange || Math.abs(currentChunkY - chunk.y) > chunksRange) {
-    //     delete this.currentChunks[i];
-    //   }
-    // }
+  //     //   if (Math.abs(currentChunkX - chunk.x) > chunksRange || Math.abs(currentChunkY - chunk.y) > chunksRange) {
+  //     //     delete this.currentChunks[i];
+  //     //   }
+  //     // }
 
-    for (let x = -chunksRange; x <= chunksRange; x++) {
-      if (!this.currentChunks[x]) this.currentChunks[x] = {};
+  //     for (let x = -chunksRange; x <= chunksRange; x++) {
+  //       if (!this.currentChunks[x]) this.currentChunks[x] = {};
 
-      for (let y = -chunksRange; y <= chunksRange; y++) {
-        const xPos = currentChunkX + x;
-        const yPos = currentChunkY + y;
-        const chunkHash = String(xPos) + String(yPos);
-        console.log(xPos, yPos);
+  //       for (let y = -chunksRange; y <= chunksRange; y++) {
+  //         const xPos = currentChunkX + x;
+  //         const yPos = currentChunkY + y;
+  //         const chunkHash = String(xPos) + String(yPos);
+  //         console.log(xPos, yPos);
 
-        if (!this.currentChunks[x][y]) this.createChunk(xPos, yPos);
-      }
-    }
+  //         if (!this.currentChunks[x][y]) this.createChunk(xPos, yPos);
+  //       }
+  //     }
 
-    console.log(this.currentChunks);
-  }
+  //     console.log(this.currentChunks);
+  //   }
 
-  loadTargets() {
-    const loadRange = this.range * 3;
+  //   loadTargets() {
+  //     const loadRange = this.range * 3;
 
-    const minX = this.cameraX - loadRange;
-    const maxX = this.cameraX + loadRange;
-    const minY = this.cameraY - loadRange;
-    const maxY = this.cameraY + loadRange;
+  //     const minX = this.cameraX - loadRange;
+  //     const maxX = this.cameraX + loadRange;
+  //     const minY = this.cameraY - loadRange;
+  //     const maxY = this.cameraY + loadRange;
 
-    const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, minX, maxX);
-    const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, minY, maxY);
+  //     const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, minX, maxX);
+  //     const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, minY, maxY);
 
-    this.loadedX = this.cameraX;
-    this.loadedY = this.cameraY;
-    this.loadedRange = loadRange;
-    this.loaded = getIntersections([xInRange, yInRange], App.restaurantCount);
-  }
+  //     this.loadedX = this.cameraX;
+  //     this.loadedY = this.cameraY;
+  //     this.loadedRange = loadRange;
+  //     this.loaded = getIntersections([xInRange, yInRange], App.restaurantCount);
+  //   }
 
   // checkForLoad() {
   //   if (Math.abs(this.cameraX - this.loadedX) + this.range > this.loadedRange || Math.abs(this.cameraY - this.loadedY) > this.loadedRange || this.range < this.loadedRange / 3) {
@@ -139,7 +145,39 @@ class DisplayMap {
   //   }
   // }
 
-  paint() {
+  displayChunk(chunkNumber: number, context: CanvasRenderingContext2D, width: number, height: number) {
+    const chunkRestaurants = this.chunks[chunkNumber];
+
+    const cY = chunkNumber % this.chunkRows;
+    const cX = (chunkNumber - cY) / this.chunkRows;
+    const chunkX = this.minX + cX*DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE/2 - this.cameraX;
+    const chunkY = this.minY + cY*DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE/2 - this.cameraY;
+
+    const screenX = width / 2 + chunkX / this.range * width / 2;
+    const screenY = height / 2 - chunkY / this.range * height / 2;
+    const size = width / (this.range * 2) * DisplayMap.CHUNK_SIZE;
+
+    context.fillStyle = `rgb(${(chunkNumber/3 % 1) * 255/2 + 255/2}, ${(chunkNumber/5 % 1) * 255/2 + 255/2}, ${(chunkNumber/4 % 1) * 255/2 + 255/2})`
+    context.fillRect(screenX - size/2, screenY - size/2, size, size);
+
+    context.fillStyle = "black";
+
+    for (let i = 0; i < chunkRestaurants.length; i++) {
+      const index = chunkRestaurants[i];
+      const xPos = this.app.data.x[index] - this.cameraX;
+      const yPos = this.app.data.y[index] - this.cameraY;
+
+      const screenX = width / 2 + xPos / this.range * width / 2;
+      const screenY = height / 2 - yPos / this.range * height / 2;
+
+      const size = width / this.range * 0.5;
+
+      context.fillRect(screenX - size / 2, screenY - size / 2, size, size);
+    }
+  }
+
+  updateDisplay() {
+    const t = performance.now();
     const width = CANVAS.width;
     const height = CANVAS.height;
     const aspectRatio = width / height;
@@ -151,6 +189,21 @@ class DisplayMap {
     context.fillRect(width / 2 - width / this.range * 0.5 / 2, height / 2 - width / this.range * 0.5, width / this.range * 0.5, width / this.range * 0.5);
 
     context.fillStyle = "black";
+
+    const camChunkX = floor((this.cameraX - this.minX)/DisplayMap.CHUNK_SIZE);
+    const camChunkY = floor((this.cameraY - this.minY)/DisplayMap.CHUNK_SIZE);
+
+    for (let x = 0; x <= 0; x++) {
+      for (let y = 0; y <= 0; y++) {
+        const xPos = camChunkX + x;
+        const yPos = camChunkY + y;
+        const chunkNumber = xPos*this.chunkRows + yPos;
+
+        if (chunkNumber >= 0 && chunkNumber < this.chunkCount) this.displayChunk(chunkNumber, context, width, height);
+      }
+    }
+
+    const t2 = performance.now();
 
     // for (let i = 0; i < this.loaded.length; i++) {
     //   const index = this.loaded[i];
@@ -183,44 +236,44 @@ class DisplayMap {
     const rangeFloor = Math.floor(this.range);
     const rangeCeil = Math.ceil(this.range);
 
-    // for (let x = -rangeFloor; x <= rangeFloor; x++) {
-    //     if (x == 0 || x == -rangeFloor || x == rangeFloor) context.strokeStyle = "red";
-    //     else context.strokeStyle = "black";
+    context.lineWidth = width/this.range*0.01;
 
-    //     const xPos = x + 0.5 - this.cameraX % 1;
-    //     const screenPos = width/2 + xPos/this.range*width/2;
+    for (let x = -rangeFloor; x <= rangeFloor; x++) {
+        if (x == 0 || x == -rangeFloor || x == rangeFloor) context.strokeStyle = "red";
+        else context.strokeStyle = "black";
 
-    //     context.beginPath();
-    //     context.moveTo(screenPos, 0);
-    //     context.lineTo(screenPos, height);
-    //     context.stroke();
-    // }
+        const xPos = x - this.cameraX % 1;
+        const screenPos = width/2 + xPos/this.range*width/2;
 
-    // for (let y = 0; y < this.range*2; y++) {
-    //     const yPos = y + 0.5 - this.cameraY % 1;
-    //     const screenPos = height/2 - yPos/this.range*height/2;
+        context.beginPath();
+        context.moveTo(screenPos, 0);
+        context.lineTo(screenPos, height);
+        context.stroke();
+    }
 
-    //     context.beginPath();
-    //     context.moveTo(0, screenPos);
-    //     context.lineTo(width, screenPos);
-    //     context.stroke();
-    // }
+    for (let y = 0; y < this.range*2; y++) {
+        const yPos = y - this.cameraY % 1;
+        const screenPos = height/2 - yPos/this.range*height/2;
+
+        context.beginPath();
+        context.moveTo(0, screenPos);
+        context.lineTo(width, screenPos);
+        context.stroke();
+    }
   }
 
   moveCamera(x: number, y: number) {
     this.cameraX += x;
     this.cameraY += y;
 
-    // this.loadChunks();
-    this.paint();
+    this.updateDisplay();
   }
 
   zoomCamera(direction: boolean) {
     if (direction) this.range *= 1.1;
     else this.range /= 1.1;
 
-    // this.loadChunks();
-    this.paint();
+    this.updateDisplay();
   }
 
   initInput() {
