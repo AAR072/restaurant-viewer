@@ -278,6 +278,8 @@ class DisplayMap {
     const combined = getIntersections([filteredX, filteredY], App.restaurantCount);
     const combLength = combined.length;
 
+    console.log("TEST");
+
     for (let i = 0; i < combLength; i++) {
       const index = combined[i];
       const restX = this.app.data.x[index];
