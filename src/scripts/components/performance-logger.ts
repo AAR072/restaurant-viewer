@@ -62,7 +62,9 @@ function startAutoClearTimer() {
  * logTask("Example Task", 5000, Date.now(), "This task involved setting up a project.", "taskContainer");
  * // This will create a new task box inside the element with id "taskContainer"
  */
-function logTask(name: string, time: number, timestamp: number, description: string) {
+function logTask(name: string, time: number, description: string) {
+  const currentTime = Date.now();
+
   // Create a new div element to represent the task
   const taskDiv = document.createElement('div');
   taskDiv.style.border = '1px solid #444';  // Use a darker border color
@@ -77,13 +79,11 @@ function logTask(name: string, time: number, timestamp: number, description: str
   <h4 style="color: #4caf50;">${name}</h4>  <!-- Green heading to match button color -->
   <p>Time spent: ${time} milliseconds</p>
   <p>Description: ${description}</p>
-  <p>Logged at: ${new Date(timestamp).toLocaleTimeString()}</p>
+  <p>Logged at: ${currentTime.toLocaleString()}</p>
   `;
 
   // Append the taskDiv to the target div
   TASK_CONTAINER.appendChild(taskDiv);
-
-  const currentTime = Date.now();
 
   const logItem: LogItem = {
     count: logQueueLength,

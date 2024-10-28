@@ -148,10 +148,7 @@ class App {
    */
   updateDistances() {
     for (let i = 0; i < App.restaurantCount; i++) {
-      const xDist = this.locationX - data.x[i];
-      const yDist = this.locationY - data.y[i];
-
-      this.sorted.distData[i] = Math.sqrt(xDist ** 2 + yDist ** 2);
+      this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
 
     sortNumbers(this.sorted.distData, this.sorted.distSorted);
