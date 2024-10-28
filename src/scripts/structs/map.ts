@@ -285,6 +285,8 @@ class DisplayMap {
 
       const screenX = (restX - this.cameraX)*scaleRatio;
       const screenY = (restY - this.cameraY)*scaleRatio;
+
+      context.fillRect(width/2 + screenX - 5, height/2 - screenY - 5, 10, 10);
     }
 
     // const screenRect = new Rectangle(this.cameraX - this.range*aspectRatio*0.75, this.cameraX + this.range*aspectRatio*0.75, this.cameraY - this.range*0.75, this.cameraY + this.range*0.75);
