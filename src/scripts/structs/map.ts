@@ -3,90 +3,8 @@ const CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
-class Rectangle {
-  constructor(
-    public x0: number,
-    public x1: number,
-    public y0: number,
-    public y1: number
-  ) {}
-
-  public intersects(rect: Rectangle): boolean {
-    // return this.contains(rect) || (
-    //   // ((this.x0 < rect.x0 && this.x1 > rect.x0) || (this.x0 < rect.x1 && this.x1 > rect.x1) || (this.x0 > rect.x0 && this.x1 < rect.x1)) &&
-    //   // ((this.y0 < rect.y0 && this.y1 > rect.y0) || (this.y0 < rect.y1 && this.y1 > rect.y1) || (this.y0 > rect.y0 && this.y1 < rect.y1))
-    //   (rect.x0 < this.x0 && rect.x1 > this.x0 || rect.x1 > this.x1 && rect.x0 < this.x1) &&
-    //   (rect.y0 < this.y0 && rect.y1 > this.y0 || rect.y1 > this.y1 && rect.y0 < this.y1)
-    // );
-    if (this.x1 <= rect.x0 || this.x0 >= rect.x1) return false;
-    if (this.y1 <= rect.y0 || this.y0 >= rect.y1) return false;
-
-    return true;
-  }
-
-  public contains(rect: Rectangle): boolean {
-    return (
-      rect.x0 >= this.x0 && rect.x1 <= this.x1 &&
-      rect.y0 >= this.y0 && rect.y1 <= this.y1
-    );
-  }
-}
-
-class QuadTree extends Rectangle {
-  public SW: QuadTree | null = null;
-  public NW: QuadTree | null = null;
-  public SE: QuadTree | null = null;
-  public NE: QuadTree | null = null;
-
-  constructor(x0: number, x1: number, y0: number, y1: number, public number: number = 0) {
-    super(x0, x1, y0, y1);
-  }
-}
-
-function subdivideQuads(quad: QuadTree, count: number) {
-  if (count <= 0) return;
-
-  const midX = floor((quad.x0 + quad.x1)/2);
-  const midY = floor((quad.y0 + quad.y1)/2);
-
-  quad.SW = new QuadTree(quad.x0, midX, quad.y0, midY, quad.number*4 + 1);
-  quad.SE = new QuadTree(midX + 1, quad.x1, quad.y0, midY, quad.number*4 + 2);
-  quad.NW = new QuadTree(quad.x0, midX, midY + 1, quad.y1, quad.number*4 + 3);
-  quad.NE = new QuadTree(midX + 1, quad.x1, midY + 1, quad.y1, quad.number*4 + 4);
-
-  subdivideQuads(quad.SW, count - 1);
-  subdivideQuads(quad.SE, count - 1);
-  subdivideQuads(quad.NW, count - 1);
-  subdivideQuads(quad.NE, count - 1);
-}
-
-function getContainedQuads(target: Rectangle, quad: QuadTree, quads: QuadTree[]) {
-  const intersects = target.intersects(quad);
-  
-  if (!intersects) return;
-
-  const contains = target.contains(quad);
-  
-  if (contains) {
-    quads.push(quad);
-
-    return;
-  }
-
-  if (quad.SW && quad.SE && quad.NW && quad.NE) {
-    getContainedQuads(target, quad.SW, quads);
-    getContainedQuads(target, quad.SE, quads);
-    getContainedQuads(target, quad.NW, quads);
-    getContainedQuads(target, quad.NE, quads);
-
-  } else {
-    quads.push(quad);
-  }
-}
-
 class DisplayMap {
-  static QUAD_TREE_SUBDIVISIONS = 6;
-  static CHUNK_SIZE = 100;
+  static CHUNK_SIZE = 50;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
@@ -104,13 +22,8 @@ class DisplayMap {
   public chunkColumns: number;
   public chunkRows: number;
   public chunkCount: number;
+  public loadingChunks: boolean[];
   public loadedChunks: Uint32Array[];
-
-  public quadRoot: QuadTree;
-
-  public quadTreeSize: number;
-  public quadTree: Rectangle[];
-  public quadTreeRestaurants: Uint32Array[];
 
   constructor(public app: App) {
     this.minX = app.data.x[app.sorted.x[0]];
@@ -120,81 +33,22 @@ class DisplayMap {
     this.cameraX = (this.minX + this.maxX)/2;
     this.cameraY = (this.minY + this.maxY)/2;
 
-    this.quadTreeSize = (4**(DisplayMap.QUAD_TREE_SUBDIVISIONS + 1) - 1)/(4 - 1)
-    this.quadTree = new Array(this.quadTreeSize);
-    this.quadTreeRestaurants = new Array(4**DisplayMap.QUAD_TREE_SUBDIVISIONS);
-
-    let t1 = performance.now();
-    this.quadRoot = new QuadTree(this.minX, this.maxX, this.minY, this.maxY);
-    subdivideQuads(this.quadRoot, DisplayMap.QUAD_TREE_SUBDIVISIONS);
-    let t2 = performance.now();
-
-    this.quadTree[0] = new Rectangle(this.minX, this.maxX, this.minY, this.maxY);
-    this.subdivideQuads();
-    let t3 = performance.now();
-
-    console.log(t2 - t1, t3 - t2);
-    
-    this.preloadChunks();
-    this.updateDisplay();
-    this.initInput();
-  }
-
-  public subdivideQuads(index: number = 0, count: number = DisplayMap.QUAD_TREE_SUBDIVISIONS) {
-    if (index >= this.quadTreeSize) return;
-
-    const quad = this.quadTree[index];
-    const midX = floor((quad.x0 + quad.x1)/2);
-    const midY = floor((quad.y0 + quad.y1)/2);
-
-    const bottomLeft = 4*index + 1;
-    const bottomRight = 4*index + 2;
-    const topLeft = 4*index + 3;
-    const topRight = 4*index + 4;
-
-    this.quadTree[bottomLeft] = new Rectangle(quad.x0, midX, quad.y0, midY);
-    this.quadTree[bottomRight] = new Rectangle(midX + 1, quad.x1, quad.y0, midY);
-    this.quadTree[topLeft] = new Rectangle(quad.x0, midX, midY + 1, quad.y1);
-    this.quadTree[topRight] = new Rectangle(midX + 1, quad.x1, midY + 1, quad.y1);
-
-    this.subdivideQuads(bottomLeft, count - 1);
-    this.subdivideQuads(bottomRight, count - 1);
-    this.subdivideQuads(topLeft, count - 1);
-    this.subdivideQuads(topRight, count - 1);
-  }
-
-  public preloadChunks() {
     const xRange = this.maxX - this.minX;
     const yRange = this.maxY - this.minY;
 
-    this.chunkColumns = Math.ceil(xRange / DisplayMap.CHUNK_SIZE);
-    this.chunkRows = Math.ceil(yRange / DisplayMap.CHUNK_SIZE);
-    this.chunkCount = this.chunkRows * this.chunkColumns;
-
+    this.chunkColumns = Math.ceil(xRange/DisplayMap.CHUNK_SIZE);
+    this.chunkRows = Math.ceil(yRange/DisplayMap.CHUNK_SIZE);
+    this.chunkCount = this.chunkRows*this.chunkColumns;
+    this.loadingChunks = new Array(this.chunkCount);
     this.loadedChunks = new Array(this.chunkCount);
 
-    // for (let x = 0; x < this.chunkColumns; x++) {
-    //   for (let y = 0; y < this.chunkRows; y++) {
-    //     const chunkCount = x * this.chunkRows + y;
-
-    //     const cY = chunkCount % this.chunkRows;
-    //     const cX = (chunkCount - cY) / this.chunkRows;
-
-    //     const chunkMinX = this.minX + cX * DisplayMap.CHUNK_SIZE;
-    //     const chunkMinY = this.minY + cY * DisplayMap.CHUNK_SIZE;
-    //     const chunkMaxX = chunkMinX + DisplayMap.CHUNK_SIZE - 1; // -1 so as to not include restaurants shared by the next chunk
-    //     const chunkMaxY = chunkMinY + DisplayMap.CHUNK_SIZE - 1;
-
-    //     const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
-    //     const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
-    //     const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
-
-    //     this.chunks[chunkCount] = inRange;
-    //   }
-    // }
+    this.updateDisplay();
+    this.initInput();
+    
+    // load chunks in parallel (so that it does not yield) and slowly preload chunks outwards overtime (also maybe sort based on distance from cam)
   }
 
-  displayChunk(chunkNumber: number, context: CanvasRenderingContext2D, width: number, height: number, skipCount: number) {
+  public displayChunk(chunkNumber: number, context: CanvasRenderingContext2D, width: number, height: number, skipCount: number) {
     const cY = chunkNumber % this.chunkRows;
     const cX = (chunkNumber - cY) / this.chunkRows;
     const chunkX = this.minX + cX * DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE / 2 - this.cameraX;
@@ -241,16 +95,29 @@ class DisplayMap {
     }
   }
 
-  public drawRect(context: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, width: number, height: number) {
-    let endX = x + w;
-    let endY = y + h;
+  public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX:number, chunkMaxY: number, chunkNumber: number) {
+    this.loadingChunks[chunkNumber] = true;
 
-    x = Math.max(0, x);
-    y = Math.max(0, y);
-    endX = Math.min(endX, width);
-    endY = Math.min(endY, height);
+    setTimeout(() => {
+      const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
+      const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
+      const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
 
-    context.fillRect(x, y, endX - x, endY - y);
+      this.loadedChunks[chunkNumber] = inRange;
+    }, 0);
+
+    // const promise = new Promise<Uint32Array>((resolve) => {
+    //   // console.log(chunkNumber);
+    //   const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
+    //   const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
+    //   const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
+
+    //   resolve(inRange);
+    // });
+
+    // promise.then((restaurants: Uint32Array) => {
+    //   this.loadedChunks[chunkNumber] = restaurants;
+    // });
   }
 
   public updateDisplay() {
@@ -273,23 +140,60 @@ class DisplayMap {
     const minY = this.cameraY - this.range;
     const maxY = this.cameraY + this.range;
 
-    const filteredX = filterNumbers(this.app.data.x, this.app.sorted.x, minX, maxX);
-    const filteredY = filterNumbers(this.app.data.y, this.app.sorted.y, minY, maxY);
-    const combined = getIntersections([filteredX, filteredY], App.restaurantCount);
-    const combLength = combined.length;
+    let minChunkX = floor(minX/DisplayMap.CHUNK_SIZE);
+    let minChunkY = floor(minY/DisplayMap.CHUNK_SIZE);
+    let maxChunkX = floor(maxX/DisplayMap.CHUNK_SIZE);
+    let maxChunkY = floor(maxY/DisplayMap.CHUNK_SIZE);
 
-    console.log("TEST");
+    minChunkX = clamp(minChunkX, 0, this.chunkColumns - 1);
+    maxChunkX = clamp(maxChunkX, 0, this.chunkColumns - 1);
+    minChunkY = clamp(minChunkY, 0, this.chunkRows - 1);
+    maxChunkY = clamp(maxChunkY, 0, this.chunkRows - 1);
 
-    for (let i = 0; i < combLength; i++) {
-      const index = combined[i];
-      const restX = this.app.data.x[index];
-      const restY = this.app.data.y[index];
+    // const chunkYStart = clamp(minChunkX % this.chunkColumns, 0, this.chunkRows);
+    // const chunkYEnd = clamp(maxChunkX % this.chunkColumns, 0, this.chunkRows);
+    // const chunkXStart = clamp((minChunkY - chunkYStart)/this.chunkRows, 0, this.chunkColumns);
+    // const chunkXEnd = clamp((maxChunkY - chunkYEnd)/this.chunkRows, 0, this.chunkColumns);
 
-      const screenX = (restX - this.cameraX)*scaleRatio;
-      const screenY = (restY - this.cameraY)*scaleRatio;
+    for (let x = minChunkX; x <= maxChunkX; x++) {
+      for (let y = minChunkY; y <= maxChunkY; y++) {
+        const chunkNumber = x*this.chunkColumns + y;
+        let restaurants = this.loadedChunks[chunkNumber];
 
-      context.fillRect(width/2 + screenX - 5, height/2 - screenY - 5, 10, 10);
+        const chunkMinX = x*DisplayMap.CHUNK_SIZE;
+        const chunkMinY = y*DisplayMap.CHUNK_SIZE;
+        const chunkSize = DisplayMap.CHUNK_SIZE;
+
+        const screenX = width/2 + (chunkMinX - this.cameraX)*scaleRatio;
+        const screenY = height/2 - (chunkMinY + chunkSize - this.cameraY)*scaleRatio;
+        const screenSize = chunkSize*scaleRatio;
+
+        context.strokeRect(screenX, screenY, screenSize, screenSize);
+
+        if (restaurants) {
+
+          
+        } else if (!this.loadingChunks[chunkNumber]) {
+          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize, chunkMinY + chunkSize, chunkNumber);
+        }
+      }
     }
+
+    // const filteredX = filterNumbers(this.app.data.x, this.app.sorted.x, minX, maxX);
+    // const filteredY = filterNumbers(this.app.data.y, this.app.sorted.y, minY, maxY);
+    // const combined = getIntersections([filteredX, filteredY], App.restaurantCount);
+    // const combLength = combined.length;
+
+    // for (let i = 0; i < combLength; i++) {
+    //   const index = combined[i];
+    //   const restX = this.app.data.x[index];
+    //   const restY = this.app.data.y[index];
+
+    //   const screenX = (restX - this.cameraX)*scaleRatio;
+    //   const screenY = (restY - this.cameraY)*scaleRatio;
+
+    //   context.fillRect(width/2 + screenX - 5, height/2 - screenY - 5, 10, 10);
+    // }
 
     // const screenRect = new Rectangle(this.cameraX - this.range*aspectRatio*0.75, this.cameraX + this.range*aspectRatio*0.75, this.cameraY - this.range*0.75, this.cameraY + this.range*0.75);
 
