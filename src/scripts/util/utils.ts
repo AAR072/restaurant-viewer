@@ -81,3 +81,7 @@ function getMax(a: number, b: number): number {
 function getMin(a: number, b: number): number {
   return a > b ? b : a;
 }
+
+function getDistance(x0: number, y0: number, x1: number, y1: number): number {
+  return Math.sqrt((x0 - x1)**2 + (y0 - y1)**2);
+}

@@ -93,9 +93,8 @@ function sortArray(arr: (number | string)[] | Uint32Array | Float32Array, compar
   sort(sorted, 0, length - 1, compare);
 
   const t1 = performance.now();
-  const date = Date.now();
-  const description = `Sorted an array of ${typeof arr[0]}s`;
-  logTask("Sorted Array", t1-t0, date, description);
+  logTask("Sorted Array", t1 - t0, `Sorted an array of ${typeof arr[0]}s`);
+  
   return sorted;
 }
 

@@ -9,6 +9,7 @@
  */
 function getIntersections(data: (Uint32Array | number[])[], indexRange: number, sortBy?: Uint32Array): Uint32Array {
   const t0 = performance.now();
+  
   const dataSetCount = data.length;
   const requiredCount = dataSetCount - 1;
 
@@ -59,24 +60,18 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     }
 
     const t1 = performance.now();
-    logTask(
-      "Get Intersections", 
-      t1-t0, Date.now(), 
-      `Found intersection in an array and sorted with custom parameters`
-    );
+    logTask("Get Intersections", t1 - t0, `Found intersection in an array and sorted with custom parameters`);
 
     return sorted;
   }
 
   const t2 = performance.now();
-  logTask(
-    "Get Intersections", 
-    t2-t0, Date.now(), 
-    `Found intersection in an array`
-  );
+  logTask("Get Intersections", t2 - t0, `Found intersection in an array`);
 
   return new Uint32Array(duplicates);
 }
+
+// Modularize sort/hash logic for sortBy and getIntersections
 
 /**
  * Sorts the elements of the `indices` array according to the order defined by `sortedIndices`. 
