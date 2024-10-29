@@ -67,7 +67,7 @@ body {
 
 .container {
   display: flex;
-  max-width: 1200px;
+  max-width: fit-content;
   margin: 20px auto;
 }
 
@@ -128,10 +128,6 @@ body {
 /* .main-content{
   width:150%;
 } */
-
-.performance-section{
-  width:15%;
-}
 
 .search-section input,
 .search-section select,
