@@ -106,17 +106,31 @@ body {
   overflow-y: scroll;
 }
 
+/* .performance-section{
+  margin: right 10px;
+  margin: bottom 10px;
+  position:fixed;
+} */
+
 /* Search and Filter Section */
 .search-section,
 .filter-section,
 .sort-section,
-.performance-section,
+/*.performance-section,*/
 .test-section,
 .browse-section {
   background-color: var(--sidebar-background);
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
+}
+
+/* .main-content{
+  width:150%;
+} */
+
+.performance-section{
+  width:15%;
 }
 
 .search-section input,
@@ -198,8 +212,8 @@ body {
   background-color: #d32f2f !important; /* Manually specify a darker shade of red */
 }
 
-.perflog-fade-out {
-  transition: opacity 1s ease, height 1s ease 1s;
+/* .perflog-fade-out {
+    transition: opacity 1s ease, height 1s ease 1s;
   opacity: 0;
   height: 0;
-}
+} */
