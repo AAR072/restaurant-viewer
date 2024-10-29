@@ -210,6 +210,10 @@ class App {
 
       this.currentSearch = new SearchResult(this, results);
     });
+          SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
+        this.currentSearch = new SearchResult(this, this.sorted.storeName);
+    });
+
 
     TYPE_SELECT.addEventListener("input", () => {
       this.currentSearch.setTypeFilter(TYPE_SELECT.value);

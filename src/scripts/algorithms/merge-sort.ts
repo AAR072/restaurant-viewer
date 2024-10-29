@@ -37,8 +37,7 @@ function merge(arr: Uint32Array, low: number, mid: number, high: number, compare
       leftPoint++;
     } else {
       arr[low + pointer++] = right;
-      rightPoint++;
-    }
+      rightPoint++; }
   }
 
   while (leftPoint < leftLength) {
@@ -124,6 +123,8 @@ function sortNumbers(data: number[] | Uint32Array | Float32Array, outSorted?: Ui
  */
 function sortStrings(data: string[], outSorted?: Uint32Array): Uint32Array {
   return sortArray(data, (a: number, b: number) => {
-    return data[a].localeCompare(data[b]);
+    if (data[a] < data[b]) return -1;
+    if (data[a] > data[b]) return 1;
+    return 0;
   }, outSorted);
 }

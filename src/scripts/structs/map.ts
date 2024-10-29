@@ -266,29 +266,48 @@ class DisplayMap {
 
     context.fillStyle = "black";
 
-    const screenRect = new Rectangle(this.cameraX - this.range*aspectRatio*0.75, this.cameraX + this.range*aspectRatio*0.75, this.cameraY - this.range*0.75, this.cameraY + this.range*0.75);
-
-    const quadsToDisplay: QuadTree[] = [];//[this.quadRoot.SW!.SW!.SW!.SW!.SW!.SW!, this.quadRoot.SW!.SW!.SW!.SW!.SW!.SE!];
-    getContainedQuads(screenRect, this.quadRoot, quadsToDisplay);
-
     const scaleRatio = height/(this.range*2);
 
-    for (let i = 0; i < quadsToDisplay.length; i++) {
-      const quad = quadsToDisplay[i];
+    const minX = this.cameraX - this.range*aspectRatio;
+    const maxX = this.cameraX + this.range*aspectRatio;
+    const minY = this.cameraY - this.range;
+    const maxY = this.cameraY + this.range;
 
-      if (quad.NE == null) context.fillStyle = "blue";
-      else context.fillStyle = "green"
+    const filteredX = filterNumbers(this.app.data.x, this.app.sorted.x, minX, maxX);
+    const filteredY = filterNumbers(this.app.data.y, this.app.sorted.y, minY, maxY);
+    const combined = getIntersections([filteredX, filteredY], App.restaurantCount);
+    const combLength = combined.length;
 
-      const screenX = (quad.x0 - this.cameraX)*scaleRatio;
-      const screenY = (quad.y1 - this.cameraY)*scaleRatio;
-      const sizeX = (quad.x1 - quad.x0)*scaleRatio;
-      const sizeY = (quad.y1 - quad.y0)*scaleRatio;
+    for (let i = 0; i < combLength; i++) {
+      const index = combined[i];
+      const restX = this.app.data.x[index];
+      const restY = this.app.data.y[index];
 
-      context.fillRect(width/2 + screenX, height/2 - screenY, sizeX, sizeY);
+      const screenX = (restX - this.cameraX)*scaleRatio;
+      const screenY = (restY - this.cameraY)*scaleRatio;
     }
 
-    context.strokeStyle = "red";
-    context.strokeRect(width/2 + (screenRect.x0 - this.cameraX)*(height/2)/this.range, height/2 - (screenRect.y1 - this.cameraY)*(height/2)/this.range, (screenRect.x1 - screenRect.x0)*(height/2)/this.range, (screenRect.y1 - screenRect.y0)*(height/2)/this.range);
+    // const screenRect = new Rectangle(this.cameraX - this.range*aspectRatio*0.75, this.cameraX + this.range*aspectRatio*0.75, this.cameraY - this.range*0.75, this.cameraY + this.range*0.75);
+
+    // const quadsToDisplay: QuadTree[] = [];//[this.quadRoot.SW!.SW!.SW!.SW!.SW!.SW!, this.quadRoot.SW!.SW!.SW!.SW!.SW!.SE!];
+    // getContainedQuads(screenRect, this.quadRoot, quadsToDisplay);
+
+    // for (let i = 0; i < quadsToDisplay.length; i++) {
+    //   const quad = quadsToDisplay[i];
+
+    //   if (quad.NE == null) context.fillStyle = "blue";
+    //   else context.fillStyle = "green"
+
+    //   const screenX = (quad.x0 - this.cameraX)*scaleRatio;
+    //   const screenY = (quad.y1 - this.cameraY)*scaleRatio;
+    //   const sizeX = (quad.x1 - quad.x0)*scaleRatio;
+    //   const sizeY = (quad.y1 - quad.y0)*scaleRatio;
+
+    //   context.fillRect(width/2 + screenX, height/2 - screenY, sizeX, sizeY);
+    // }
+
+    // context.strokeStyle = "red";
+    // context.strokeRect(width/2 + (screenRect.x0 - this.cameraX)*(height/2)/this.range, height/2 - (screenRect.y1 - this.cameraY)*(height/2)/this.range, (screenRect.x1 - screenRect.x0)*(height/2)/this.range, (screenRect.y1 - screenRect.y0)*(height/2)/this.range);
   }
 
   moveCamera(x: number, y: number) {
