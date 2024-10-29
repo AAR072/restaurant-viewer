@@ -111,6 +111,7 @@ body {
 .filter-section,
 .sort-section,
 .performance-section,
+.test-section,
 .browse-section {
   background-color: var(--sidebar-background);
   padding: 20px;

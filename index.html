@@ -4,129 +4,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <link rel="stylesheet" href="./src/css/style.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Frosted glass effect */
-    .frosted-glass {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-  </style>
-</head>
-
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
-  <div class="frosted-glass p-10 shadow-lg w-full max-w-5xl">
-    <h1 class="text-2xl font-semibold mb-8 text-center">Search Interface</h1>
-
-    <div class="mb-6">
-      <input id="id-search-input" class="text-black w-full p-3 mb-3 border border-gray-600 rounded" placeholder="ID" />
-      <button id="id-search-button"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded">Search</button>
-    </div>
-
-    <div class="mb-6">
-      <input id="name-search-input" class="text-black w-full p-3 mb-3 border border-gray-600 rounded"
-        placeholder="Name" />
-      <button id="name-search-button"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded">Search</button>
-    </div>
-
-    <div class="mb-6 flex space-x-2">
-      <input id="x-search-input" class="text-black w-1/2 p-3 border border-gray-600 rounded" placeholder="X" />
-      <input id="y-search-input" class="text-black w-1/2 p-3 border border-gray-600 rounded" placeholder="Y" />
-      <button id="xy-search-button"
-        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded">Search</button>
-    </div>
-
-    <div class="flex items-center mb-6">
-      <p class="mr-2">Page</p>
-      <input id="page-number-input" class="text-black w-16 p-3 border border-gray-600 rounded" />
-      <span id="page-count" class="mx-2"></span>
-    </div>
-
-    <div class="flex space-x-2 mb-6">
-      <button id="prev-page" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded">Previous
-        Page</button>
-      <button id="next-page" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded">Next
-        Page</button>
-    </div>
-
-    <div class="mb-6 flex items-center">
-      <label for="page-size" class="mr-2">Page Size</label>
-      <input id="page-size" class="text-black w-24 p-3 border border-gray-600 rounded" placeholder="(1 - 100)" />
-    </div>
-
-    <button id="search-results-order"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded w-full">Order Results</button>
-
-    <div id="search-results" class="mt-6 border border-gray-600 p-4 rounded"></div>
-  </div>
-
-  <!--Do not move the line below-->
-  <script src="./dist/DO_NOT_TOUCH.js"></script>
-  <!--Do not move the line above-->
-  <script src="./dist/scripts/util/utils.js"></script>
-  <script src="./dist/scripts/algorithms/merge-sort.js"></script>
-  <script src="./dist/scripts/algorithms/binary-search.js"></script>
-  <script src="./dist/scripts/algorithms/array-intersection.js"></script>
-  <script src="./dist/index.js"></script>
-</body>
-
-</html>
-<html lang="en">
-
-</html>
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <link rel="stylesheet" href="./src/css/style.css" />
+  <title>Banana Republic Restaurant Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/css/ali.css">
 </head>
 
 <body>
-  <div id="performance" class="performanceUpdates" hidden>
-    <p id="performanceText" class="performanceText"></p>
-  </div>
-  <div id="firstPage" class="main-menu" onclick="changeMenu()">
-    <img src="ComputerProject.png">
-  </div>
-  <div id="inputs" class="inputs" hidden>
-    <div id="inputItems" class="inputItems">
-      <h3>Search Parameters</h3>
-      <input id="id-search-input" placeholder="ID" />
-      <button id="id-search-button" type="button">Search</button>
-      <br>
-      <input id="name-search-input" placeholder="Name" />
-      <button id="name-search-button" type="button">Search</button>
-      <br>
-      <input id="x-search-input" placeholder="X" />
-      <input id="y-search-input" placeholder="Y" />
-      <button id="xy-search-button" type="button">Search</button>
-    </div>
-  </div>
-  <div id="display" class="display" hidden>
-    <p>Page <input id="page-number-input" />/<span id="page-count"></span></p>
-    <button id="next-page">Next Page</button>
-    <button id="prev-page">Previous Page</button>
-    <br>
-    <label for="page-size">Page Size</label><input id="page-size" placeholder="(1 - 100)" />
-    <br>
-    <button id="search-results-order"></button>
+
+  <!-- Map Section -->
+  <div hidden>
+    <canvas id="map-canvas" width="800" height="450" style="background-color: white;"></canvas>
   </div>
 
-  <!--Do not move the line below-->
+  <div class="container">
+    <!-- Sidebar for filters -->
+    <div class="sidebar">
+      <h2>Filters</h2>
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <label for="type-filter">Cuisine Type:</label>
+        <br>
+        <select id="type-filter" name="type">
+          <option value="">Any</option>
+        </select>
+        <br>
+        <br>
+
+        <label for="cost-filter">Cost:</label>
+        <br>
+        <select id="cost-filter" name="cost">
+          <option value="">Any</option>
+          <option value="low">Cheap (under $10)</option>
+          <option value="less">Mid-Range ($20 - $40)</option>
+          <option value="range">High-End (above $40)</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div>
+          <input id="cost-min" type="text" />
+          <input type="range" value="0" min="0" max="1000" />
+          <input id="cost-max" type="text" />
+        </div>
+        <label for="review-filter">Review:</label>
+        <select id="review-filter" name="review">
+          <option value="">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+          <option value="4.5">4.5+</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div>
+          <input id="review-min" type="text" />
+          <input type="range" value="0" min="0" max="1000" />
+          <input id="review-max" type="text" />
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Search Section -->
+      <div class="search-section">
+        <h2>Search</h2>
+        <br>
+        <input id="search-name" type="text" placeholder="Name"/>
+        <br>
+        <input id="search-id" type="text" placeholder="Id"/>
+        <br>
+        <input id="search-x" type="text" placeholder="X"/>
+        <input id="search-y" type="text" placeholder="Y"/>
+        <br>
+        <button id="search-button" type="button">Search</button>
+        <button id="search-clear" class="error-button">Clear Search</button>
+      </div>
+
+      <!-- Sort Section -->
+      <div class="sort-section">
+        <h2>Sort</h2>
+        <label for="sort-select">Sort By</label>
+        <select id="sort-select" name="Sort By">
+          <option value="storeName">Alphabetical Order</option>
+          <option value="cost">Price</option>
+          <option value="review">Review</option>
+        </select>
+        <button id="sort-direction">Ascending</button>
+      </div>
+
+      <!-- Browse Section -->
+      <div class="browse-section">
+        <h2>Browse</h2>
+        <div>
+          <label for="page-size">Page Size:</label>
+          <input id="page-size" type="text" placeholder="(1 - 100)" value="0" />
+        </div>
+        <div>
+          <label for="page-number-input">Page:</label>
+          <input id="page-number-input" type="text" value="0" />
+          <span>/</span>
+          <span id="page-count">0</span>
+        </div>
+        <button id="prev-page">Previous Page</button>
+        <button id="next-page">Next Page</button>
+      </div>
+
+      <!-- Results Section -->
+      <div id="search-results" class="results">
+        <div class="skeleton-loader"></div>
+      </div>
+    </div>
+
+    <!-- Performance Section -->
+    <div class="sidebar performance-section">
+      <h2>Performance</h2>
+      <label style="color:var(--warning-color);" for="disable-performance-clear">Disable Auto Clear:</label>
+      <input id="disable-performance-clear" type="checkbox">
+      <br>
+      <br>
+      <button id="clear-performance-log" class="error-button">Clear All</button>
+      <div id="taskContainer"></div>
+    </div>
+  </div>
+
+  <!-- Do not move the line below -->
   <script src="./dist/DO_NOT_TOUCH.js"></script>
-  <!--Do not move the line above-->
+  <!-- Do not move the line above -->
   <script src="./dist/scripts/util/utils.js"></script>
+  <script src="./dist/scripts/components/performance-logger.js"></script>
   <script src="./dist/scripts/algorithms/merge-sort.js"></script>
   <script src="./dist/scripts/algorithms/binary-search.js"></script>
   <script src="./dist/scripts/algorithms/array-intersection.js"></script>
   <script src="./dist/index.js"></script>
+  <script src="./dist/scripts/components/map.js"></script>
 </body>
 
-</html>
+<
