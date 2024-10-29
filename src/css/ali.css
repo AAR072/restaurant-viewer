@@ -208,8 +208,8 @@ body {
   background-color: #d32f2f !important; /* Manually specify a darker shade of red */
 }
 
-/* .perflog-fade-out {
+.perflog-fade-out {
     transition: opacity 1s ease, height 1s ease 1s;
   opacity: 0;
   height: 0;
-} */
+} 
