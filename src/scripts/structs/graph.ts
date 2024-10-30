@@ -5,6 +5,7 @@
 interface vector {
   x: number;
   y: number;
+  type: string;
 }
 class GraphNode<T> {
     value:vector; 
@@ -15,8 +16,8 @@ class GraphNode<T> {
      * @param {T} x - The x value to be stored in the node.
      * @param {T} y - The y value to be stored in the node.
      */
-    constructor(x: number, y: number) {
-        this.value =  {x,y};
+    constructor(x: number, y: number, type:string) {
+        this.value =  {x,y, type};
         this.neighbors = new Map();
     }
 
