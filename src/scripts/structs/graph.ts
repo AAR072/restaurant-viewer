@@ -2,16 +2,21 @@
  * Represents a node in a graph.
  * @template T - The type of the value stored in the node.
  */
+interface vector {
+  x: number;
+  y: number;
+}
 class GraphNode<T> {
-    value: T;
+    value:vector; 
     neighbors: Map<GraphNode<T>, number>;
 
     /**
      * Creates an instance of GraphNode.
-     * @param {T} value - The value to be stored in the node.
+     * @param {T} x - The x value to be stored in the node.
+     * @param {T} y - The y value to be stored in the node.
      */
-    constructor(value: T) {
-        this.value = value;
+    constructor(x: number, y: number) {
+        this.value =  {x,y};
         this.neighbors = new Map();
     }
 
