@@ -1,12 +1,10 @@
 // TODO
-// Do get combinations once in the start of the program in index
+// Do get combinations once in the start of the program in index -- PULL AND DO THIS
 // Add JSDOC and comments
-// Remove all illegal code
-// I don't like the cuisine const
-// Write a helper function
+// Remove all illegal code -- DONE
+// I don't like the cuisine const -- PULL AND DO THIS
+// Write a helper function -- DONE
 
-
-// Force sebastian to write the distance sort but correct
 const cuisines = [
   "Indian",
   "Coffee",
@@ -18,105 +16,36 @@ const cuisines = [
   "Pizza",
   "Korean"
 ];
+/**
+ * Gets all combinations of length four from an array 
+ * @param {any[]} arr. Our array of strings we want to form combinations with
+ * @timecomplexity `O(n!)` We have 4! as a parameter but that is = O(1)
+ */
 function getCombinations(arr: any[]) {
-  const result: any [] = [];
-
-  const generateCombinations = (start: number, currentCombination: any []) => {
+  const result: any[] = [];
+  /**
+   * :w
+   *
+  */
+  const generateCombinations = (start: number, currentCombination: any[], currentPtr = 0, resultPtr = 0) => {
     // Only add combinations of length 4 to the result
-    if (currentCombination.length === 4) {
-      result.push([...currentCombination]); // Use a copy of currentCombination
-      return; // Return early since we only want combinations of length 4
+    if (currentPtr === 4) {
+      result[resultPtr] = [...currentCombination];
+      resultPtr++;
+      return resultPtr; // Return resultPtr to track next insertion index
     }
 
     // Loop through the array to generate combinations
     for (let i = start; i < arr.length; i++) {
-      currentCombination.push(arr[i]); // Include the current element
-      generateCombinations(i + 1, currentCombination); // Recur with the next index
-      currentCombination.pop(); // Backtrack
+      currentCombination[currentPtr] = arr[i];
+      resultPtr = generateCombinations(i + 1, currentCombination, currentPtr + 1, resultPtr); // Recur with the next index
     }
+
+    return resultPtr;
   };
 
   generateCombinations(0, []);
   return result;
-}
-
-
-
-function sortPointsWithTypes(
-  xArray: number[],
-  yArray: number[],
-  typeArray: string[],
-  inputPoint: [number, number]
-): [number[], number[], string[]] {
-  const n = xArray.length;
-  const distances = new Array(n);
-  const indices = new Array(n);
-
-  // Calculate distances and initialize indices
-  for (let i = 0; i < n; i++) {
-    distances[i] = Math.sqrt((xArray[i] - inputPoint[0]) ** 2 + (yArray[i] - inputPoint[1]) ** 2);
-    indices[i] = i;
-  }
-
-  // Merge sort function to sort indices based on distances
-  function mergeSort(arr: number[], left: number, right: number): number[] {
-    if (left >= right) return [arr[left]];
-
-    const mid = Math.floor((left + right) / 2);
-    const leftSorted = mergeSort(arr, left, mid);
-    const rightSorted = mergeSort(arr, mid + 1, right);
-
-    return merge(leftSorted, rightSorted);
-  }
-
-  function merge(leftArr: number[], rightArr: number[]): number[] {
-    const merged = new Array(leftArr.length + rightArr.length);
-    let i = 0, j = 0, k = 0;
-
-    // Merge while comparing distances
-    while (i < leftArr.length && j < rightArr.length) {
-      if (distances[leftArr[i]] <= distances[rightArr[j]]) {
-        merged[k] = leftArr[i];
-        i++;
-      } else {
-        merged[k] = rightArr[j];
-        j++;
-      }
-      k++;
-    }
-
-    // Copy remaining elements from leftArr if any
-    while (i < leftArr.length) {
-      merged[k] = leftArr[i];
-      i++;
-      k++;
-    }
-
-    // Copy remaining elements from rightArr if any
-    while (j < rightArr.length) {
-      merged[k] = rightArr[j];
-      j++;
-      k++;
-    }
-
-    return merged;
-  }
-
-  // Sort indices based on distances using merge sort
-  const sortedIndices = mergeSort(indices, 0, n - 1);
-
-  // Use sorted indices to create sorted arrays
-  const sortedX = new Array(n);
-  const sortedY = new Array(n);
-  const sortedTypes = new Array(n);
-
-  for (let i = 0; i < n; i++) {
-    sortedX[i] = xArray[sortedIndices[i]];
-    sortedY[i] = yArray[sortedIndices[i]];
-    sortedTypes[i] = typeArray[sortedIndices[i]];
-  }
-
-  return [sortedX, sortedY, sortedTypes];
 }
 
 
@@ -242,6 +171,7 @@ function findMinimumDistanceToTypesAndEnd(graph: Graph, startId: number, endId: 
   return { distance: minDistance, path };
 }
 function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance: number; path: TNode[] } {
+  let ptr = 0;
   const { TNodes, categories } = graph;
   const n = TNodes.length;
   const dist = computeAllPairDistances(TNodes);
@@ -253,8 +183,21 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
   });
 
   // DP array to track the minimum distance
-  const dp: number[][] = Array.from({ length: n }, () => Array(1 << categories.length).fill(Infinity));
-  const previous: number[][] = Array.from({ length: n }, () => Array(1 << categories.length).fill(-1));
+const dp: number[][] = [];
+for (let i = 0; i < n; i++) {
+  dp[i] = [];
+  for (let j = 0; j < (1 << categories.length); j++) {
+    dp[i][j] = Infinity;
+  }
+}
+
+const previous: number[][] = [];
+for (let i = 0; i < n; i++) {
+  previous[i] = [];
+  for (let j = 0; j < (1 << categories.length); j++) {
+    previous[i][j] = -1;
+  }
+}
 
   // Start with the start node's category marked as visited
   const startMask = categoryMap[TNodes[startId].type];
@@ -297,14 +240,15 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
   let currentMask = allCategoriesMask;
 
   while (lastTNodeId !== -1) {
-    path.push(TNodes[lastTNodeId]);
+    path[ptr] = TNodes[lastTNodeId];
+    ptr++;
     const prevTNode = previous[lastTNodeId][currentMask];
     currentMask &= ~categoryMap[TNodes[lastTNodeId].type]; // Remove the category from mask
     lastTNodeId = prevTNode;
   }
 
   // Reverse the path to get it from start to end
-  path.reverse();
+  // path.reverse();
 
   return { distance: minDistance, path };
 }
@@ -316,8 +260,19 @@ function goFrugal(
   currentY: number,
   combinations: string[][],
   budget: number,
+  sortedData:Uint32Array 
 ): { distance: number; path: TNode[]; possible: boolean} {
-  const [sortedX, sortedY, sortedTypes] = sortPointsWithTypes(xData, yData, typesData, [currentX,currentY]);
+  const sortedX: number[] = [];
+  const sortedY: number[] = [];
+  const sortedTypes: string[] = [];
+    for (let i = 0; i < 110; i++) {
+    let index = sortedData[i];
+    sortedX[i] = xData[index];
+    sortedY[i] = yData[index];
+    sortedTypes[i] = typesData[index];
+  }
+
+
   let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
   for (let i = 1; i < 100; i++) {
     TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
@@ -326,7 +281,7 @@ function goFrugal(
     TNodes,
     categories: [""]
   };
-  const deepCopy = combinations.map(combination => [...combination]);
+  const deepCopy = JSON.parse(JSON.stringify(combinations));
   let best = {distance: Infinity, path: [TNodes[0]] , possible: false};
   for (let i = 0; i < deepCopy.length; i++) {
     graph = {TNodes, categories: deepCopy[i]}
@@ -341,7 +296,7 @@ function goFrugal(
     return {distance: Infinity, path: [], possible: false};
   }
   let distanceInKm = best.distance / 50;
-  if (distanceInKm > budget * 2) {
+  if (distanceInKm >= budget * 2) {
     return {distance: best.distance, path: best.path, possible: false};
   } 
   return {distance: best.distance, path: best.path, possible: true};
@@ -357,8 +312,22 @@ function savingFuel(
   currentY: number,
   targetX: number,
   targetY: number,
+  sortedData: Uint32Array
 ): { distance: number; path: TNode[] } {
-  const [sortedX, sortedY, sortedTypes] = sortPointsWithTypes(xData, yData, typesData, [currentX,currentY]);
+  const sortedX = [];
+  const sortedY = [];
+  const sortedTypes = [];
+  const deepCopy = JSON.parse(JSON.stringify(categories));
+  deepCopy[deepCopy.length] = "START";
+  deepCopy[deepCopy.length] = "END";
+  // i is 110 becaue I am scared of random bugs when copying over
+  for (let i = 0; i < 110; i++) {
+    let index = sortedData[i];
+    sortedX[i] = xData[index];
+    sortedY[i] = yData[index];
+    sortedTypes[i] = typesData[index];
+  }
+
   let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
   for (let i = 1; i < 100; i++) {
     TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
@@ -366,16 +335,20 @@ function savingFuel(
   TNodes[100] = {id: 100, x: targetX, y:targetY, type: "END"}
   let graph: Graph = {
     TNodes,
-    categories 
+    categories: deepCopy 
   };
   const result = findMinimumDistanceToTypesAndEnd(graph, 0, 100);
   return result;
 }
 const uniqueCombinations = getCombinations(cuisines);
 // Example
-console.log(savingFuel(["START", "END", "Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0));
+const t0 = performance.now();
+console.log(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0, app.sorted.distSorted));
+console.log(performance.now() - t0);
 console.log("GO FRUGAL!");
-console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1));
+const t1 = performance.now();
+console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted));
+console.log(performance.now() - t1);
 
 
 
