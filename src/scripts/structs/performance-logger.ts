@@ -74,7 +74,7 @@ function logTask(name: string, time: number, description: string) {
   taskDiv.style.backgroundColor = '#2e2e2e';  // Match the dark background of the theme
   taskDiv.style.color = '#fff';  // Ensure text is white for readability
 
-  //taskDiv.style.
+  // taskDiv.style.
   
   // Add task details inside the taskDiv
   taskDiv.innerHTML = `
