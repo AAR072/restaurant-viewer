@@ -4,6 +4,8 @@
 // Remove all illegal code
 // I don't like the cuisine const
 // Write a helper function
+
+
 // Force sebastian to write the distance sort but correct
 const cuisines = [
     "Indian",
@@ -317,25 +319,19 @@ function savingFuel(
   targetY: number,
 ): { distance: number; path: TNode[] } {
   const [sortedX, sortedY, sortedTypes] = sortPointsWithTypes(xData, yData, typesData, [currentX,currentY]);
-  const [tempX, tempY, tempTypes] = sortPointsWithTypes(data.x, data.y, data.type, [targetX,targetY]);
-  let targetId = 0;
-  let TNodes:  TNode[] = [];
-  for (let i = 0; i < 100; i++) {
-    if (sortedX[i] == tempX[0] && sortedY[0] == tempY[0]) {
-      targetId = i;
-    }
+  let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
+  for (let i = 1; i < 100; i++) {
     TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
   }
+  TNodes[100] = {id: 100, x: targetX, y:targetY, type: "END"}
   let graph: Graph = {
     TNodes,
     categories 
   };
-  const result = findMinimumDistanceToTypesAndEnd(graph, 0, targetId);
-  result.distance += getDistance(currentX, currentY, sortedX[0], sortedY[0]); 
-  result.distance += getDistance(sortedX[targetId], sortedY[targetId], targetX, targetY);
+  const result = findMinimumDistanceToTypesAndEnd(graph, 0, 100);
   return result;
 }
 const uniqueCombinations = getCombinations(cuisines);
 // Example
-// savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0);
+console.log(savingFuel(["START", "END", "Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0));
 
