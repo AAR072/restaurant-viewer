@@ -1,10 +1,12 @@
-const CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
+const MAP_CONTAINER = document.getElementById("map-container") as HTMLDivElement;
+const MAP_CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
 
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
 class DisplayMap {
-  static CHUNK_SIZE = 50;
+  static CHUNK_SIZE = 100;
+  static ICON_SIZE = 24;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
@@ -25,26 +27,28 @@ class DisplayMap {
   public loadingChunks: boolean[];
   public loadedChunks: Uint32Array[];
 
+  public infoDisplay: HTMLDivElement | null = null;
+
   constructor(public app: App) {
     this.minX = app.data.x[app.sorted.x[0]];
     this.minY = app.data.y[app.sorted.y[0]];
     this.maxX = app.data.x[app.sorted.x[App.restaurantCount - 1]];
     this.maxY = app.data.y[app.sorted.y[App.restaurantCount - 1]];
-    this.cameraX = (this.minX + this.maxX)/2;
-    this.cameraY = (this.minY + this.maxY)/2;
+    this.cameraX = (this.minX + this.maxX) / 2;
+    this.cameraY = (this.minY + this.maxY) / 2;
 
     const xRange = this.maxX - this.minX;
     const yRange = this.maxY - this.minY;
 
-    this.chunkColumns = Math.ceil(xRange/DisplayMap.CHUNK_SIZE);
-    this.chunkRows = Math.ceil(yRange/DisplayMap.CHUNK_SIZE);
-    this.chunkCount = this.chunkRows*this.chunkColumns;
+    this.chunkColumns = Math.ceil(xRange / DisplayMap.CHUNK_SIZE);
+    this.chunkRows = Math.ceil(yRange / DisplayMap.CHUNK_SIZE);
+    this.chunkCount = this.chunkRows * this.chunkColumns;
     this.loadingChunks = new Array(this.chunkCount);
     this.loadedChunks = new Array(this.chunkCount);
 
     this.updateDisplay();
     this.initInput();
-    
+
     // load chunks in parallel (so that it does not yield) and slowly preload chunks outwards overtime (also maybe sort based on distance from cam)
   }
 
@@ -54,9 +58,9 @@ class DisplayMap {
     const chunkX = this.minX + cX * DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE / 2 - this.cameraX;
     const chunkY = this.minY + cY * DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE / 2 - this.cameraY;
 
-    const screenX = width/2 + chunkX/this.range*height/2;
-    const screenY = height/2 - chunkY/this.range*height/2;
-    const size = height/(this.range*2)*DisplayMap.CHUNK_SIZE;
+    const screenX = width / 2 + chunkX / this.range * height / 2;
+    const screenY = height / 2 - chunkY / this.range * height / 2;
+    const size = height / (this.range * 2) * DisplayMap.CHUNK_SIZE;
 
     context.fillStyle = "red";
     context.strokeRect(screenX - size / 2, screenY - size / 2, size, size);
@@ -84,10 +88,10 @@ class DisplayMap {
       const xPos = this.app.data.x[index] - this.cameraX;
       const yPos = this.app.data.y[index] - this.cameraY;
 
-      const screenX = width/2 + xPos/this.range*height/2;
-      const screenY = height/2 - yPos/this.range*height/2;
+      const screenX = width / 2 + xPos / this.range * height / 2;
+      const screenY = height / 2 - yPos / this.range * height / 2;
 
-      const size = height/this.range*0.5;
+      const size = height / this.range * 0.5;
 
       // context.drawImage(LOCATION_ICON, screenX - 12, screenY - 24, 24, 24);
 
@@ -95,16 +99,13 @@ class DisplayMap {
     }
   }
 
-  public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX:number, chunkMaxY: number, chunkNumber: number) {
-    this.loadingChunks[chunkNumber] = true;
+  public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX: number, chunkMaxY: number, chunkNumber: number) {
+    const inRange = getIntersections([
+      filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX),
+      filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY)
+    ], App.restaurantCount);
 
-    setTimeout(() => {
-      const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
-      const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
-      const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
-
-      this.loadedChunks[chunkNumber] = inRange;
-    }, 0);
+    this.loadedChunks[chunkNumber] = inRange;
 
     // const promise = new Promise<Uint32Array>((resolve) => {
     //   // console.log(chunkNumber);
@@ -121,60 +122,74 @@ class DisplayMap {
   }
 
   public updateDisplay() {
-    const width = CANVAS.width;
-    const height = CANVAS.height;
-    const aspectRatio = width/height;
-    const context = CANVAS.getContext("2d") as CanvasRenderingContext2D;
+    const width = MAP_CANVAS.width;
+    const height = MAP_CANVAS.height;
+    const aspectRatio = width / height;
+    const context = MAP_CANVAS.getContext("2d") as CanvasRenderingContext2D;
 
     context.clearRect(0, 0, width, height);
 
     context.fillStyle = "red";
-    context.fillRect(width/2 - height/this.range*0.5/2, height/2 - height/this.range*0.5/2, height/this.range*0.5, height/this.range*0.5);
+    context.fillRect(width / 2 - height / this.range * 0.5 / 2, height / 2 - height / this.range * 0.5 / 2, height / this.range * 0.5, height / this.range * 0.5);
 
     context.fillStyle = "black";
 
-    const scaleRatio = height/(this.range*2);
+    const scaleRatio = height / (this.range * 2);
 
-    const minX = this.cameraX - this.range*aspectRatio;
-    const maxX = this.cameraX + this.range*aspectRatio;
+    const minX = this.cameraX - this.range * aspectRatio;
+    const maxX = this.cameraX + this.range * aspectRatio;
     const minY = this.cameraY - this.range;
     const maxY = this.cameraY + this.range;
 
-    let minChunkX = floor(minX/DisplayMap.CHUNK_SIZE);
-    let minChunkY = floor(minY/DisplayMap.CHUNK_SIZE);
-    let maxChunkX = floor(maxX/DisplayMap.CHUNK_SIZE);
-    let maxChunkY = floor(maxY/DisplayMap.CHUNK_SIZE);
+    let minChunkX = floor(minX / DisplayMap.CHUNK_SIZE);
+    let minChunkY = floor(minY / DisplayMap.CHUNK_SIZE);
+    let maxChunkX = floor(maxX / DisplayMap.CHUNK_SIZE);
+    let maxChunkY = floor(maxY / DisplayMap.CHUNK_SIZE);
 
     minChunkX = clamp(minChunkX, 0, this.chunkColumns - 1);
     maxChunkX = clamp(maxChunkX, 0, this.chunkColumns - 1);
     minChunkY = clamp(minChunkY, 0, this.chunkRows - 1);
     maxChunkY = clamp(maxChunkY, 0, this.chunkRows - 1);
 
-    // const chunkYStart = clamp(minChunkX % this.chunkColumns, 0, this.chunkRows);
-    // const chunkYEnd = clamp(maxChunkX % this.chunkColumns, 0, this.chunkRows);
-    // const chunkXStart = clamp((minChunkY - chunkYStart)/this.chunkRows, 0, this.chunkColumns);
-    // const chunkXEnd = clamp((maxChunkY - chunkYEnd)/this.chunkRows, 0, this.chunkColumns);
+    // const chunkSkip = 2 ** floor(this.range / 500);
+    const restaurantSkip = 2**floor(this.range/25);
 
     for (let x = minChunkX; x <= maxChunkX; x++) {
       for (let y = minChunkY; y <= maxChunkY; y++) {
         const chunkNumber = x*this.chunkColumns + y;
+
         let restaurants = this.loadedChunks[chunkNumber];
 
-        const chunkMinX = x*DisplayMap.CHUNK_SIZE;
-        const chunkMinY = y*DisplayMap.CHUNK_SIZE;
+        const chunkMinX = x * DisplayMap.CHUNK_SIZE;
+        const chunkMinY = y * DisplayMap.CHUNK_SIZE;
         const chunkSize = DisplayMap.CHUNK_SIZE;
 
-        const screenX = width/2 + (chunkMinX - this.cameraX)*scaleRatio;
-        const screenY = height/2 - (chunkMinY + chunkSize - this.cameraY)*scaleRatio;
-        const screenSize = chunkSize*scaleRatio;
+        const screenX = width / 2 + (chunkMinX - this.cameraX) * scaleRatio;
+        const screenY = height / 2 - (chunkMinY + chunkSize - this.cameraY) * scaleRatio;
+        const screenSize = chunkSize * scaleRatio;
 
         context.strokeRect(screenX, screenY, screenSize, screenSize);
+        context.fillText(String(screenX) + " " + String(screenY), screenX + screenSize/2, screenY + screenSize/2);
 
         if (restaurants) {
+          for (let i = 0; i < restaurants.length; i += restaurantSkip) {
+            const index = restaurants[i];
 
-          
-        } else if (!this.loadingChunks[chunkNumber]) {
-          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize, chunkMinY + chunkSize, chunkNumber);
+            const xPos = this.app.data.x[index] - this.cameraX;
+            const yPos = this.app.data.y[index] - this.cameraY;
+
+            const screenX = width/2 + xPos*scaleRatio;
+            const screenY = height/2 - yPos*scaleRatio;
+
+            // const size = height/this.range*0.5;
+
+            context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
+          }
+
+        } else if (this.loadingChunks[chunkNumber] != true) {
+          this.loadingChunks[chunkNumber] = true;
+
+          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
         }
       }
     }
@@ -236,13 +251,49 @@ class DisplayMap {
     let mouseX: number | null;
     let mouseY: number | null;
 
-    CANVAS.addEventListener("contextmenu", (event: MouseEvent) => {
+    MAP_CANVAS.addEventListener("contextmenu", (event: MouseEvent) => {
       event.preventDefault();
     });
 
-    CANVAS.addEventListener("mousedown", (event: MouseEvent) => {
+    MAP_CANVAS.addEventListener("mousedown", (event: MouseEvent) => {
       mouseX = event.clientX;
       mouseY = event.clientY;
+
+      const width = MAP_CANVAS.width;
+      const height = MAP_CANVAS.height;
+      const scaleRatio = height/(this.range*2);
+
+      const actualX = this.cameraX + (event.clientX - width/2)/scaleRatio;
+      const actualY = this.cameraY + (height/2 - event.clientY)/scaleRatio;
+      const actualSize = DisplayMap.ICON_SIZE/scaleRatio;
+
+      const inRange = getIntersections([
+        filterNumbers(this.app.data.x, this.app.sorted.x, actualX - actualSize/2, actualX + actualSize/2),
+        filterNumbers(this.app.data.y, this.app.sorted.y, actualY, actualY + actualSize)
+      ], App.restaurantCount);
+
+      console.log(actualX, actualY, actualSize);
+
+      if (inRange.length > 0) {
+        if (this.infoDisplay) this.infoDisplay.remove();
+
+        const index = inRange[0];
+
+        const bounds = MAP_CANVAS.getBoundingClientRect();
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "map-info";
+        infoDiv.style.left = String(event.clientX - bounds.left) + "px";
+        infoDiv.style.top = String(event.clientY - bounds.top) + "px";
+
+        const name = document.createElement("p");
+        name.innerText = this.app.data.storeName[index];
+
+        infoDiv.appendChild(name);
+        MAP_CONTAINER.appendChild(infoDiv);
+
+        this.infoDisplay = infoDiv;
+      }
     });
 
     document.addEventListener("mousemove", (event: MouseEvent) => {
@@ -253,7 +304,9 @@ class DisplayMap {
         mouseX = event.clientX;
         mouseY = event.clientY;
 
-        this.moveCamera(-diffX/CANVAS.width*this.range*2, diffY/CANVAS.height*this.range*2);
+        const scaleRatio = MAP_CANVAS.height/(this.range*2);
+
+        this.moveCamera(-diffX/scaleRatio, diffY/scaleRatio);
       }
     });
 
@@ -262,10 +315,8 @@ class DisplayMap {
       mouseY = null;
     });
 
-    CANVAS.addEventListener("wheel", (event: WheelEvent) => {
+    MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
       this.zoomCamera(event.deltaY > 0);
     });
   }
 }
-
-new DisplayMap(app)

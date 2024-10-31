@@ -111,31 +111,19 @@ function filterStrings(data: string[], sortedIndices: Uint32Array, searchInput: 
     const value = data[index];
     const vLen = value.length;
 
-    // Replacing localeCompare with manual comparison
-    let comparison = 0;
-    for (let i = 0; i < getMin(vLen, len); i++) {
-      const valueChar = value[i].toLowerCase();
-      const searchChar = searchInput[i].toLowerCase();
-
-      if (valueChar < searchChar) {
-        comparison = -1;
-        break;
-      } else if (valueChar > searchChar) {
-        comparison = 1;
-        break;
-      }
-    }
-
-    // If all characters up to len match, determine based on length
-    if (comparison === 0 && vLen !== len) {
-      comparison = vLen < len ? -1 : 1;
-    }
-
-    if (comparison == 0) return 0;
+    if (value == searchInput) return 0;
 
     for (let i = 0; i < len; i++) {
-      if (i >= vLen || value[i].toLowerCase() != searchInput[i].toLowerCase()) {
-        return comparison;
+      if (i >= vLen) return -1;
+
+      const charA = value[i].toLowerCase();
+      const charB = searchInput[i].toLowerCase();
+
+      if (charA < charB) {
+        return -1;
+
+      } else if (charA > charB) {
+        return 1;
       }
     }
 
