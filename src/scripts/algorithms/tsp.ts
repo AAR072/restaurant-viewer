@@ -8,115 +8,115 @@
 
 // Force sebastian to write the distance sort but correct
 const cuisines = [
-    "Indian",
-    "Coffee",
-    "Mexican",
-    "Chinese",
-    "Burger",
-    "Japanese",
-    "Italian",
-    "Pizza",
-    "Korean"
+  "Indian",
+  "Coffee",
+  "Mexican",
+  "Chinese",
+  "Burger",
+  "Japanese",
+  "Italian",
+  "Pizza",
+  "Korean"
 ];
 function getCombinations(arr: any[]) {
-    const result: any [] = [];
+  const result: any [] = [];
 
-    const generateCombinations = (start: number, currentCombination: any []) => {
-        // Only add combinations of length 4 to the result
-        if (currentCombination.length === 4) {
-            result.push([...currentCombination]); // Use a copy of currentCombination
-            return; // Return early since we only want combinations of length 4
-        }
+  const generateCombinations = (start: number, currentCombination: any []) => {
+    // Only add combinations of length 4 to the result
+    if (currentCombination.length === 4) {
+      result.push([...currentCombination]); // Use a copy of currentCombination
+      return; // Return early since we only want combinations of length 4
+    }
 
-        // Loop through the array to generate combinations
-        for (let i = start; i < arr.length; i++) {
-            currentCombination.push(arr[i]); // Include the current element
-            generateCombinations(i + 1, currentCombination); // Recur with the next index
-            currentCombination.pop(); // Backtrack
-        }
-    };
+    // Loop through the array to generate combinations
+    for (let i = start; i < arr.length; i++) {
+      currentCombination.push(arr[i]); // Include the current element
+      generateCombinations(i + 1, currentCombination); // Recur with the next index
+      currentCombination.pop(); // Backtrack
+    }
+  };
 
-    generateCombinations(0, []);
-    return result;
+  generateCombinations(0, []);
+  return result;
 }
 
 
 
 function sortPointsWithTypes(
-    xArray: number[],
-    yArray: number[],
-    typeArray: string[],
-    inputPoint: [number, number]
+  xArray: number[],
+  yArray: number[],
+  typeArray: string[],
+  inputPoint: [number, number]
 ): [number[], number[], string[]] {
-    const n = xArray.length;
-    const distances = new Array(n);
-    const indices = new Array(n);
+  const n = xArray.length;
+  const distances = new Array(n);
+  const indices = new Array(n);
 
-    // Calculate distances and initialize indices
-    for (let i = 0; i < n; i++) {
-        distances[i] = Math.sqrt((xArray[i] - inputPoint[0]) ** 2 + (yArray[i] - inputPoint[1]) ** 2);
-        indices[i] = i;
+  // Calculate distances and initialize indices
+  for (let i = 0; i < n; i++) {
+    distances[i] = Math.sqrt((xArray[i] - inputPoint[0]) ** 2 + (yArray[i] - inputPoint[1]) ** 2);
+    indices[i] = i;
+  }
+
+  // Merge sort function to sort indices based on distances
+  function mergeSort(arr: number[], left: number, right: number): number[] {
+    if (left >= right) return [arr[left]];
+
+    const mid = Math.floor((left + right) / 2);
+    const leftSorted = mergeSort(arr, left, mid);
+    const rightSorted = mergeSort(arr, mid + 1, right);
+
+    return merge(leftSorted, rightSorted);
+  }
+
+  function merge(leftArr: number[], rightArr: number[]): number[] {
+    const merged = new Array(leftArr.length + rightArr.length);
+    let i = 0, j = 0, k = 0;
+
+    // Merge while comparing distances
+    while (i < leftArr.length && j < rightArr.length) {
+      if (distances[leftArr[i]] <= distances[rightArr[j]]) {
+        merged[k] = leftArr[i];
+        i++;
+      } else {
+        merged[k] = rightArr[j];
+        j++;
+      }
+      k++;
     }
 
-    // Merge sort function to sort indices based on distances
-    function mergeSort(arr: number[], left: number, right: number): number[] {
-        if (left >= right) return [arr[left]];
-
-        const mid = Math.floor((left + right) / 2);
-        const leftSorted = mergeSort(arr, left, mid);
-        const rightSorted = mergeSort(arr, mid + 1, right);
-
-        return merge(leftSorted, rightSorted);
+    // Copy remaining elements from leftArr if any
+    while (i < leftArr.length) {
+      merged[k] = leftArr[i];
+      i++;
+      k++;
     }
 
-    function merge(leftArr: number[], rightArr: number[]): number[] {
-        const merged = new Array(leftArr.length + rightArr.length);
-        let i = 0, j = 0, k = 0;
-
-        // Merge while comparing distances
-        while (i < leftArr.length && j < rightArr.length) {
-            if (distances[leftArr[i]] <= distances[rightArr[j]]) {
-                merged[k] = leftArr[i];
-                i++;
-            } else {
-                merged[k] = rightArr[j];
-                j++;
-            }
-            k++;
-        }
-
-        // Copy remaining elements from leftArr if any
-        while (i < leftArr.length) {
-            merged[k] = leftArr[i];
-            i++;
-            k++;
-        }
-        
-        // Copy remaining elements from rightArr if any
-        while (j < rightArr.length) {
-            merged[k] = rightArr[j];
-            j++;
-            k++;
-        }
-
-        return merged;
+    // Copy remaining elements from rightArr if any
+    while (j < rightArr.length) {
+      merged[k] = rightArr[j];
+      j++;
+      k++;
     }
 
-    // Sort indices based on distances using merge sort
-    const sortedIndices = mergeSort(indices, 0, n - 1);
+    return merged;
+  }
 
-    // Use sorted indices to create sorted arrays
-    const sortedX = new Array(n);
-    const sortedY = new Array(n);
-    const sortedTypes = new Array(n);
+  // Sort indices based on distances using merge sort
+  const sortedIndices = mergeSort(indices, 0, n - 1);
 
-    for (let i = 0; i < n; i++) {
-        sortedX[i] = xArray[sortedIndices[i]];
-        sortedY[i] = yArray[sortedIndices[i]];
-        sortedTypes[i] = typeArray[sortedIndices[i]];
-    }
+  // Use sorted indices to create sorted arrays
+  const sortedX = new Array(n);
+  const sortedY = new Array(n);
+  const sortedTypes = new Array(n);
 
-    return [sortedX, sortedY, sortedTypes];
+  for (let i = 0; i < n; i++) {
+    sortedX[i] = xArray[sortedIndices[i]];
+    sortedY[i] = yArray[sortedIndices[i]];
+    sortedTypes[i] = typeArray[sortedIndices[i]];
+  }
+
+  return [sortedX, sortedY, sortedTypes];
 }
 
 
@@ -308,6 +308,46 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
 
   return { distance: minDistance, path };
 }
+function goFrugal(
+  xData: number[], 
+  yData: number[], 
+  typesData: string[], 
+  currentX: number, 
+  currentY: number,
+  combinations: string[][],
+  budget: number,
+): { distance: number; path: TNode[]; possible: boolean} {
+  const [sortedX, sortedY, sortedTypes] = sortPointsWithTypes(xData, yData, typesData, [currentX,currentY]);
+  let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
+  for (let i = 1; i < 100; i++) {
+    TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
+  }
+  let graph: Graph = {
+    TNodes,
+    categories: [""]
+  };
+  const deepCopy = combinations.map(combination => [...combination]);
+  let best = {distance: Infinity, path: [TNodes[0]] , possible: false};
+  for (let i = 0; i < deepCopy.length; i++) {
+    graph = {TNodes, categories: deepCopy[i]}
+    graph.categories[graph.categories.length] = "START";  
+    let result = findMinimumDistanceAnywhere(graph, 0); 
+    if (result.distance < best.distance) {
+      best.path = result.path; 
+      best.distance = result.distance;
+    }
+  }
+  if (best.distance == Infinity) {
+    return {distance: Infinity, path: [], possible: false};
+  }
+  let distanceInKm = best.distance / 50;
+  if (distanceInKm > budget * 2) {
+    return {distance: best.distance, path: best.path, possible: false};
+  } 
+  return {distance: best.distance, path: best.path, possible: true};
+
+
+}
 function savingFuel(
   categories: string[], 
   xData: number[], 
@@ -334,4 +374,8 @@ function savingFuel(
 const uniqueCombinations = getCombinations(cuisines);
 // Example
 console.log(savingFuel(["START", "END", "Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0));
+console.log("GO FRUGAL!");
+console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1));
+
+
 
