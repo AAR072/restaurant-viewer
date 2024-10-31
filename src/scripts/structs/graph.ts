@@ -2,16 +2,25 @@
  * Represents a node in a graph.
  * @template T - The type of the value stored in the node.
  */
-class GraphNode<T> {
-    value: T;
-    neighbors: Map<GraphNode<T>, number>;
+interface vector {
+  x: number;
+  y: number;
+  type: string;
+}
+class GraphNode {
+    [Symbol.iterator]() {
+    return Object.values(this.value)[Symbol.iterator]();
+  }
+    value:vector; 
+    neighbors: Map<GraphNode, number>;
 
     /**
      * Creates an instance of GraphNode.
-     * @param {T} value - The value to be stored in the node.
+     * @param {T} x - The x value to be stored in the node.
+     * @param {T} y - The y value to be stored in the node.
      */
-    constructor(value: T) {
-        this.value = value;
+    constructor(x: number, y: number, type:string) {
+        this.value =  {x,y, type};
         this.neighbors = new Map();
     }
 
@@ -24,7 +33,7 @@ class GraphNode<T> {
      * const nodeB = new GraphNode('B');
      * nodeA.addNeighbor(nodeB, 5); // Adds nodeB as a neighbor of nodeA with a weight of 5.
      */
-    addNeighbor(node: GraphNode<T>, weight: number): void {
+    addNeighbor(node: GraphNode, weight: number): void {
         this.neighbors.set(node, weight);
     }
 
@@ -39,7 +48,8 @@ class GraphNode<T> {
      * nodeA.addNeighbor(nodeC, 10);
      * const neighbors = nodeA.getNeighbors(); // Returns a Map with nodeB and nodeC as keys and their weights.
      */
-    getNeighbors(): Map<GraphNode<T>, number> {
+    getNeighbors(): Map<GraphNode, number> {
         return this.neighbors;
     }
 }
+
