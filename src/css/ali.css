@@ -203,3 +203,12 @@ body {
   opacity: 0;
   height: 0;
 }
+
+.map-container {
+  position: relative;
+}
+
+.map-info {
+  position: absolute;
+  background-color: red;
+}

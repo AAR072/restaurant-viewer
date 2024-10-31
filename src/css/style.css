@@ -1,80 +1,236 @@
-body {
+/* Skeleton Loader Styles */
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Space between skeletons */
+}
+
+.skeleton-bubble {
+  background-color: #444;
+  /* Dark background for the skeleton */
+  border-radius: 15px;
+  /* Rounded corners */
+  height: 100px;
+  /* Height of the skeleton item */
+  width: 100%;
+  /* Full width */
+  animation: pulse 1.5s infinite;
+  /* Animation for the loading effect */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Optional: Add a specific style for each bubble to vary heights */
+.skeleton-bubble:nth-child(1) {
+  height: 80px;
+  /* First item shorter */
+}
+
+.skeleton-bubble:nth-child(2) {
+  height: 60px;
+  /* Second item shorter */
+}
+
+.skeleton-bubble:nth-child(3) {
+  height: 100px;
+  /* Normal height */
+}
+
+.skeleton-bubble:nth-child(4) {
+  height: 70px;
+  /* Last item shorter */
+}
+
+:root {
+  --background-color: #181818;
+  --sidebar-background: #232323;
+  --filter-background: #2e2e2e;
+  --hover-background: #3a3a3a;
+  --button-background: #4caf50;
+  --button-hover-background: #45a049;
+  --text-color: #fff;
+  --footer-color: #888;
+  --warning-color: #ffc107;
+  /* Yellow */
+  --error-color: #f44336;
+  /* Red */
+}
+
+* {
+  font-family: "Ubuntu", sans-serif;
   margin: 0;
   padding: 0;
+  /* box-sizing: border-box; */
 }
 
-div{
-  height:100%;
-  width: 100%;
-}
-
-img{
-  width: 100%;
-  max-height: auto;
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .container {
-  height: 100%; 
-  display: flex; 
-  justify-content: center;
-  align-items: center;
+  display: flex;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+/* Sidebar for filters */
+.sidebar {
+  height: 100%;
+  width: 250px;
+  background-color: var(--sidebar-background);
+  padding: 20px;
+  border-radius: 8px;
+  overflow-y: scroll;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+}
+
+.filter-item {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: var(--filter-background);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-item:hover {
+  background-color: var(--hover-background);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 20px;
+  margin-right: 20px;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+/* Search and Filter Section */
+.search-section,
+.filter-section,
+.sort-section,
+.performance-section,
+.test-section,
+.browse-section {
+  background-color: var(--sidebar-background);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.search-section input,
+.search-section select,
+.filter-section input,
+.filter-section select,
+.sort-section select,
+.browse-section input {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--filter-background);
+  color: var(--text-color);
+  margin-right: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.search-section button,
+.filter-section button,
+.sort-section button,
+.browse-section button {
+  padding: 10px 20px;
+  border: none;
+  background-color: var(--button-background);
+  color: var(--text-color);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.search-section button:hover,
+.filter-section button:hover,
+.sort-section button:hover,
+.browse-section button:hover {
+  background-color: var(--button-hover-background);
+}
+
+.filter-section input[type="range"] {
+  width: 80%;
+}
+
+/* Results grid */
+.results {
+  background-color: var(--filter-background);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  color: var(--footer-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
   }
 
-.main-menu {
-  flex: 1;
+  .main-content {
+    margin-left: 0;
+  }
 }
 
-.performanceUpdates{
-  position:fixed;
-  height: 25px;
-  bottom:10;
-  right:10;
-  outline-style:solid;
-  outline-color:invert;
-  width: 150px;
-  background-color:aliceblue;
-  border-radius: 10px;
+/* Important is very bad but I am lazy */
+.error-button {
+  background-color: var(--error-color) !important;
+  /* Set the background to the error color */
+  color: #fff !important;
+  /* Set text color to white */
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
 }
 
-.performanceText{
-  position:fixed;
-  height: 25px;
-  bottom:-10;
-  right:120;
+.error-button:hover {
+  opacity: 0.8 !important;
+  /* Dim effect on hover */
+  background-color: #d32f2f !important;
+  /* Manually specify a darker shade of red */
 }
 
-.inputs{
-  position:fixed;
-  width:15%;
-  background-color:aqua ;
-}
-.inputItems{
-  position:fixed;
-  width:13.6%;
-  background-color:rgb(255, 0, 0) ;
-  margin:0.6%;
-  align-self: center;
+.perflog-fade-out {
+  transition: opacity 1s ease, height 1s ease 1s;
+  opacity: 0;
+  height: 0;
 }
 
-.display{
-  float:right;
-  background-color: antiquewhite;
-  width:85%;
+.map-container {
+  position: relative;
 }
 
-
-.outer-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-.inner-container {
-  flex: 1;
-}
-
-canvas {
+.map-info {
+  position: absolute;
   background-color: red;
-  height: 100%;
-  width: 100%;
 }
