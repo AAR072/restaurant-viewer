@@ -1,13 +1,10 @@
 // TODO
-// Do get combinations once in the start of the program in index
+// Do get combinations once in the start of the program in index -- PULL AND DO THIS
 // Add JSDOC and comments
-// Remove all illegal code
-// I don't like the cuisine const
+// Remove all illegal code -- DONE
+// I don't like the cuisine const -- PULL AND DO THIS
 // Write a helper function -- DONE
 
-
-
-// Force sebastian to write the distance sort but correct
 const cuisines = [
   "Indian",
   "Coffee",
@@ -19,9 +16,17 @@ const cuisines = [
   "Pizza",
   "Korean"
 ];
+/**
+ * Gets all combinations of length four from an array 
+ * @param {any[]} arr. Our array of strings we want to form combinations with
+ * @timecomplexity `O(n!)` We have 4! as a parameter but that is = O(1)
+ */
 function getCombinations(arr: any[]) {
   const result: any[] = [];
-
+  /**
+   * :w
+   *
+  */
   const generateCombinations = (start: number, currentCombination: any[], currentPtr = 0, resultPtr = 0) => {
     // Only add combinations of length 4 to the result
     if (currentPtr === 4) {
