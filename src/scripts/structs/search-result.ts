@@ -163,7 +163,7 @@ class SearchResult {
     // optimize and cleanup code (fix stuff with number[] | Uint32Array and make sure everything is Uint32Array from initialization )
 
     if (this.typeFilter != "") {
-      filteredType = this.app.sorted.type[this.typeFilter];
+      filteredType = this.app.getCuisineTypeArr(this.typeFilter);
     }
 
     if (this.costMin > 0 && this.costMax > 0) {

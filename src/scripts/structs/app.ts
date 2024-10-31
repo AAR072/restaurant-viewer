@@ -23,7 +23,8 @@ const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 interface SortedData {
   ID: Uint32Array; // Sorted array of IDs.
   storeName: Uint32Array; // Sorted array of store names.
-  type: { [key: string]: number[] }; // Dictionary to hold types and their corresponding indices.
+  cuisines: string[];
+  type: number[][]; // Dictionary to hold types and their corresponding indices.
   cost: Uint32Array; // Sorted array of costs.
   review: Uint32Array; // Sorted array of reviews.
   x: Uint32Array; // Sorted array of x coordinates.
@@ -56,6 +57,7 @@ class App {
   public locationY: number = 0; // User's current Y location.
 
   public currentSearch: SearchResult; // Holds the current search result.
+  public displayMap: DisplayMap;
 
   /**
    * Initializes the App with the given data and sorts it accordingly.
@@ -71,7 +73,8 @@ class App {
     this.sorted = {
       ID: sortStrings(data.ID), // Sort IDs.
       storeName: sortStrings(data.storeName), // Sort store names.
-      type: {}, // Initialize type dictionary.
+      cuisines: [],
+      type: [], // Initialize type dictionary.
       cost: sortNumbers(data.cost), // Sort costs.
       review: sortNumbers(data.review), // Sort reviews.
       x: sortNumbers(data.x), // Sort x coordinates.
@@ -88,9 +91,9 @@ class App {
 
     // Initialize the current search with store names and an empty query.
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
-    this.initInput(); // Set up input handling for searches.
+    this.displayMap = new DisplayMap(this);
 
-    new DisplayMap(this);
+    this.initInput(); // Set up input handling for searches.
   }
 
   createTypeOption(name: string) {
@@ -107,23 +110,42 @@ class App {
    * 
    * @timecomplexity O(n) - The method loops through `App.restaurantCount`, performing constant time operations for each restaurant.
    */
+
+  getCuisineTypeIndex(cuisineName: string): number {
+    for (let i = 0; i < this.sorted.cuisines.length; i++) {
+      if (this.sorted.cuisines[i] == cuisineName) return i;
+    }
+
+    return -1;
+  }
+
+  getCuisineTypeArr(cuisineName: string): number[] {
+    return this.sorted.type[this.getCuisineTypeIndex(cuisineName)];
+  }
+
   loadTypes() {
-    const typePointers: { [key: string]: number } = {};
+    const typePointers: number[] = [];
+    let cuisinePointer = 0;
 
     for (let i = 0; i < App.restaurantCount; i++) {
       const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names.
       const type = this.data.type[index]; // Retrieve the type of the restaurant using the index.
+      let typeIndex = this.getCuisineTypeIndex(type);
 
       // If the type doesn't exist in the sorted type object, initialize it as an empty array.
-      if (!this.sorted.type[type]) {
-        this.sorted.type[type] = [];
-        typePointers[type] = 0;
+      if (typeIndex < 0) {
+        typeIndex = cuisinePointer++;
+
+        this.sorted.type[typeIndex] = [];
+        typePointers[typeIndex] = 0;
+
+        this.sorted.cuisines[typeIndex] = type;
 
         this.createTypeOption(type);
       }
 
       // Store the original index of the restaurant under its type in the sorted structure.
-      this.sorted.type[type][typePointers[type]++] = index;
+      this.sorted.type[typeIndex][typePointers[typeIndex]++] = index;
     }
   }
 

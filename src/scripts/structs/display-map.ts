@@ -27,7 +27,14 @@ class DisplayMap {
   public loadingChunks: boolean[];
   public loadedChunks: Uint32Array[];
 
+  public infoIndex: number | null = null;
   public infoDisplay: HTMLDivElement | null = null;
+  public testX0: number | null = null;
+  public testX1: number | null = null;
+  public testY0: number | null = null;
+  public testY1: number | null = null;
+  public testX: number | null = null;
+  public testY: number | null = null;
 
   constructor(public app: App) {
     this.minX = app.data.x[app.sorted.x[0]];
@@ -40,8 +47,8 @@ class DisplayMap {
     const xRange = this.maxX - this.minX;
     const yRange = this.maxY - this.minY;
 
-    this.chunkColumns = Math.ceil(xRange / DisplayMap.CHUNK_SIZE);
-    this.chunkRows = Math.ceil(yRange / DisplayMap.CHUNK_SIZE);
+    this.chunkColumns = Math.ceil(xRange/DisplayMap.CHUNK_SIZE);
+    this.chunkRows = Math.ceil(yRange/DisplayMap.CHUNK_SIZE);
     this.chunkCount = this.chunkRows * this.chunkColumns;
     this.loadingChunks = new Array(this.chunkCount);
     this.loadedChunks = new Array(this.chunkCount);
@@ -50,53 +57,6 @@ class DisplayMap {
     this.initInput();
 
     // load chunks in parallel (so that it does not yield) and slowly preload chunks outwards overtime (also maybe sort based on distance from cam)
-  }
-
-  public displayChunk(chunkNumber: number, context: CanvasRenderingContext2D, width: number, height: number, skipCount: number) {
-    const cY = chunkNumber % this.chunkRows;
-    const cX = (chunkNumber - cY) / this.chunkRows;
-    const chunkX = this.minX + cX * DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE / 2 - this.cameraX;
-    const chunkY = this.minY + cY * DisplayMap.CHUNK_SIZE + DisplayMap.CHUNK_SIZE / 2 - this.cameraY;
-
-    const screenX = width / 2 + chunkX / this.range * height / 2;
-    const screenY = height / 2 - chunkY / this.range * height / 2;
-    const size = height / (this.range * 2) * DisplayMap.CHUNK_SIZE;
-
-    context.fillStyle = "red";
-    context.strokeRect(screenX - size / 2, screenY - size / 2, size, size);
-
-    context.fillStyle = "black";
-
-    let chunkStores = this.loadedChunks[chunkNumber];
-
-    if (!chunkStores) {
-      const chunkMinX = this.minX + cX * DisplayMap.CHUNK_SIZE;
-      const chunkMinY = this.minY + cY * DisplayMap.CHUNK_SIZE;
-      const chunkMaxX = chunkMinX + DisplayMap.CHUNK_SIZE - 1; // -1 so as to not include restaurants shared by the next chunk
-      const chunkMaxY = chunkMinY + DisplayMap.CHUNK_SIZE - 1;
-
-      const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
-      const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
-
-      chunkStores = getIntersections([xInRange, yInRange], App.restaurantCount);
-
-      this.loadedChunks[chunkNumber] = chunkStores;
-    }
-
-    for (let i = 0; i < chunkStores.length; i += skipCount) {
-      const index = chunkStores[i];
-      const xPos = this.app.data.x[index] - this.cameraX;
-      const yPos = this.app.data.y[index] - this.cameraY;
-
-      const screenX = width / 2 + xPos / this.range * height / 2;
-      const screenY = height / 2 - yPos / this.range * height / 2;
-
-      const size = height / this.range * 0.5;
-
-      // context.drawImage(LOCATION_ICON, screenX - 12, screenY - 24, 24, 24);
-
-      context.fillRect(screenX - size / 2, screenY - size / 2, size, size);
-    }
   }
 
   public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX: number, chunkMaxY: number, chunkNumber: number) {
@@ -124,14 +84,10 @@ class DisplayMap {
   public updateDisplay() {
     const width = MAP_CANVAS.width;
     const height = MAP_CANVAS.height;
-    const aspectRatio = width / height;
+    const aspectRatio = width/height;
     const context = MAP_CANVAS.getContext("2d") as CanvasRenderingContext2D;
 
     context.clearRect(0, 0, width, height);
-
-    context.fillStyle = "red";
-    context.fillRect(width / 2 - height / this.range * 0.5 / 2, height / 2 - height / this.range * 0.5 / 2, height / this.range * 0.5, height / this.range * 0.5);
-
     context.fillStyle = "black";
 
     const scaleRatio = height / (this.range * 2);
@@ -166,13 +122,28 @@ class DisplayMap {
 
         const screenX = width / 2 + (chunkMinX - this.cameraX) * scaleRatio;
         const screenY = height / 2 - (chunkMinY + chunkSize - this.cameraY) * scaleRatio;
-        const screenSize = chunkSize * scaleRatio;
+        const screenSize = chunkSize*scaleRatio;
 
         context.strokeRect(screenX, screenY, screenSize, screenSize);
-        context.fillText(String(screenX) + " " + String(screenY), screenX + screenSize/2, screenY + screenSize/2);
+
+        if (this.testX0 && this.testX1 && this.testY0 && this.testY1 && this.testX && this.testY) {
+          const posX = (this.testX0 - this.cameraX)*scaleRatio;
+          const posY = (this.testY1 - this.cameraY)*scaleRatio;
+          const sizeX = (this.testX1 - this.testX0)*scaleRatio;
+          const sizeY = (this.testY1 - this.testY0)*scaleRatio;
+          const posX2 = (this.testX - this.cameraX)*scaleRatio;
+          const posY2 = (this.testY - this.cameraY)*scaleRatio;
+
+          context.strokeStyle = "red";
+          context.fillStyle = "red";
+          context.strokeRect(width/2 + posX, height/2 - posY, sizeX, sizeY);
+          context.fillRect(width/2 + posX2, height/2 - posY2, 10, 10);
+          context.strokeStyle = "black";
+          context.fillStyle = "black";
+        }
 
         if (restaurants) {
-          for (let i = 0; i < restaurants.length; i += restaurantSkip) {
+          for (let i = 0; i < restaurants.length; i++) {
             const index = restaurants[i];
 
             const xPos = this.app.data.x[index] - this.cameraX;
@@ -181,9 +152,14 @@ class DisplayMap {
             const screenX = width/2 + xPos*scaleRatio;
             const screenY = height/2 - yPos*scaleRatio;
 
-            // const size = height/this.range*0.5;
+            if (index == this.infoIndex) {
+              context.fillRect(screenX, screenY, 20, 20);
+            }
+
+            if (index % restaurantSkip != 0) continue;
 
             context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
+            context.fillText(this.app.data.storeName[index], screenX, screenY);
           }
 
         } else if (this.loadingChunks[chunkNumber] != true) {
@@ -259,40 +235,66 @@ class DisplayMap {
       mouseX = event.clientX;
       mouseY = event.clientY;
 
+      const bounds = MAP_CANVAS.getBoundingClientRect();
       const width = MAP_CANVAS.width;
       const height = MAP_CANVAS.height;
       const scaleRatio = height/(this.range*2);
 
-      const actualX = this.cameraX + (event.clientX - width/2)/scaleRatio;
-      const actualY = this.cameraY + (height/2 - event.clientY)/scaleRatio;
-      const actualSize = DisplayMap.ICON_SIZE/scaleRatio;
+      const screenX = event.clientX - bounds.left;
+      const screenY = event.clientY - bounds.top;
+      const actualX = this.cameraX + (screenX - width/2)/scaleRatio;
+      const actualY = this.cameraY + (height/2 - screenY)/scaleRatio;
+      const actualSize = DisplayMap.ICON_SIZE/scaleRatio*1.1;
+
+      console.log(height/2, mouseY);
+
+      // height/2 = 225
+      // 225 - 0 = 225
+      // 225*range*2/450
+      // 0.5*range*2
+      // range
+
+      this.testX0 = actualX - actualSize/2;
+      this.testX1 = actualX + actualSize/2;
+      this.testY0 = actualY - actualSize/2;
+      this.testY1 = actualY + actualSize/2;
+      this.testX = actualX;
+      this.testY = actualY;
+      this.updateDisplay();
 
       const inRange = getIntersections([
         filterNumbers(this.app.data.x, this.app.sorted.x, actualX - actualSize/2, actualX + actualSize/2),
-        filterNumbers(this.app.data.y, this.app.sorted.y, actualY, actualY + actualSize)
+        filterNumbers(this.app.data.y, this.app.sorted.y, actualY - actualSize/2, actualY + actualSize/2)
       ], App.restaurantCount);
 
-      console.log(actualX, actualY, actualSize);
+      const restIndex = inRange[0];
 
-      if (inRange.length > 0) {
-        if (this.infoDisplay) this.infoDisplay.remove();
+      if (restIndex) {
+        if (this.infoIndex && this.infoDisplay) {
+          this.infoIndex = null;
+          this.infoDisplay.remove();
+        }
 
-        const index = inRange[0];
-
-        const bounds = MAP_CANVAS.getBoundingClientRect();
+        const screenX = (this.app.data.x[restIndex] - this.cameraX)*scaleRatio;
+        const screenY = (this.app.data.y[restIndex] - this.cameraY)*scaleRatio;
 
         const infoDiv = document.createElement("div");
         infoDiv.className = "map-info";
-        infoDiv.style.left = String(event.clientX - bounds.left) + "px";
-        infoDiv.style.top = String(event.clientY - bounds.top) + "px";
+        infoDiv.style.left = String(screenX - bounds.left) + "px";
+        infoDiv.style.top = String(screenY - bounds.top) + "px";
 
         const name = document.createElement("p");
-        name.innerText = this.app.data.storeName[index];
+        name.innerText = this.app.data.storeName[restIndex];
+
+        console.log(name.innerText, this.app.data.x[restIndex], this.app.data.y[restIndex], actualX, actualY);
 
         infoDiv.appendChild(name);
         MAP_CONTAINER.appendChild(infoDiv);
 
+        this.infoIndex = restIndex;
         this.infoDisplay = infoDiv;
+
+        this.updateDisplay();
       }
     });
 
