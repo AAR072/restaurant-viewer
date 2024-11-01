@@ -63,7 +63,7 @@ class SearchResult {
 
   static fromID(app: App, id: string): SearchResult {
     const results = filterStrings(app.data.ID, app.sorted.ID, id);
-    const sorted = sortBy(results, App.restaurantCount, app.sorted.storeName);
+    const sorted = sortBy(results, App.RESTAURANT_COUNT, app.sorted.storeName);
 
     return new SearchResult(app, sorted);
   }
@@ -71,7 +71,7 @@ class SearchResult {
   static fromCoords(app: App, x: number, y: number): SearchResult {
     const resultsX = filterNumbers(app.data.x, app.sorted.x, x, x);
     const resultsY = filterNumbers(app.data.y, app.sorted.y, y, y);
-    const sortedIntersections = getIntersections([resultsX, resultsY], App.restaurantCount, app.sorted.storeName);
+    const sortedIntersections = getIntersections([resultsX, resultsY], App.RESTAURANT_COUNT, app.sorted.storeName);
 
     return new SearchResult(app, sortedIntersections);
   }
@@ -210,9 +210,9 @@ class SearchResult {
 
     let final = this.results;
 
-    if (dataPointer > 1) final = getIntersections(data, App.restaurantCount, sorted);
+    if (dataPointer > 1) final = getIntersections(data, App.RESTAURANT_COUNT, sorted);
     else if (dataPointer == 1) {
-      if (sorted) final = sortBy(data[0], App.restaurantCount, sorted);
+      if (sorted) final = sortBy(data[0], App.RESTAURANT_COUNT, sorted);
       else final = new Uint32Array(data[0]);
     }
 
@@ -277,7 +277,7 @@ class SearchResult {
     reviewSpan.style.color = '#2196F3';  // Blue color for reviews
 
     const positionSpan = document.createElement("p");
-    positionSpan.innerText = `Position: (x: ${this.app.data.x[index]}, y: ${this.app.data.y[index]})`;
+    positionSpan.innerText = `Position: (x: ${this.app.data.x[index]*App.UNIT_SCALE}m, y: ${this.app.data.y[index]*App.UNIT_SCALE}m)`;
     positionSpan.style.fontWeight = '500';  // Medium font weight
     positionSpan.style.color = '#ccc';  // Light gray color
 

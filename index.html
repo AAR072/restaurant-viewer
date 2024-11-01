@@ -14,6 +14,19 @@
 
   <div id="map-container" class="map-container">
     <canvas id="map-canvas" width="800" height="450" style="background-color: white;"></canvas>
+    <div class="map-main-info">
+      <label for="map-grid-scale">Grid Scale</label>
+      <span id="map-grid-scale"></span>
+      <br>
+
+      <label>Position: </label>
+      <span>(x: <input id="map-position-x"/>m, y: <input id="map-position-y"/>m)</span>
+      <br>
+
+      <button>Center</button>
+      <br>
+      <button>Default Focus</button>
+    </div>
   </div>
 
   <div class="container">
@@ -119,7 +132,7 @@
       <br>
       <br>
       <button id="clear-performance-log" class="error-button">Clear All</button>
-      <div id="taskContainer"></div>
+      <ul id="task-container"></ul>
     </div>
   </div>
 

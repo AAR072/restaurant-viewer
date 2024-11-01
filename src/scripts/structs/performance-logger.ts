@@ -1,12 +1,11 @@
 const DISABLE_CLEAR_CHECKBOX = document.getElementById("disable-performance-clear") as HTMLInputElement;
 const CLEAR_ALL_BUTTON = document.getElementById("clear-performance-log") as HTMLButtonElement;
-const TASK_CONTAINER = document.getElementById("taskContainer") as HTMLDivElement;
+const TASK_CONTAINER = document.getElementById("task-container") as HTMLUListElement;
 
 // use queue to store current "log elements", when checkbox is active clear
 // add X button on individual performance tasks to clear them
 // add clear all button
 // queue timeouts as well so that they can be cleared
-
 
 const LOG_QUEUE_SIZE: number = 20;
 const LOG_CLEAR_INTERVAL = 2000;
@@ -17,7 +16,7 @@ let logQueueLength = 0;
 
 interface LogItem {
   count: number;
-  element: HTMLDivElement;
+  element: HTMLLIElement;
 }
 
 function getQueueIndex(count: number): number {
@@ -33,7 +32,7 @@ function clearTask() {
 
   if (item) {
     item.element.style.height = item.element.offsetHeight + "px";
-    item.element.classList.add("perflog-fade-out");
+    item.element.classList.add("fade-out");
 
     window.setTimeout(() => {
       item.element.remove();
@@ -66,7 +65,8 @@ function logTask(name: string, time: number, description: string) {
   const currentTime = Date.now();
 
   // Create a new div element to represent the task
-  const taskDiv = document.createElement('div');
+  const taskDiv = document.createElement("li");
+  taskDiv.className = "perflog";
   taskDiv.style.border = '1px solid #444';  // Use a darker border color
   taskDiv.style.padding = '10px';
   taskDiv.style.marginBottom = '10px';

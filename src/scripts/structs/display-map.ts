@@ -1,18 +1,28 @@
 const MAP_CONTAINER = document.getElementById("map-container") as HTMLDivElement;
 const MAP_CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
+const MAP_GRID_SCALE = document.getElementById("map-grid-scale") as HTMLSpanElement;
+const MAP_POSITION_X = document.getElementById("map-position-x") as HTMLInputElement;
+const MAP_POSITION_Y = document.getElementById("map-position-y") as HTMLInputElement;
 
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
 class DisplayMap {
-  static CHUNK_SIZE = 100;
+  static CHUNK_SIZE = 128;
+
   static ICON_SIZE = 24;
   static TEXT_SIZE = 12;
-  static ZOOM_FACTOR = 1.1;
+
+  static ZOOM_SPEED = 0.01;
+  static MIN_ZOOM = 1;
+  static MAX_ZOOM = 10;
+
+  static GRID_RANGE_FACTOR = 8;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
-  public range: number = 10;
+  public zoom: number = 6;
+  public range: number;
 
   public context: CanvasRenderingContext2D;
   public width: number;
@@ -35,20 +45,17 @@ class DisplayMap {
 
   constructor(public app: App) {
     this.context = MAP_CANVAS.getContext("2d")!;
+    this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
+
     this.width = MAP_CANVAS.width;
     this.height = MAP_CANVAS.height;
     this.bounds = MAP_CANVAS.getBoundingClientRect();
-
-    this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
-
     // listen to canvas resize for width, height and bounds
 
     this.minX = app.data.x[app.sorted.x[0]];
     this.minY = app.data.y[app.sorted.y[0]];
-    this.maxX = app.data.x[app.sorted.x[App.restaurantCount - 1]];
-    this.maxY = app.data.y[app.sorted.y[App.restaurantCount - 1]];
-    this.cameraX = (this.minX + this.maxX)/2;
-    this.cameraY = (this.minY + this.maxY)/2;
+    this.maxX = app.data.x[app.sorted.x[App.RESTAURANT_COUNT - 1]];
+    this.maxY = app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]];
 
     const xRange = this.maxX - this.minX;
     const yRange = this.maxY - this.minY;
@@ -58,18 +65,18 @@ class DisplayMap {
     this.chunkCount = this.chunkRows * this.chunkColumns;
     this.loadingChunks = new Array(this.chunkCount);
     this.loadedChunks = new Array(this.chunkCount);
-    
+
+    this.centerCamera();
+    this.setRange();
     this.updateDisplay();
     this.initInput();
-
-    // load chunks in parallel (so that it does not yield) and slowly preload chunks outwards overtime (also maybe sort based on distance from cam)
   }
 
   public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX: number, chunkMaxY: number, chunkNumber: number) {
     const inRange = getIntersections([
       filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX),
       filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY)
-    ], App.restaurantCount);
+    ], App.RESTAURANT_COUNT);
 
     this.loadedChunks[chunkNumber] = inRange;
 
@@ -97,11 +104,15 @@ class DisplayMap {
     this.context.strokeStyle = "black";
 
     // fix this, ceil sometimes not working
-    const gridScale = 2**floor(Math.log2(this.range/10));
+    const gridScale = 2**floor(Math.log2(this.range/DisplayMap.GRID_RANGE_FACTOR));
     const gridXMin = ceil(this.cameraX - this.range*aspectRatio, gridScale);
     const gridXMax = floor(this.cameraX + this.range*aspectRatio, gridScale);
-    const gridYMin = ceil(this.cameraX - this.range, gridScale);
+    const gridYMin = ceil(this.cameraY - this.range, gridScale);
     const gridYMax = floor(this.cameraY + this.range, gridScale);
+
+    MAP_GRID_SCALE.innerText = gridScale*App.UNIT_SCALE + "m";
+    MAP_POSITION_X.value = round(this.cameraX*App.UNIT_SCALE) + "m";
+    MAP_POSITION_Y.value = round(this.cameraY*App.UNIT_SCALE) + "m";
 
     for (let x = gridXMin; x <= gridXMax; x += gridScale) {
       const screenX = this.width/2 + (x - this.cameraX)*scaleRatio;
@@ -137,7 +148,7 @@ class DisplayMap {
     maxChunkY = clamp(maxChunkY, 0, this.chunkRows - 1);
 
     // const chunkSkip = 2 ** floor(this.range / 500);
-    const restaurantSkip = 2**floor(this.range/25);
+    const restaurantSkip = 2**getMax(floor(Math.log2(this.range/20)), 0);
 
     this.context.strokeStyle = "red";
 
@@ -145,7 +156,7 @@ class DisplayMap {
       for (let y = minChunkY; y <= maxChunkY; y++) {
         const chunkNumber = x*this.chunkColumns + y;
 
-        let restaurants = this.loadedChunks[chunkNumber];
+        // let restaurants = this.loadedChunks[chunkNumber];
 
         const chunkMinX = x * DisplayMap.CHUNK_SIZE;
         const chunkMinY = y * DisplayMap.CHUNK_SIZE;
@@ -157,42 +168,52 @@ class DisplayMap {
 
         this.context.strokeRect(screenX, screenY, screenSize, screenSize);
 
-        if (restaurants) {
-          for (let i = 0; i < restaurants.length; i++) {
-            const index = restaurants[i];
+        // if (restaurants) {
+        //   for (let i = 0; i < restaurants.length; i++) {
+        //     const index = restaurants[i];
 
-            if (index % restaurantSkip != 0) continue;
+        //     if (index % restaurantSkip != 0) continue;
 
-            const xPos = this.app.data.x[index] - this.cameraX;
-            const yPos = this.app.data.y[index] - this.cameraY;
+        //     const xPos = this.app.data.x[index] - this.cameraX;
+        //     const yPos = this.app.data.y[index] - this.cameraY;
 
-            const screenX = this.width/2 + xPos*scaleRatio;
-            const screenY = this.height/2 - yPos*scaleRatio;
+        //     const screenX = this.width/2 + xPos*scaleRatio;
+        //     const screenY = this.height/2 - yPos*scaleRatio;
 
-            this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
-            this.context.fillText(this.app.data.storeName[index], screenX + DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE/2);
-          }
+        //     this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
+        //     this.context.fillText(this.app.data.storeName[index], screenX + DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE/2);
+        //   }
 
-        } else if (this.loadingChunks[chunkNumber] != true) {
-          this.loadingChunks[chunkNumber] = true;
+        // } else if (this.loadingChunks[chunkNumber] != true) {
+        //   this.loadingChunks[chunkNumber] = true;
 
-          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
-        }
+        //   this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
+        // }
       }
     }
   }
 
-  public moveCamera(x: number, y: number) {
+  public centerCamera() {
+    this.cameraX = (this.minX + this.maxX)/2;
+    this.cameraY = (this.minY + this.maxY)/2;
+  }
+
+  public setRange() {
+    this.range = 2**this.zoom;
+  }
+
+  public panCamera(x: number, y: number) {
     this.cameraX += x;
     this.cameraY += y;
 
     this.updateDisplay();
   }
 
-  public zoomCamera(direction: boolean) {
-    if (direction) this.range *= DisplayMap.ZOOM_FACTOR;
-    else this.range /= DisplayMap.ZOOM_FACTOR;
+  public changeZoom(delta: number) {
+    this.zoom = this.zoom + delta*DisplayMap.ZOOM_SPEED;
+    this.zoom = clamp(this.zoom, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
 
+    this.setRange();
     this.updateDisplay();
   }
 
@@ -218,7 +239,7 @@ class DisplayMap {
     review.innerText = "Review: " + this.app.data.review[index].toFixed(1);
 
     const position = document.createElement("p");
-    position.innerText = `Position: (x: ${this.app.data.x[index]*App.gridScale}m, y: ${this.app.data.y[index]*App.gridScale}m)`
+    position.innerText = `Position: (x: ${this.app.data.x[index]*App.UNIT_SCALE}m, y: ${this.app.data.y[index]*App.UNIT_SCALE}m)`
 
     div.appendChild(id);
     div.appendChild(name);
@@ -260,7 +281,7 @@ class DisplayMap {
       const inRange = getIntersections([
         filterNumbers(this.app.data.x, this.app.sorted.x, actualX - actualSize/2, actualX + actualSize/2),
         filterNumbers(this.app.data.y, this.app.sorted.y, actualY - actualSize, actualY)
-      ], App.restaurantCount);
+      ], App.RESTAURANT_COUNT);
 
       if (inRange.length > 0) {
         const index = inRange[0];
@@ -285,7 +306,7 @@ class DisplayMap {
 
         const scaleRatio = this.height/(this.range*2);
 
-        this.moveCamera(-diffX/scaleRatio, diffY/scaleRatio);
+        this.panCamera(-diffX/scaleRatio, diffY/scaleRatio);
       }
     });
 
@@ -295,7 +316,7 @@ class DisplayMap {
     });
 
     MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
-      this.zoomCamera(event.deltaY > 0);
+      this.changeZoom(event.deltaY);
     });
   }
 }

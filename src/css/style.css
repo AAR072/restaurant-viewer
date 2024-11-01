@@ -90,7 +90,7 @@ body {
 
 /* Sidebar for filters */
 .sidebar {
-  height: 100%;
+  max-height: 100%;
   width: 250px;
   background-color: var(--sidebar-background);
   padding: 20px;
@@ -220,10 +220,16 @@ body {
   /* Manually specify a darker shade of red */
 }
 
-.perflog-fade-out {
-  transition: opacity 1s ease, height 1s ease 1s;
+.perflog {
+  max-height: 50px;
+  margin-top: 10px;
+}
+
+.perflog.fade-out {
+  transition: all 1s ease;
   opacity: 0;
-  height: 0;
+  max-height: 0;
+  margin-top: 0;
 }
 
 .map-container {
@@ -233,4 +239,11 @@ body {
 .map-info {
   position: absolute;
   background-color: red;
+}
+
+.map-main-info {
+  position: absolute;
+  background-color: red;
+  left: 0;
+  bottom: 0;
 }

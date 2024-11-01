@@ -48,8 +48,8 @@ interface SortedData {
  * @param {Data} data - The unprocessed restaurant data to initialize the app with.
  */
 class App {
-  static restaurantCount: number = 100000; // Maximum number of restaurants.
-  static gridScale: number = 20;
+  static RESTAURANT_COUNT: number = 100000; // Maximum number of restaurants.
+  static UNIT_SCALE: number = 20;
 
   public data: Data; // Holds the original data.
   public sorted: SortedData; // Holds the sorted data.
@@ -81,8 +81,8 @@ class App {
       x: sortNumbers(data.x), // Sort x coordinates.
       y: sortNumbers(data.y), // Sort y coordinates.
 
-      distData: new Float32Array(App.restaurantCount), // Array for distances.
-      distSorted: new Uint32Array(App.restaurantCount), // Array for sorted distances.
+      distData: new Float32Array(App.RESTAURANT_COUNT), // Array for distances.
+      distSorted: new Uint32Array(App.RESTAURANT_COUNT), // Array for sorted distances.
     };
 
     this.loadTypes();
@@ -128,7 +128,7 @@ class App {
     const typePointers: number[] = [];
     let cuisinePointer = 0;
 
-    for (let i = 0; i < App.restaurantCount; i++) {
+    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names.
       const type = this.data.type[index]; // Retrieve the type of the restaurant using the index.
       let typeIndex = this.getCuisineTypeIndex(type);
@@ -156,7 +156,7 @@ class App {
    * @timecomplexity O(n) - The distance calculation iterates over the list of restaurants, resulting in a linear time complexity.
    */
   updateDistances() {
-    for (let i = 0; i < App.restaurantCount; i++) {
+    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
 
@@ -188,8 +188,8 @@ class App {
     SEARCH_BUTTON.addEventListener("click", () => {
       const nameInput = SEARCH_NAME_INPUT.value;
       const idInput = SEARCH_ID_INPUT.value;
-      const xInput = parseInt(SEARCH_X_INPUT.value);
-      const yInput = parseInt(SEARCH_Y_INPUT.value);
+      const xInput = parseInt(SEARCH_X_INPUT.value)/App.UNIT_SCALE;
+      const yInput = parseInt(SEARCH_Y_INPUT.value)/App.UNIT_SCALE;
 
       const total: Uint32Array[] = [];
       let totalPointer = 0;
@@ -208,10 +208,10 @@ class App {
 
       if (totalPointer == 1) {
         if (alreadySorted) results = total[0];
-        else results = sortBy(total[0], App.restaurantCount, this.sorted.storeName);
+        else results = sortBy(total[0], App.RESTAURANT_COUNT, this.sorted.storeName);
 
       } else if (totalPointer > 1) {
-        results = getIntersections(total, App.restaurantCount, alreadySorted ? undefined : this.sorted.storeName);
+        results = getIntersections(total, App.RESTAURANT_COUNT, alreadySorted ? undefined : this.sorted.storeName);
 
       } else {
         results = new Uint32Array(0);
@@ -219,10 +219,10 @@ class App {
 
       this.currentSearch = new SearchResult(this, results);
     });
-          SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
-        this.currentSearch = new SearchResult(this, this.sorted.storeName);
+    
+    SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
+      this.currentSearch = new SearchResult(this, this.sorted.storeName);
     });
-
 
     TYPE_SELECT.addEventListener("input", () => {
       this.currentSearch.setTypeFilter(TYPE_SELECT.value);
