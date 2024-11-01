@@ -10,8 +10,20 @@ function properMod(n: number, b: number) {
  * 
  * @timecomplexity O(1) - The operation involves simple arithmetic and modulus, both of which are constant time operations.
  */
-function floor(n: number): number {
-  return n - properMod(n, 1);
+function floor(n: number, b: number = 1): number {
+  return n - properMod(n, b);
+}
+
+// add "base" for flooring (i.e. round to nearest 2, 10, etc.)
+// fix all rounding functions to go up/down for negative values too, and add custom floor which always floors towards zero
+
+// fix so that negative values go up too
+function ceil(n: number, b: number = 1): number {
+  const r = n % b;
+
+  if (r == 0) return n;
+
+  return n - r + b;
 }
 
 function round(n: number): number {

@@ -49,6 +49,7 @@ interface SortedData {
  */
 class App {
   static restaurantCount: number = 100000; // Maximum number of restaurants.
+  static gridScale: number = 20;
 
   public data: Data; // Holds the original data.
   public sorted: SortedData; // Holds the sorted data.
