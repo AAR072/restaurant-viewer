@@ -8,7 +8,7 @@ const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
 class DisplayMap {
-  static CHUNK_SIZE = 128;
+  static CHUNK_SIZE = 64;
 
   static ICON_SIZE = 24;
   static TEXT_SIZE = 12;
@@ -21,7 +21,7 @@ class DisplayMap {
 
   public cameraX: number = 0;
   public cameraY: number = 0;
-  public zoom: number = 6;
+  public zoom: number = 5;
   public range: number;
 
   public context: CanvasRenderingContext2D;
@@ -110,9 +110,9 @@ class DisplayMap {
     const gridYMin = ceil(this.cameraY - this.range, gridScale);
     const gridYMax = floor(this.cameraY + this.range, gridScale);
 
-    MAP_GRID_SCALE.innerText = gridScale*App.UNIT_SCALE + "m";
-    MAP_POSITION_X.value = round(this.cameraX*App.UNIT_SCALE) + "m";
-    MAP_POSITION_Y.value = round(this.cameraY*App.UNIT_SCALE) + "m";
+    MAP_GRID_SCALE.innerText = (gridScale*App.UNIT_SCALE).toString();
+    MAP_POSITION_X.value = round(this.cameraX*App.UNIT_SCALE).toString();
+    MAP_POSITION_Y.value = round(this.cameraY*App.UNIT_SCALE).toString();
 
     for (let x = gridXMin; x <= gridXMax; x += gridScale) {
       const screenX = this.width/2 + (x - this.cameraX)*scaleRatio;
@@ -156,7 +156,7 @@ class DisplayMap {
       for (let y = minChunkY; y <= maxChunkY; y++) {
         const chunkNumber = x*this.chunkColumns + y;
 
-        // let restaurants = this.loadedChunks[chunkNumber];
+        let restaurants = this.loadedChunks[chunkNumber];
 
         const chunkMinX = x * DisplayMap.CHUNK_SIZE;
         const chunkMinY = y * DisplayMap.CHUNK_SIZE;
@@ -168,27 +168,27 @@ class DisplayMap {
 
         this.context.strokeRect(screenX, screenY, screenSize, screenSize);
 
-        // if (restaurants) {
-        //   for (let i = 0; i < restaurants.length; i++) {
-        //     const index = restaurants[i];
+        if (restaurants) {
+          for (let i = 0; i < restaurants.length; i++) {
+            const index = restaurants[i];
 
-        //     if (index % restaurantSkip != 0) continue;
+            if (index % restaurantSkip != 0) continue;
 
-        //     const xPos = this.app.data.x[index] - this.cameraX;
-        //     const yPos = this.app.data.y[index] - this.cameraY;
+            const xPos = this.app.data.x[index] - this.cameraX;
+            const yPos = this.app.data.y[index] - this.cameraY;
 
-        //     const screenX = this.width/2 + xPos*scaleRatio;
-        //     const screenY = this.height/2 - yPos*scaleRatio;
+            const screenX = this.width/2 + xPos*scaleRatio;
+            const screenY = this.height/2 - yPos*scaleRatio;
 
-        //     this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
-        //     this.context.fillText(this.app.data.storeName[index], screenX + DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE/2);
-        //   }
+            this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
+            this.context.fillText(this.app.data.storeName[index], screenX + DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE/2);
+          }
 
-        // } else if (this.loadingChunks[chunkNumber] != true) {
-        //   this.loadingChunks[chunkNumber] = true;
+        } else if (this.loadingChunks[chunkNumber] != true) {
+          this.loadingChunks[chunkNumber] = true;
 
-        //   this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
-        // }
+          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
+        }
       }
     }
   }
@@ -203,15 +203,14 @@ class DisplayMap {
   }
 
   public panCamera(x: number, y: number) {
-    this.cameraX += x;
-    this.cameraY += y;
+    this.cameraX = clamp(this.cameraX + x, this.minX, this.maxX);
+    this.cameraY = clamp(this.cameraY + y, this.minY, this.maxY);
 
     this.updateDisplay();
   }
 
   public changeZoom(delta: number) {
-    this.zoom = this.zoom + delta*DisplayMap.ZOOM_SPEED;
-    this.zoom = clamp(this.zoom, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
+    this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
 
     this.setRange();
     this.updateDisplay();
