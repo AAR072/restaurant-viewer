@@ -115,5 +115,6 @@ DISABLE_CLEAR_CHECKBOX.addEventListener("input", () => {
 });
 
 CLEAR_ALL_BUTTON.addEventListener("click", () => {
+  TASK_CONTAINER.innerHTML = "";
   while (logQueueLength > 0) clearTask();
 });
