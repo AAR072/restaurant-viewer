@@ -1,7 +1,29 @@
 function outPutResults(div: HTMLDivElement | null, name: string, passed: boolean, result: string) {
-  console.log(div, name, passed, result);
+  if (!div) return; // Check if the div is valid
 
+  // Create a container for the test result
+  const resultContainer = document.createElement("div");
+  resultContainer.className = "test-result";
+
+  // Create the icon for pass/fail
+  const icon = document.createElement("span");
+  icon.innerHTML = passed ? "✅" : "❌"; // Green check or red X
+  icon.style.color = passed ? "green" : "red";
+  icon.style.marginRight = "5px";
+
+  // Create a text node for the test name and result
+  const resultText = document.createElement("span");
+  resultText.textContent = `${name}: ${result}`;
+
+  // Append icon and text to the result container
+  resultContainer.appendChild(icon);
+  resultContainer.appendChild(resultText);
+
+  // Append the result container to the provided div
+  div.appendChild(resultContainer);
 }
+
+// Example button click event to test the function
 function tests(div: HTMLDivElement | null) {
   // Test 1: Sort and Binary Search
   let input:any = [1, 3, 4, 6, 5, 2];
