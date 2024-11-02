@@ -260,12 +260,20 @@ function goFrugal(
   currentY: number,
   combinations: string[][],
   budget: number,
-  sortedData:Uint32Array 
+  sortedData:Uint32Array,
+  fast: boolean = true
 ): { distance: number; path: TNode[]; possible: boolean} {
   const sortedX: number[] = [];
   const sortedY: number[] = [];
+  let speed;
+  if (fast) {
+    speed = 100;
+  } else {
+    speed = 500;
+  }
+
   const sortedTypes: string[] = [];
-    for (let i = 0; i < 110; i++) {
+    for (let i = 0; i < speed + 10; i++) {
     let index = sortedData[i];
     sortedX[i] = xData[index];
     sortedY[i] = yData[index];
@@ -274,7 +282,7 @@ function goFrugal(
 
 
   let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
-  for (let i = 1; i < 100; i++) {
+  for (let i = 1; i < speed; i++) {
     TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
   }
   let graph: Graph = {
@@ -312,7 +320,8 @@ function savingFuel(
   currentY: number,
   targetX: number,
   targetY: number,
-  sortedData: Uint32Array
+  sortedData: Uint32Array,
+  fast: boolean = true
 ): { distance: number; path: TNode[] } {
   const sortedX = [];
   const sortedY = [];
@@ -320,8 +329,14 @@ function savingFuel(
   const deepCopy = JSON.parse(JSON.stringify(categories));
   deepCopy[deepCopy.length] = "START";
   deepCopy[deepCopy.length] = "END";
+  let speed;
+  if (fast) {
+    speed = 100;
+  } else {
+    speed = 500
+  }
   // i is 110 becaue I am scared of random bugs when copying over
-  for (let i = 0; i < 110; i++) {
+  for (let i = 0; i < speed + 10; i++) {
     let index = sortedData[i];
     sortedX[i] = xData[index];
     sortedY[i] = yData[index];
@@ -329,26 +344,26 @@ function savingFuel(
   }
 
   let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
-  for (let i = 1; i < 100; i++) {
+  for (let i = 1; i < speed; i++) {
     TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
   }
-  TNodes[100] = {id: 100, x: targetX, y:targetY, type: "END"}
+  TNodes[speed] = {id: speed, x: targetX, y:targetY, type: "END"}
   let graph: Graph = {
     TNodes,
     categories: deepCopy 
   };
-  const result = findMinimumDistanceToTypesAndEnd(graph, 0, 100);
+  const result = findMinimumDistanceToTypesAndEnd(graph, 0, speed);
   return result;
 }
 const uniqueCombinations = getCombinations(cuisines);
 // Example
-const t0 = performance.now();
-console.log(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0, app.sorted.distSorted));
-console.log(performance.now() - t0);
-console.log("GO FRUGAL!");
-const t1 = performance.now();
-console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted));
-console.log(performance.now() - t1);
+// const t0 = performance.now();
+// console.log(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0, app.sorted.distSorted));
+// console.log(performance.now() - t0);
+// console.log("GO FRUGAL!");
+// const t1 = performance.now();
+// console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted));
+// console.log(performance.now() - t1);
 
 
 

@@ -1,0 +1,161 @@
+<html lang="en"></html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banana Republic Restaurant Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/css/style.css">
+</head>
+
+<body>
+
+  <div id="map-container" class="map-container">
+    <canvas id="map-canvas" width="800" height="450" style="background-color: white;"></canvas>
+    <div class="map-main-info">
+      <label for="map-grid-scale">Grid Scale</label>
+      <span id="map-grid-scale"></span>
+      <br>
+
+      <label>Position: </label>
+      <span>(x: <input id="map-position-x"/>m, y: <input id="map-position-y"/>m)</span>
+      <br>
+
+      <button>Center</button>
+      <br>
+      <button>Default Focus</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Sidebar for filters -->
+    <div class="sidebar">
+      <h2>Filters</h2>
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <label for="type-filter">Cuisine Type:</label>
+        <br>
+        <select id="type-filter" name="type">
+          <option value="">Any</option>
+        </select>
+        <br>
+        <br>
+
+        <label for="cost-filter">Cost:</label>
+        <br>
+        <select id="cost-filter" name="cost">
+          <option value="">Any</option>
+          <option value="low">Cheap (under $10)</option>
+          <option value="less">Mid-Range ($20 - $40)</option>
+          <option value="range">High-End (above $40)</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div>
+          <input id="cost-min" type="text" />
+          <input type="range" value="0" min="0" max="1000" />
+          <input id="cost-max" type="text" />
+        </div>
+        <label for="review-filter">Review:</label>
+        <select id="review-filter" name="review">
+          <option value="">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+          <option value="4.5">4.5+</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div>
+          <input id="review-min" type="text" />
+          <input type="range" value="0" min="0" max="1000" />
+          <input id="review-max" type="text" />
+        </div>
+        <br>
+        <hr>
+        <br>
+        <h2>Tests</h2>
+        <div id="testing-div" class="filter-section">
+
+        </div>
+        <button id="test-button" type="button">Run Tests</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Search Section -->
+      <div class="search-section">
+        <h2>Search</h2>
+        <br>
+        <input id="search-name" type="text" placeholder="Name"/>
+        <input id="search-id" type="text" placeholder="Id"/>
+        <br>
+        <input id="search-x" type="text" placeholder="X"/>
+        <input id="search-y" type="text" placeholder="Y"/>
+        <br>
+        <button id="search-button" type="button">Search</button>
+        <button id="search-clear" class="error-button">Clear Search</button>
+      </div>
+
+      <!-- Sort Section -->
+      <div class="sort-section">
+        <h2>Sort</h2>
+        <label for="sort-select">Sort By</label>
+        <select id="sort-select" name="Sort By">
+          <option value="storeName">Alphabetical Order</option>
+          <option value="cost">Price</option>
+          <option value="review">Review</option>
+        </select>
+        <button id="sort-direction">Ascending</button>
+      </div>
+
+      <!-- Browse Section -->
+      <div class="browse-section">
+        <h2>Browse</h2>
+          <label for="page-size">Page Size:</label>
+          <input id="page-size" type="text" placeholder="(1 - 100)" value="0" />
+          <label for="page-number-input">Page:</label>
+          <input id="page-number-input" type="text" value="0" />
+          <span>/</span>
+          <span id="page-count">0</span>
+          <br>
+        <button id="prev-page">Previous Page</button>
+        <button id="next-page">Next Page</button>
+      </div>
+
+      <!-- Results Section -->
+      <div id="search-results" class="results">
+        <div class="skeleton-loader"></div>
+      </div>
+    </div>
+
+    <!-- Performance Section -->
+    <div class="sidebar performance-section">
+      <h2>Performance</h2>
+      <label style="color:var(--warning-color);" for="disable-performance-clear">Disable Auto Clear:</label>
+      <input id="disable-performance-clear" type="checkbox">
+      <br>
+      <br>
+      <button id="clear-performance-log" class="error-button">Clear All</button>
+      <ul id="task-container"></ul>
+    </div>
+  </div>
+
+  <script src="./dist/DO_NOT_TOUCH.js"></script>
+  <script src="./dist/scripts/util/utils.js"></script>
+  <script src="./dist/scripts/structs/performance-logger.js"></script>
+  <script src="./dist/scripts/algorithms/merge-sort.js"></script>
+  <script src="./dist/scripts/algorithms/binary-search.js"></script>
+  <script src="./dist/scripts/algorithms/array-intersection.js"></script>
+  <script src="./dist/scripts/structs/search-result.js"></script>
+  <script src="./dist/scripts/structs/display-map.js"></script>
+  <script src="./dist/scripts/structs/app.js"></script>
+  <script src="./dist/index.js"></script>
+  <script src="./dist/scripts/algorithms/tsp.js"></script>
+  <script src="./dist/scripts/tests/binary-search-test.js"></script>
+
+</body>
+
+</html>
