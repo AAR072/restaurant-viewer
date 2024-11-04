@@ -1,8 +1,32 @@
 function outPutResults(div: HTMLDivElement | null, name: string, passed: boolean, result: string) {
-  console.log(div, name, passed, result);
+  if (!div) return; // Check if the div is valid
 
+  // Create a container for the test result
+  const resultContainer = document.createElement("div");
+  resultContainer.className = "test-result";
+
+
+  // Create a text node for the test name and result
+  const resultText = document.createElement("span");
+  // innerHTML is bad but there is no XSS oppurtunity here :(
+  resultText.innerHTML = `<h2 style="margin-bottom: 0px; color: white;">${name}</h2> <h3>${result}${passed ? " ✅" : " ❌"}</h3>`;
+  resultText.style.color = passed ? "green" : "red";
+  const br = document.createElement("br");
+
+
+  // Append icon and text to the result container
+  resultContainer.appendChild(resultText);
+
+  // Append the result container to the provided div
+  div.appendChild(resultContainer);
+  div.appendChild(br);
 }
-function tests(div: HTMLDivElement | null) {
+
+// Example button click event to test the function
+function tests(div: any | null) {
+  // clearing our div
+  div.innerHTML = "";
+   
   // Test 1: Sort and Binary Search
   let input:any = [1, 3, 4, 6, 5, 2];
   let sorted:any = sortNumbers(input);
@@ -56,21 +80,36 @@ function tests(div: HTMLDivElement | null) {
   let output = getIntersections([firstInput, secondInput], 10);
   let expected = [1,4];
   if (output.toString() !== expected.toString()) {
-    outPutResults(div, "Interesction Test", false, `Expected ${expectedSortedArray}, got ${sorted}`);
+    outPutResults(div, "Interesction Test", false, `Expected ${expected}, got ${output.toString}`);
   } else {
     outPutResults(div, "Intersection Test", true, "Success");
   }
+  // Test 4: No intersection
   firstInput = [1, 2, 3, 4];
   secondInput = [9, 7, 8];
   output = getIntersections([firstInput, secondInput], 10);
   expected = [];
   if (output.toString() !== expected.toString()) {
-    outPutResults(div, "Interesction Test", false, `Expected ${expectedSortedArray}, got ${sorted}`);
+    outPutResults(div, "Null Interesction Test", false, `Expected ${expected}, got ${output.toString}`);
   } else {
-    outPutResults(div, "Intersection Test", true, "Success");
+    outPutResults(div, "Null Intersection Test", true, "Success");
   }
 
-
+  // Test 5: Frugal Test 
+  let expectedString = '{"distance":28.081848859886076,"path":[{"id":12,"x":19,"y":20,"type":"Chinese"},{"id":11,"x":17,"y":17,"type":"Burger"},{"id":7,"x":16,"y":15,"type":"Indian"},{"id":1,"x":8,"y":5,"type":"Korean"},{"id":0,"x":0,"y":0,"type":"START"}],"possible":true}'
+  let out = JSON.stringify(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted, true));
+  if ( out === expectedString) {
+    outPutResults(div, "Go Frugal Test", true, `Success`);
+  } else {
+    outPutResults(div, "Go Frugal Test", false, `Expected ${expectedString}, got ${out}`);
+  }
+  // Test 6: Saving Fuel Test:
+  expectedString = '{"distance":1009.4321554472098,"path":[{"id":0,"x":0,"y":0,"type":"START"},{"id":2,"x":11,"y":1,"type":"Coffee"},{"id":15,"x":26,"y":11,"type":"Pizza"},{"id":95,"x":61,"y":30,"type":"Chinese"},{"id":100,"x":999,"y":99,"type":"END"}]}';
+  out = JSON.stringify(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,999,99, app.sorted.distSorted));
+    if ( out === expectedString) {
+    outPutResults(div, "Saving Fuel Test", true, `Success`);
+  } else {
+    outPutResults(div, "Saving Fuel Test", false, `Expected ${expectedString}, got ${out}`);
+  }
 
 }
-tests(null);

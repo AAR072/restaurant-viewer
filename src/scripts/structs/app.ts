@@ -6,6 +6,8 @@ const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
 const SEARCH_Y_INPUT = document.getElementById("search-y") as HTMLInputElement;
 const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
 const SEARCH_CLEAR_BUTTON = document.getElementById("search-clear") as HTMLButtonElement;
+const TESTING_BUTTON = document.getElementById("test-button") as HTMLInputElement;
+
 
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
 
@@ -185,6 +187,9 @@ class App {
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
   initInput() {
+    TESTING_BUTTON.addEventListener("click", () => {
+      tests(document.getElementById("testing-div"));
+    });
     SEARCH_BUTTON.addEventListener("click", () => {
       const nameInput = SEARCH_NAME_INPUT.value;
       const idInput = SEARCH_ID_INPUT.value;
