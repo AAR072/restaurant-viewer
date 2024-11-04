@@ -8,8 +8,9 @@ const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElem
 const SEARCH_CLEAR_BUTTON = document.getElementById("search-clear") as HTMLButtonElement;
 const TESTING_BUTTON = document.getElementById("test-button") as HTMLInputElement;
 
-
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
+const COST_RANGE = document.getElementById("cost-range") as HTMLDivElement;
+const REVIEW_RANGE = document.getElementById("review-range") as HTMLDivElement;
 
 const SORT_SELECT = document.getElementById("sort-select") as HTMLSelectElement;
 const SORT_DIRECTION = document.getElementById("sort-direction") as HTMLButtonElement;
@@ -62,6 +63,9 @@ class App {
   public currentSearch: SearchResult; // Holds the current search result.
   public displayMap: DisplayMap;
 
+  public costSlider: DoubleSlider;
+  public reviewSlider: DoubleSlider;
+
   /**
    * Initializes the App with the given data and sorts it accordingly.
    *
@@ -95,6 +99,18 @@ class App {
     // Initialize the current search with store names and an empty query.
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
     this.displayMap = new DisplayMap(this);
+
+    this.costSlider = new DoubleSlider(COST_RANGE,
+      this.data.cost[this.sorted.cost[0]],
+      this.data.cost[this.sorted.cost[App.RESTAURANT_COUNT - 1]],
+      2
+    );
+
+    this.reviewSlider = new DoubleSlider(REVIEW_RANGE,
+      this.data.review[this.sorted.review[0]],
+      this.data.review[this.sorted.review[App.RESTAURANT_COUNT - 1]],
+      1
+    );
 
     this.initInput(); // Set up input handling for searches.
   }

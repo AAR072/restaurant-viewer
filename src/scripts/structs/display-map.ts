@@ -455,7 +455,7 @@ class DisplayMap {
         const scaleRatio = this.height/(this.range*2);
 
         this.panCamera(-diffX/scaleRatio, diffY/scaleRatio);
-
+        
       } else {
         const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
 

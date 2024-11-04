@@ -28,26 +28,25 @@
       </div>
 
       <div class="bubble filter-container">
-        <div class="dropdown">
-          <button class="drop-button">Cuisine Type</button>
-          <div class="drop-content">
-            <div>
-              <input type="checkbox"/><label>All</label>
-            </div>
-          </div>
-        </div>
-
         <label for="type-filter">Cuisine Type:</label>
         <select id="type-filter" name="type">
           <option value="">Any</option>
         </select>
 
-        <div class="slider-wrapper">
-          <div class="slider-range">
-            <div class="progress"></div>
-            <input type="range" min="0" max="10000" value="2500">
-            <input type="range" min="0" max="10000" value="7500">
-          </div>
+        <div id="cost-range" class="double-slider">
+          <span class="slider-min-text">$<input class="slider-min-input" type="text"/></span>
+          <span class="slider-max-text">$<input class="slider-max-input" type="text"/></span>
+          <div class="progress"></div>
+          <input class="min-range" type="range">
+          <input class="max-range" type="range">
+        </div>
+
+        <div id="review-range" class="double-slider">
+          <span class="slider-min-text">&#9733<input class="slider-min-input" type="text"/></span>
+          <span class="slider-max-text">&#9733<input class="slider-max-input" type="text"/></span>
+          <div class="progress"></div>
+          <input class="min-range" type="range">
+          <input class="max-range" type="range">
         </div>
       </div>
 
@@ -160,14 +159,15 @@
   <script src="./dist/scripts/algorithms/merge-sort.js"></script>
   <script src="./dist/scripts/algorithms/binary-search.js"></script>
   <script src="./dist/scripts/algorithms/array-intersection.js"></script>
+  <script src="./dist/scripts/algorithms/tsp.js"></script>
 
+  <script src="./dist/scripts/components/double-slider.js"></script>
   <script src="./dist/scripts/components/dropdown.js"></script>
 
   <script src="./dist/scripts/structs/search-result.js"></script>
   <script src="./dist/scripts/structs/display-map.js"></script>
   <script src="./dist/scripts/structs/app.js"></script>
   <script src="./dist/index.js"></script>
-  <!-- <script src="./dist/scripts/algorithms/tsp.js"></script> -->
 </body>
 
 </html>
