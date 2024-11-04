@@ -445,11 +445,6 @@ class DisplayMap {
     });
 
     document.addEventListener("mousemove", (event: MouseEvent) => {
-      const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
-
-      if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
-      else MAP_CANVAS.classList.remove("hover");
-
       if (mouseX && mouseY) {
         const diffX = event.clientX - mouseX;
         const diffY = event.clientY - mouseY;
@@ -460,6 +455,12 @@ class DisplayMap {
         const scaleRatio = this.height/(this.range*2);
 
         this.panCamera(-diffX/scaleRatio, diffY/scaleRatio);
+
+      } else {
+        const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
+
+        if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
+        else MAP_CANVAS.classList.remove("hover");
       }
     });
 

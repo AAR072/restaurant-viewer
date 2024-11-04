@@ -187,9 +187,9 @@ class App {
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
   initInput() {
-    TESTING_BUTTON.addEventListener("click", () => {
-      tests(document.getElementById("testing-div"));
-    });
+    // TESTING_BUTTON.addEventListener("click", () => {
+    //   tests(document.getElementById("testing-div"));
+    // });
     SEARCH_BUTTON.addEventListener("click", () => {
       const nameInput = SEARCH_NAME_INPUT.value;
       const idInput = SEARCH_ID_INPUT.value;

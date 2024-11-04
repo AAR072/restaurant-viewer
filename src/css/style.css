@@ -2,19 +2,25 @@
   --background-color: rgb(20, 20, 20);
   --sidebar-color: rgb(44, 44, 44);
   --bubble-color: rgb(36, 36, 36);
+  --secondary-color: rgb(41, 41, 41);
   --detail-color: rgb(228, 228, 228);
   --secondary-detail-color: rgb(175, 175, 175);
 }
 
 * {
   font-family: "Ubuntu", sans-serif;
+  font-size: 16px;
   margin: 0;
   padding: 0;
   color: var(--detail-color);
 }
 
-input {
-  font-size: 16px;
+body {
+  overflow: hidden;
+}
+
+input, select, button {
+  background-color: var(--secondary-color);
 }
 
 input::placeholder {
@@ -28,10 +34,13 @@ input::placeholder {
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   width: 400px;
-  padding: 20px;
   background-color: var(--sidebar-color);
+  gap: 20px;
+  padding-top: 20px;
 }
 
 .bubble {
@@ -39,7 +48,8 @@ input::placeholder {
   border: 2px solid var(--detail-color);
   background-color: var(--bubble-color);
   width: auto;
-  margin-bottom: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
   padding: 15px;
 }
 
@@ -72,6 +82,7 @@ input::placeholder {
   flex-direction: column;
   justify-content: space-between;
   width: auto;
+  gap: 5px;
 }
 
 .search-icon-button {
@@ -126,8 +137,90 @@ input::placeholder {
 /*#endregion Search Section*/
 
 /*#region Filter Section*/
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
 
+.dropdown .drop-button {
+  width: 150px;
+  height: 30px;
+  border: 1px solid var(--secondary-detail-color);
+  background-color: var(--secondary-color);
+  outline: none;
+  cursor: pointer;
+}
+
+.dropdown .drop-content {
+  display: none;
+  position: absolute;
+}
+
+.drop-content.show {
+  display: block;
+}
+
+.slider-range {
+  height: 10px;
+  background: none;
+  border-radius: 5px;
+  background-color: gray;
+  position: relative;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.slider-range .progress {
+  height: 10px;
+  left: 25%;
+  right: 25%;
+  border-radius: 5px;
+  position: absolute;
+  background-color: rgb(0, 60, 255);
+}
+
+.slider-range input[type="range"] {
+  padding: 0;
+  position: absolute;
+  height: 10px;
+  width: 100%;
+
+  pointer-events: none;
+
+  appearance: none;
+  background: none;
+}
+
+.slider-range input[type="range"]::-webkit-slider-thumb {
+  pointer-events: all;
+
+  appearance: none;
+
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--detail-color);
+  cursor: pointer;
+}
+
+.slider-range input[type="range"]::-moz-range-thumb {
+  pointer-events: all;
+
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--secondary-detail-color);
+  cursor: pointer;
+}
 /*#endregion Filter Section*/
+
+/*#region Browse/Sort Section*/
+.result-container {
+  flex-grow: 1;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+/*#endregion Browse/Sort Section*/
 
 .map-container {
   flex-grow: 1;
@@ -177,11 +270,11 @@ input::placeholder {
   gap: 10px;
 }
 
-.bubble {
+/* .bubble {
   flex: 1;
   background-color: var(--bubble-color);
   overflow-y: auto;
-}
+} */
 
 .sidebar h2 {
   margin-bottom: 20px;
@@ -362,56 +455,4 @@ input::placeholder {
   opacity: 0;
   max-height: 0;
   margin-top: 0;
-}
-
-.slider-range {
-  height: 5px;
-  background: green;
-  border-radius: 5px;
-  position: relative;
-}
-
-.slider-range .progress {
-  height: 5px;
-  left: 25%;
-  right: 25%;
-  border-radius: 5px;
-  position: absolute;
-  background: blue;
-}
-
-.slider-range input[type="range"] {
-  padding: 0;
-  position: absolute;
-  height: 5px;
-  width: 100%;
-
-  pointer-events: none;
-
-  appearance: none;
-  background: none;
-}
-
-.slider-range input[type="range"]::-webkit-slider-thumb {
-  pointer-events: all;
-
-  appearance: none;
-
-  width: 20px;
-  height: 20px;
-  border: 0;
-  border-radius: 50%;
-  background: red;
-  cursor: pointer;
-}
-
-.slider-range input[type="range"]::-moz-range-thumb {
-  pointer-events: all;
-
-  width: 20px;
-  height: 20px;
-  border: 0;
-  border-radius: 50%;
-  background: red;
-  cursor: pointer;
 }

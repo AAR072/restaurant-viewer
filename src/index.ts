@@ -12,3 +12,5 @@ interface Data {
 const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data; // Load data from JSON file.
 
 const app = new App(data);
+
+// duplicate position at 26700m, 29980m
