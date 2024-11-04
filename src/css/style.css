@@ -1,101 +1,186 @@
-/* Skeleton Loader Styles */
-.skeleton-loader {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  /* Space between skeletons */
-}
-
-.skeleton-bubble {
-  background-color: #444;
-  /* Dark background for the skeleton */
-  border-radius: 15px;
-  /* Rounded corners */
-  height: 100px;
-  /* Height of the skeleton item */
-  width: 100%;
-  /* Full width */
-  animation: pulse 1.5s infinite;
-  /* Animation for the loading effect */
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.7;
-  }
-}
-
-/* Optional: Add a specific style for each bubble to vary heights */
-.skeleton-bubble:nth-child(1) {
-  height: 80px;
-  /* First item shorter */
-}
-
-.skeleton-bubble:nth-child(2) {
-  height: 60px;
-  /* Second item shorter */
-}
-
-.skeleton-bubble:nth-child(3) {
-  height: 100px;
-  /* Normal height */
-}
-
-.skeleton-bubble:nth-child(4) {
-  height: 70px;
-  /* Last item shorter */
-}
-
 :root {
-  --background-color: #181818;
-  --sidebar-background: #232323;
-  --filter-background: #2e2e2e;
-  --hover-background: #3a3a3a;
-  --button-background: #4caf50;
-  --button-hover-background: #45a049;
-  --text-color: #fff;
-  --footer-color: #888;
-  --warning-color: #ffc107;
-  /* Yellow */
-  --error-color: #f44336;
-  /* Red */
+  --background-color: rgb(20, 20, 20);
+  --sidebar-color: rgb(44, 44, 44);
+  --bubble-color: rgb(36, 36, 36);
+  --detail-color: rgb(228, 228, 228);
+  --secondary-detail-color: rgb(175, 175, 175);
 }
 
 * {
   font-family: "Ubuntu", sans-serif;
   margin: 0;
   padding: 0;
-  /* box-sizing: border-box; */
+  color: var(--detail-color);
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
+input {
+  font-size: 16px;
 }
 
-.container {
+input::placeholder {
+  color: var(--secondary-detail-color);
+}
+
+.main-container {
   display: flex;
-  max-width: 1200px;
-  margin: 20px auto;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  box-sizing: border-box;
+  width: 400px;
+  padding: 20px;
+  background-color: var(--sidebar-color);
+}
+
+.bubble {
+  border-radius: 15px;
+  border: 2px solid var(--detail-color);
+  background-color: var(--bubble-color);
+  width: auto;
+  margin-bottom: 10px;
+  padding: 15px;
+}
+
+/*#region Search Section*/
+.search-container {
+  display: flex;
+}
+
+.search-input-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.search-input-container input {
+  width: 100%;
+  height: 20px;
+  outline: none;
+  background: none;
+  border: none;
+}
+
+.search-input-container input:focus {
+  border-bottom: 2px solid var(--detail-color);
+}
+
+.search-icons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: auto;
+}
+
+.search-icon-button {
+  width: 40px;
+  height: 40px;
+  background: none;
+  cursor: pointer;
+  border: none;
+  position: relative;
+  display: inline-flex;
+}
+
+.search-icon::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 4px solid var(--detail-color);
+  border-radius: 50%;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+.search-icon::after {
+  content: "";
+  width: 16px;
+  height: 4px;
+  background-color: var(--detail-color);
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+  transform-origin: top left;
+}
+
+.clear-icon::before, .clear-icon::after {
+  content: "";
+  width: 36px;
+  height: 4px;
+  background-color: var(--detail-color);
+  position: absolute;
+  border-radius: 2px;
+  top: 18px;
+  left: 2px;
+}
+.clear-icon::before {
+  transform: rotate(45deg);
+}
+.clear-icon::after {
+  transform: rotate(-45deg);
+}
+/*#endregion Search Section*/
+
+/*#region Filter Section*/
+
+/*#endregion Filter Section*/
+
+.map-container {
+  flex-grow: 1;
+  position: relative;
+}
+
+.map-info {
+  position: absolute;
+  background-color: red;
+}
+
+.map-main-info {
+  position: absolute;
+  background-color: red;
+  left: 0;
+  bottom: 0;
+}
+
+#map-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background-color);
+}
+
+#map-canvas.drag {
+  cursor: move;
+}
+
+#map-canvas.hover {
+  cursor: pointer;
+}
+
+#map-canvas.click {
+  cursor: grab;
 }
 
 /* Sidebar for filters */
-.sidebar {
-  max-height: 100%;
+.bar-panel {
+  height: 100%;
   width: 250px;
-  background-color: var(--sidebar-background);
-  padding: 20px;
-  border-radius: 8px;
-  overflow-y: scroll;
+  background-color: red;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  gap: 10px;
+}
+
+.bubble {
+  flex: 1;
+  background-color: var(--bubble-color);
+  overflow-y: auto;
 }
 
 .sidebar h2 {
@@ -105,7 +190,6 @@ body {
 .filter-item {
   margin-bottom: 15px;
   padding: 10px;
-  background-color: var(--filter-background);
   border-radius: 4px;
   cursor: pointer;
 }
@@ -121,6 +205,10 @@ body {
   margin-right: 20px;
   height: 100%;
   overflow-y: scroll;
+}
+
+.in-text-input {
+  background-color: red;
 }
 
 /* Search and Filter Section */
@@ -171,10 +259,6 @@ body {
   background-color: var(--button-hover-background);
 }
 
-.filter-section input[type="range"] {
-  width: 80%;
-}
-
 /* Results grid */
 .results {
   background-color: var(--filter-background);
@@ -199,6 +283,55 @@ body {
   .main-content {
     margin-left: 0;
   }
+}
+
+.skeleton-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.skeleton-bubble {
+  background-color: #444;
+  /* Dark background for the skeleton */
+  border-radius: 15px;
+  /* Rounded corners */
+  height: 100px;
+  /* Height of the skeleton item */
+  width: 100%;
+  /* Full width */
+  animation: pulse 1.5s infinite;
+  /* Animation for the loading effect */
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.skeleton-bubble:nth-child(1) {
+  height: 80px;
+}
+
+.skeleton-bubble:nth-child(2) {
+  height: 60px;
+}
+
+.skeleton-bubble:nth-child(3) {
+  height: 100px;
+}
+
+.skeleton-bubble:nth-child(4) {
+  height: 70px;
 }
 
 /* Important is very bad but I am lazy */
@@ -232,18 +365,54 @@ body {
   margin-top: 0;
 }
 
-.map-container {
+.slider-range {
+  height: 5px;
+  background: green;
+  border-radius: 5px;
   position: relative;
 }
 
-.map-info {
+.slider-range .progress {
+  height: 5px;
+  left: 25%;
+  right: 25%;
+  border-radius: 5px;
   position: absolute;
-  background-color: red;
+  background: blue;
 }
 
-.map-main-info {
+.slider-range input[type="range"] {
+  padding: 0;
   position: absolute;
-  background-color: red;
-  left: 0;
-  bottom: 0;
+  height: 5px;
+  width: 100%;
+
+  pointer-events: none;
+
+  appearance: none;
+  background: none;
+}
+
+.slider-range input[type="range"]::-webkit-slider-thumb {
+  pointer-events: all;
+
+  appearance: none;
+
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: red;
+  cursor: pointer;
+}
+
+.slider-range input[type="range"]::-moz-range-thumb {
+  pointer-events: all;
+
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 50%;
+  background: red;
+  cursor: pointer;
 }

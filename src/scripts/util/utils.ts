@@ -102,3 +102,7 @@ function circleMod(n: number, base: number): number {
 function getDistance(x0: number, y0: number, x1: number, y1: number): number {
   return Math.sqrt((x0 - x1)**2 + (y0 - y1)**2);
 }
+
+function geoSeries(r: number, n: number) {
+  return (r**n - 1)/(r - 1);
+}

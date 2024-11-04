@@ -11,30 +11,63 @@
 </head>
 
 <body>
+  <div class="main-container">
+    <div class="sidebar">
+      <div class="bubble search-container">
+        <div class="search-input-container">
+          <input class="search-input-input" id="search-name" type="text" placeholder="Name"/>
+          <input id="search-id" type="text" placeholder="Id"/>
+          <input id="search-x" type="text" placeholder="X"/>
+          <input id="search-y" type="text" placeholder="Y"/>
+        </div>
 
-  <div id="map-container" class="map-container">
-    <canvas id="map-canvas" width="800" height="450" style="background-color: white;"></canvas>
-    <div class="map-main-info">
-      <label for="map-grid-scale">Grid Scale</label>
-      <span id="map-grid-scale"></span>
-      <br>
+        <div class="search-icons-container">
+          <button id="search-button" class="search-icon-button search-icon"></button>
+          <button id="search-clear" class="search-icon-button clear-icon"></button>
+        </div>
+      </div>
 
-      <label>Position: </label>
-      <span>(x: <input id="map-position-x"/>m, y: <input id="map-position-y"/>m)</span>
-      <br>
+      <div class="bubble filter-container">
+        <label for="type-filter">Cuisine Type:</label>
+        <select id="type-filter" name="type">
+          <option value="">Any</option>
+        </select>
 
-      <button>Center</button>
-      <br>
-      <button>Default Focus</button>
+        <div class="slider-wrapper">
+          <div class="slider-range">
+            <div class="progress"></div>
+            <input type="range" min="0" max="10000" value="2500">
+            <input type="range" min="0" max="10000" value="7500">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="map-container" class="map-container">
+      <canvas id="map-canvas"></canvas>
+
+      <div class="map-main-info" hidden>
+        <label for="map-grid-scale">Grid Scale</label>
+        <span id="map-grid-scale"></span>
+        <br>
+  
+        <label>Position: </label>
+        <span>(x: <input id="map-position-x"/>m, y: <input id="map-position-y"/>m)</span>
+        <br>
+  
+        <button>Center</button>
+        <br>
+        <button>Default Focus</button>
+      </div>
     </div>
   </div>
 
-  <div class="container">
-    <!-- Sidebar for filters -->
-    <div class="sidebar">
-      <h2>Filters</h2>
-      <!-- Filter Section -->
-      <div class="filter-section">
+  <div class="" hidden>
+    <!-- Main Content Area -->
+    <div class="main-content" hidden>
+      <div class="bubble">
+        <h2>Filters</h2>
+
         <label for="type-filter">Cuisine Type:</label>
         <br>
         <select id="type-filter" name="type">
@@ -43,41 +76,18 @@
         <br>
         <br>
 
-        <label for="cost-filter">Cost:</label>
-        <br>
-        <select id="cost-filter" name="cost">
-          <option value="">Any</option>
-          <option value="low">Cheap (under $10)</option>
-          <option value="less">Mid-Range ($20 - $40)</option>
-          <option value="range">High-End (above $40)</option>
-          <option value="custom">Custom</option>
-        </select>
-        <div>
-          <input id="cost-min" type="text" />
-          <input type="range" value="0" min="0" max="1000" />
-          <input id="cost-max" type="text" />
-        </div>
-        <label for="review-filter">Review:</label>
-        <select id="review-filter" name="review">
-          <option value="">Any</option>
-          <option value="1">1+</option>
-          <option value="2">2+</option>
-          <option value="3">3+</option>
-          <option value="4">4+</option>
-          <option value="4.5">4.5+</option>
-          <option value="custom">Custom</option>
-        </select>
-        <div>
-          <input id="review-min" type="text" />
-          <input type="range" value="0" min="0" max="1000" />
-          <input id="review-max" type="text" />
+        <div class="slider-wrapper">
+          <!-- <div class="slider-input">
+
+          </div> -->
+          <div class="slider-range">
+            <div class="progress"></div>
+            <input type="range" min="0" max="10000" value="2500">
+            <input type="range" min="0" max="10000" value="7500">
+          </div>
         </div>
       </div>
-
-    </div>
-
-    <!-- Main Content Area -->
-    <div class="main-content">
+      
       <!-- Search Section -->
       <div class="search-section">
         <h2>Search</h2>
@@ -125,7 +135,7 @@
     </div>
 
     <!-- Performance Section -->
-    <div class="sidebar performance-section">
+    <div class="sidebar performance-section" hidden>
       <h2>Performance</h2>
       <label style="color:var(--warning-color);" for="disable-performance-clear">Disable Auto Clear:</label>
       <input id="disable-performance-clear" type="checkbox">
@@ -146,7 +156,7 @@
   <script src="./dist/scripts/structs/display-map.js"></script>
   <script src="./dist/scripts/structs/app.js"></script>
   <script src="./dist/index.js"></script>
-  <script src="./dist/scripts/algorithms/tsp.js"></script>
+  <!-- <script src="./dist/scripts/algorithms/tsp.js"></script> -->
 </body>
 
 </html>

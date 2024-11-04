@@ -7,216 +7,366 @@ const MAP_POSITION_Y = document.getElementById("map-position-y") as HTMLInputEle
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
+const TIME_SEED = Date.now();
+
+function constantRandom(seed: number, index: number) {
+  const hash = (seed * 0x5bd1e995) ^ (index * 0x9e3779b9);
+  
+  return (hash & 3);
+}
+
+function randomQuadSplit(count: number, seed: number): Uint32Array {
+  const portions = new Uint32Array(4);
+  const portion = floor(count/4);
+  let remainder = count % 4;
+
+  for (let i = 0; i < 4; i++) {
+    portions[i] = portion + (remainder > 0 ? 1 : 0);
+    remainder--;
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const newIndex = (i + constantRandom(seed, i)) % 4;
+    const temp = portions[i];
+
+    portions[i] = portions[newIndex];
+    portions[newIndex] = temp;
+  }
+
+  return portions;
+}
+
+class Rectangle {
+  public w: number;
+  public h: number;
+
+  constructor(
+    public x0: number,
+    public x1: number,
+    public y0: number,
+    public y1: number
+  ) {
+    this.w = this.x1 - this.x0;
+    this.h = this.y1 - this.y0;
+  }
+
+  public intersects(rect: Rectangle): boolean {
+    if (this.x1 <= rect.x0 || this.x0 >= rect.x1) return false;
+    if (this.y1 <= rect.y0 || this.y0 >= rect.y1) return false;
+
+    return true;
+  }
+}
+
 class DisplayMap {
-  static CHUNK_SIZE = 64;
+  static ICON_WIDTH = LOCATION_ICON.width;
+  static ICON_HEIGHT = LOCATION_ICON.height;
+  static TEXT_SIZE = 16;
 
-  static ICON_SIZE = 24;
-  static TEXT_SIZE = 12;
-
-  static ZOOM_SPEED = 0.01;
+  static ZOOM_SPEED = 0.001;
   static MIN_ZOOM = 1;
   static MAX_ZOOM = 10;
 
-  static GRID_RANGE_FACTOR = 8;
+  static GRID_RANGE_FACTOR = 16;
+  static QT_SUBDIVISIONS = 6;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
+
   public zoom: number = 5;
   public range: number;
+  public scaleRatio: number;
+  public aspectRatio: number;
 
   public context: CanvasRenderingContext2D;
   public width: number;
   public height: number;
   public bounds: DOMRect;
 
-  public minX: number;
-  public minY: number;
-  public maxX: number;
-  public maxY: number;
+  public mapRect: Rectangle;
 
-  public chunkColumns: number;
-  public chunkRows: number;
-  public chunkCount: number;
-  public loadingChunks: boolean[];
-  public loadedChunks: Uint32Array[];
+  public quadTree: Rectangle[];
+  public qtSize: number;
+  public qtLeaves: number;
+  public qtRestaurants: number[][];
+  public qtLeafSizeX: number;
+  public qtLeafSizeY: number;
 
+  public visibleRests: number[];
   public infoIndex: number | null = null;
   public infoDisplay: HTMLDivElement | null = null;
 
   constructor(public app: App) {
     this.context = MAP_CANVAS.getContext("2d")!;
-    this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
 
-    this.width = MAP_CANVAS.width;
-    this.height = MAP_CANVAS.height;
-    this.bounds = MAP_CANVAS.getBoundingClientRect();
-    // listen to canvas resize for width, height and bounds
+    this.mapRect = new Rectangle(
+      app.data.x[app.sorted.x[0]],
+      app.data.x[app.sorted.x[App.RESTAURANT_COUNT - 1]] + 1,
+      app.data.y[app.sorted.y[0]],
+      app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]] + 1
+    );
+    
+    this.loadQuadTree();
 
-    this.minX = app.data.x[app.sorted.x[0]];
-    this.minY = app.data.y[app.sorted.y[0]];
-    this.maxX = app.data.x[app.sorted.x[App.RESTAURANT_COUNT - 1]];
-    this.maxY = app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]];
-
-    const xRange = this.maxX - this.minX;
-    const yRange = this.maxY - this.minY;
-
-    this.chunkColumns = ceil(xRange/DisplayMap.CHUNK_SIZE);
-    this.chunkRows = ceil(yRange/DisplayMap.CHUNK_SIZE);
-    this.chunkCount = this.chunkRows * this.chunkColumns;
-    this.loadingChunks = new Array(this.chunkCount);
-    this.loadedChunks = new Array(this.chunkCount);
-
+    this.setDimensions(MAP_CANVAS.getBoundingClientRect());
+    this.setRangeScale();
     this.centerCamera();
-    this.setRange();
-    this.updateDisplay();
+
     this.initInput();
+    this.render();
   }
 
-  public loadChunk(chunkMinX: number, chunkMinY: number, chunkMaxX: number, chunkMaxY: number, chunkNumber: number) {
-    const inRange = getIntersections([
-      filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX),
-      filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY)
-    ], App.RESTAURANT_COUNT);
+  // find index of leaf containing point using morton/z-curve index method
+  private getQuadLeaf(x: number, y: number): number {
+    const gridX = floor(x/this.qtLeafSizeX);
+    const gridY = floor(y/this.qtLeafSizeY);
 
-    this.loadedChunks[chunkNumber] = inRange;
-
-    // const promise = new Promise<Uint32Array>((resolve) => {
-    //   // console.log(chunkNumber);
-    //   const xInRange = filterNumbers(this.app.data.x, this.app.sorted.x, chunkMinX, chunkMaxX);
-    //   const yInRange = filterNumbers(this.app.data.y, this.app.sorted.y, chunkMinY, chunkMaxY);
-    //   const inRange = getIntersections([xInRange, yInRange], App.restaurantCount);
-
-    //   resolve(inRange);
-    // });
-
-    // promise.then((restaurants: Uint32Array) => {
-    //   this.loadedChunks[chunkNumber] = restaurants;
-    // });
+    let index = 0;
+    
+    for (let i = 0; i < DisplayMap.QT_SUBDIVISIONS; i++) {
+      const xBit = (gridX >> i) & 1;
+      const yBit = (gridY >> i) & 1;
+      
+      index |= (xBit << (2*i)) | (yBit << (2*i + 1));
+    }
+    
+    return index;
   }
 
-  public updateDisplay() {
-    const aspectRatio = this.width/this.height;
-    const scaleRatio = this.height/(this.range*2);
+  private loadQuadTree() {
+    this.qtSize = geoSeries(4, DisplayMap.QT_SUBDIVISIONS + 1);
+    this.qtLeaves = 4**DisplayMap.QT_SUBDIVISIONS;
+    this.quadTree = new Array(this.qtSize);
+    this.qtRestaurants = new Array(this.qtLeaves);
+    this.qtLeafSizeX = this.mapRect.w/(1 << DisplayMap.QT_SUBDIVISIONS);
+    this.qtLeafSizeY = this.mapRect.h/(1 << DisplayMap.QT_SUBDIVISIONS);
 
+    this.subdivideQuads(this.mapRect);
+
+    const restaurantPointers = new Uint32Array(this.qtLeaves);
+
+    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
+      const index = this.getQuadLeaf(this.app.data.x[i], this.app.data.y[i]);
+
+      if (!this.qtRestaurants[index]) this.qtRestaurants[index] = [];
+
+      this.qtRestaurants[index][restaurantPointers[index]++] = i;
+    }
+  }
+
+  private subdivideQuads(quad: Rectangle, index: number = 0, count: number = DisplayMap.QT_SUBDIVISIONS) {
+    if (count < 0) return;
+
+    const midX = (quad.x0 + quad.x1)/2;
+    const midY = (quad.y0 + quad.y1)/2;
+
+    this.quadTree[index] = quad;
+
+    const bottomLeft = new Rectangle(quad.x0, midX, quad.y0, midY);
+    const bottomRight = new Rectangle(midX, quad.x1, quad.y0, midY);
+    const topLeft = new Rectangle(quad.x0, midX, midY, quad.y1);
+    const topRight = new Rectangle(midX, quad.x1, midY, quad.y1);
+
+    index *= 4;
+    count--;
+
+    this.subdivideQuads(bottomLeft, index + 1, count);
+    this.subdivideQuads(bottomRight, index + 2, count);
+    this.subdivideQuads(topLeft, index + 3, count);
+    this.subdivideQuads(topRight, index + 4, count);
+  }
+
+  private getQuadsInside(target: Rectangle, desiredDepth: number, quadList: number[], index: number = 0, depth: number = 0) {
+    const quad = this.quadTree[index];
+
+    if (!target.intersects(quad)) return;
+
+    if (depth == desiredDepth) {
+      quadList[quadList.length] = index;
+
+      return;
+    }
+
+    index *= 4;
+    depth++;
+
+    this.getQuadsInside(target, desiredDepth, quadList, index + 1, depth);
+    this.getQuadsInside(target, desiredDepth, quadList, index + 2, depth);
+    this.getQuadsInside(target, desiredDepth, quadList, index + 3, depth);
+    this.getQuadsInside(target, desiredDepth, quadList, index + 4, depth);
+  }
+
+  private getRestaurantsInQuad(index: number, depth: number, restCount: number, restList: number[]) {
+    if (restCount <= 0) return;
+
+    if (depth == DisplayMap.QT_SUBDIVISIONS) {
+      const quadRestaurants = this.qtRestaurants[index - this.qtSize + this.qtLeaves];
+      const restLen = quadRestaurants.length;
+
+      for (let i = 0; i < restCount; i++) {
+        if (i >= restLen) break;
+
+        restList[restList.length] = quadRestaurants[i];
+      }
+
+      return;
+    }
+
+    const parts = randomQuadSplit(restCount, index);
+
+    index *= 4;
+    depth++;
+
+    this.getRestaurantsInQuad(index + 1, depth, parts[0], restList);
+    this.getRestaurantsInQuad(index + 2, depth, parts[1], restList);
+    this.getRestaurantsInQuad(index + 3, depth, parts[2], restList);
+    this.getRestaurantsInQuad(index + 4, depth, parts[3], restList);
+  }
+
+  private setDimensions(rect: DOMRectReadOnly) {
+    const width = rect.width;
+    const height = rect.height;
+
+    MAP_CANVAS.width = width;
+    MAP_CANVAS.height = height;
+
+    this.width = width;
+    this.height = height;
+    this.bounds = rect;
+    this.aspectRatio = width/height;
+  }
+
+  private setRangeScale() {
+    this.range = 2**this.zoom;
+    this.scaleRatio = this.height/(this.range*2);
+  }
+
+  public centerCamera() {
+    this.cameraX = (this.mapRect.x0 + this.mapRect.x1)/2;
+    this.cameraY = (this.mapRect.y0 + this.mapRect.y1)/2;
+  }
+
+  public panCamera(x: number, y: number) {
+    this.cameraX = clamp(this.cameraX + x, this.mapRect.x0, this.mapRect.x1);
+    this.cameraY = clamp(this.cameraY + y, this.mapRect.y0, this.mapRect.y1);
+
+    this.render();
+  }
+
+  public changeZoom(delta: number) {
+    this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
+
+    this.setRangeScale();
+    this.render();
+  }
+
+  private drawLine(x0: number, y0: number, x1: number, y1: number, style: string, width: number) {
+    this.context.strokeStyle = style;
+    this.context.lineWidth = width;
+
+    this.context.beginPath();
+    this.context.moveTo(x0, y0);
+    this.context.lineTo(x1, y1);
+    this.context.stroke();
+  }
+
+  private getScreenPos(x: number, y: number): number[] {
+    return [
+      this.width/2 + (x - this.cameraX)*this.scaleRatio,
+      this.height/2 - (y - this.cameraY)*this.scaleRatio
+    ]
+  }
+
+  private render() {
     this.context.clearRect(0, 0, this.width, this.height);
+    this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
+    this.context.fillStyle = "rgba(255, 255, 255, 0.5)";
 
-    this.context.fillStyle = "black";
-    this.context.strokeStyle = "black";
+    const screenRect = new Rectangle(
+      this.cameraX - this.range*this.aspectRatio,
+      this.cameraX + this.range*this.aspectRatio,
+      this.cameraY - this.range, 
+      this.cameraY + this.range
+    );
 
-    // fix this, ceil sometimes not working
     const gridScale = 2**floor(Math.log2(this.range/DisplayMap.GRID_RANGE_FACTOR));
-    const gridXMin = ceil(this.cameraX - this.range*aspectRatio, gridScale);
-    const gridXMax = floor(this.cameraX + this.range*aspectRatio, gridScale);
-    const gridYMin = ceil(this.cameraY - this.range, gridScale);
-    const gridYMax = floor(this.cameraY + this.range, gridScale);
+    const gridXMin = ceil(screenRect.x0, gridScale);
+    const gridXMax = floor(screenRect.x1, gridScale);
+    const gridYMin = ceil(screenRect.y0, gridScale);
+    const gridYMax = floor(screenRect.y1, gridScale);
 
     MAP_GRID_SCALE.innerText = (gridScale*App.UNIT_SCALE).toString();
     MAP_POSITION_X.value = round(this.cameraX*App.UNIT_SCALE).toString();
     MAP_POSITION_Y.value = round(this.cameraY*App.UNIT_SCALE).toString();
 
     for (let x = gridXMin; x <= gridXMax; x += gridScale) {
-      const screenX = this.width/2 + (x - this.cameraX)*scaleRatio;
+      const screenX = this.width/2 + (x - this.cameraX)*this.scaleRatio;
 
-      this.context.beginPath();
-      this.context.moveTo(screenX, 0);
-      this.context.lineTo(screenX, this.height);
-      this.context.stroke();
+      let style = "rgba(255, 255, 255, 0.1)";
+      let lineWidth = 1;
+
+      if (x == 0) {
+        style = "rgba(255, 255, 255, 0.25)";
+        lineWidth = 2;
+
+      } else if (x % (gridScale*4) == 0) {
+        style = "rgba(255, 255, 255, 0.25)";
+      }
+
+      this.drawLine(screenX, 0, screenX, this.height, style, lineWidth);
     }
 
     for (let y = gridYMin; y <= gridYMax; y += gridScale) {
-      const screenY = this.height/2 - (y - this.cameraY)*scaleRatio;
+      const screenY = this.height/2 - (y - this.cameraY)*this.scaleRatio;
 
-      this.context.beginPath();
-      this.context.moveTo(0, screenY);
-      this.context.lineTo(this.width, screenY);
-      this.context.stroke();
-    }
+      let style = "rgba(255, 255, 255, 0.1)";
+      let lineWidth = 1;
 
-    const minX = this.cameraX - this.range*aspectRatio;
-    const maxX = this.cameraX + this.range*aspectRatio;
-    const minY = this.cameraY - this.range;
-    const maxY = this.cameraY + this.range;
+      if (y == 0) {
+        style = "rgba(255, 255, 255, 0.25)";
+        lineWidth = 2;
 
-    let minChunkX = floor(minX/DisplayMap.CHUNK_SIZE);
-    let minChunkY = floor(minY/DisplayMap.CHUNK_SIZE);
-    let maxChunkX = floor(maxX/DisplayMap.CHUNK_SIZE);
-    let maxChunkY = floor(maxY/DisplayMap.CHUNK_SIZE);
-
-    minChunkX = clamp(minChunkX, 0, this.chunkColumns - 1);
-    maxChunkX = clamp(maxChunkX, 0, this.chunkColumns - 1);
-    minChunkY = clamp(minChunkY, 0, this.chunkRows - 1);
-    maxChunkY = clamp(maxChunkY, 0, this.chunkRows - 1);
-
-    // const chunkSkip = 2 ** floor(this.range / 500);
-    const restaurantSkip = 2**getMax(floor(Math.log2(this.range/20)), 0);
-
-    this.context.strokeStyle = "red";
-
-    for (let x = minChunkX; x <= maxChunkX; x++) {
-      for (let y = minChunkY; y <= maxChunkY; y++) {
-        const chunkNumber = x*this.chunkColumns + y;
-
-        let restaurants = this.loadedChunks[chunkNumber];
-
-        const chunkMinX = x * DisplayMap.CHUNK_SIZE;
-        const chunkMinY = y * DisplayMap.CHUNK_SIZE;
-        const chunkSize = DisplayMap.CHUNK_SIZE;
-
-        const screenX = this.width/2 + (chunkMinX - this.cameraX)*scaleRatio;
-        const screenY = this.height/2 - (chunkMinY + chunkSize - this.cameraY)*scaleRatio;
-        const screenSize = chunkSize*scaleRatio;
-
-        this.context.strokeRect(screenX, screenY, screenSize, screenSize);
-
-        if (restaurants) {
-          for (let i = 0; i < restaurants.length; i++) {
-            const index = restaurants[i];
-
-            if (index % restaurantSkip != 0) continue;
-
-            const xPos = this.app.data.x[index] - this.cameraX;
-            const yPos = this.app.data.y[index] - this.cameraY;
-
-            const screenX = this.width/2 + xPos*scaleRatio;
-            const screenY = this.height/2 - yPos*scaleRatio;
-
-            this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE, DisplayMap.ICON_SIZE);
-            this.context.fillText(this.app.data.storeName[index], screenX + DisplayMap.ICON_SIZE/2, screenY - DisplayMap.ICON_SIZE/2);
-          }
-
-        } else if (this.loadingChunks[chunkNumber] != true) {
-          this.loadingChunks[chunkNumber] = true;
-
-          this.loadChunk(chunkMinX, chunkMinY, chunkMinX + chunkSize - 1, chunkMinY + chunkSize - 1, chunkNumber);
-        }
+      } else if (y % (gridScale*4) == 0) {
+        style = "rgba(255, 255, 255, 0.25)";
       }
+
+      this.drawLine(0, screenY, this.width, screenY, style, lineWidth);
+    }
+
+    const zoomDepth = Math.log(this.mapRect.h/this.range)/Math.log(2) + 1;
+    const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);
+    const restCount = floor(4**(zoomDepth - quadDepth));
+
+    const quadList: number[] = [];
+    const restList: number[] = [];
+
+    this.visibleRests = restList;
+
+    this.getQuadsInside(screenRect, quadDepth, quadList);
+
+    for (let i = 0; i < quadList.length; i++) {
+      const index = quadList[i];
+
+      this.getRestaurantsInQuad(index, quadDepth, restCount, restList);
+    }
+
+    for (let i = 0; i < restList.length; i++) {
+      const restIndex = restList[i];
+      const [screenX, screenY] = this.getScreenPos(this.app.data.x[restIndex], this.app.data.y[restIndex]);
+
+      this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_WIDTH/2, screenY - DisplayMap.ICON_HEIGHT, DisplayMap.ICON_WIDTH, DisplayMap.ICON_HEIGHT);
+      this.context.fillText(this.app.data.storeName[restIndex], screenX + DisplayMap.ICON_WIDTH/2 + 4, screenY - DisplayMap.ICON_HEIGHT/2);
     }
   }
 
-  public centerCamera() {
-    this.cameraX = (this.minX + this.maxX)/2;
-    this.cameraY = (this.minY + this.maxY)/2;
+  private clearInfo() {
+    if (this.infoIndex && this.infoDisplay) {
+      this.infoIndex = null;
+      this.infoDisplay.remove();
+    }
   }
-
-  public setRange() {
-    this.range = 2**this.zoom;
-  }
-
-  public panCamera(x: number, y: number) {
-    this.cameraX = clamp(this.cameraX + x, this.minX, this.maxX);
-    this.cameraY = clamp(this.cameraY + y, this.minY, this.maxY);
-
-    this.updateDisplay();
-  }
-
-  public changeZoom(delta: number) {
-    this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
-
-    this.setRange();
-    this.updateDisplay();
-  }
-
-  public createInfo(index: number, left: number, top: number) {
+  
+  private createInfo(index: number, left: number, top: number) {
     const div = document.createElement("div");
     div.className = "map-info";
     div.style.left = left + "px";
@@ -252,9 +402,34 @@ class DisplayMap {
     this.infoDisplay = div;
   }
 
-  public initInput() {
+  private getClickedLocation(mouseX: number, mouseY: number): number {
+    const visible = this.visibleRests;
+
+    if (visible) {
+      for (let i = 0; i < visible.length; i++) {
+        const index = visible[i];
+        const [screenX, screenY] = this.getScreenPos(this.app.data.x[index], this.app.data.y[index]);
+        const diffX = abs(mouseX - screenX);
+        const diffY = abs(mouseY - screenY + DisplayMap.ICON_HEIGHT/2);
+
+        if (diffX <= DisplayMap.ICON_WIDTH/2 && diffY <= DisplayMap.ICON_HEIGHT/2) {
+          return index;
+        }
+      }
+    }
+
+    return -1;
+  }
+
+  private initInput() {
     let mouseX: number | null;
     let mouseY: number | null;
+
+    new ResizeObserver(([canvasEntry]) => {
+      this.setDimensions(MAP_CANVAS.getBoundingClientRect());
+      this.render();
+
+    }).observe(MAP_CANVAS);
 
     MAP_CANVAS.addEventListener("contextmenu", (event: MouseEvent) => {
       event.preventDefault();
@@ -264,38 +439,17 @@ class DisplayMap {
       mouseX = event.clientX;
       mouseY = event.clientY;
 
-      if (this.infoIndex && this.infoDisplay) {
-        this.infoIndex = null;
-        this.infoDisplay.remove();
-      }
+      MAP_CANVAS.classList.add("drag");
 
-      const scaleRatio = this.height/(this.range*2);
-
-      const screenX = event.clientX - this.bounds.left;
-      const screenY = event.clientY - this.bounds.top;
-      const actualX = this.cameraX + (screenX - this.width/2)/scaleRatio;
-      const actualY = this.cameraY + (this.height/2 - screenY)/scaleRatio;
-      const actualSize = DisplayMap.ICON_SIZE/scaleRatio*1.1;
-
-      const inRange = getIntersections([
-        filterNumbers(this.app.data.x, this.app.sorted.x, actualX - actualSize/2, actualX + actualSize/2),
-        filterNumbers(this.app.data.y, this.app.sorted.y, actualY - actualSize, actualY)
-      ], App.RESTAURANT_COUNT);
-
-      if (inRange.length > 0) {
-        const index = inRange[0];
-
-        const screenX = this.width/2 + (this.app.data.x[index] - this.cameraX)*scaleRatio;
-        const screenY = this.height/2 - (this.app.data.y[index] - this.cameraY)*scaleRatio;
-
-        this.createInfo(index, screenX - this.bounds.left, screenY - this.bounds.top);
-        this.infoIndex = index;
-
-        this.updateDisplay();
-      }
+      this.clearInfo();
     });
 
     document.addEventListener("mousemove", (event: MouseEvent) => {
+      const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
+
+      if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
+      else MAP_CANVAS.classList.remove("hover");
+
       if (mouseX && mouseY) {
         const diffX = event.clientX - mouseX;
         const diffY = event.clientY - mouseY;
@@ -310,12 +464,24 @@ class DisplayMap {
     });
 
     document.addEventListener("mouseup", (event: MouseEvent) => {
+      const clickedRest = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top)
+
+      if (clickedRest > 0) {
+        const [screenX, screenY] = this.getScreenPos(this.app.data.x[clickedRest], this.app.data.y[clickedRest]);
+
+        this.createInfo(clickedRest, screenX, screenY);
+        this.infoIndex = clickedRest;
+      }
+
+      MAP_CANVAS.classList.remove("drag");
+
       mouseX = null;
       mouseY = null;
     });
 
     MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
       this.changeZoom(event.deltaY);
+      this.clearInfo();
     });
   }
 }
