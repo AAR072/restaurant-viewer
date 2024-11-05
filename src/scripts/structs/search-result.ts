@@ -27,10 +27,10 @@ class SearchResult {
 
   public sort: SortFieldType = "storeName";
   public typeFilter: string = "";
-  public costMin: number = -1;
-  public costMax: number = -1;
-  public reviewMin: number = -1;
-  public reviewMax: number = -1;
+  public costMin: number;
+  public costMax: number;
+  public reviewMin: number;
+  public reviewMax: number;
 
   public final: Uint32Array; // Sorted array of result indices.
   public finalCount: number;
@@ -53,27 +53,6 @@ class SearchResult {
 
   static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
 
-  }
-
-  static fromName(app: App, name: string): SearchResult {
-    const results = filterStrings(data.storeName, app.sorted.storeName, name);
-
-    return new SearchResult(app, results);
-  }
-
-  static fromID(app: App, id: string): SearchResult {
-    const results = filterStrings(app.data.ID, app.sorted.ID, id);
-    const sorted = sortBy(results, App.RESTAURANT_COUNT, app.sorted.storeName);
-
-    return new SearchResult(app, sorted);
-  }
-
-  static fromCoords(app: App, x: number, y: number): SearchResult {
-    const resultsX = filterNumbers(app.data.x, app.sorted.x, x, x);
-    const resultsY = filterNumbers(app.data.y, app.sorted.y, y, y);
-    const sortedIntersections = getIntersections([resultsX, resultsY], App.RESTAURANT_COUNT, app.sorted.storeName);
-
-    return new SearchResult(app, sortedIntersections);
   }
 
   public setTypeFilter(type: string) {
@@ -166,11 +145,11 @@ class SearchResult {
       filteredType = this.app.getCuisineTypeArr(this.typeFilter);
     }
 
-    if (this.costMin > 0 && this.costMax > 0) {
+    if (this.costMin != null && this.costMax != null) {
       filteredCost = filterNumbers(this.app.data.cost, this.app.sorted.cost, this.costMin, this.costMax);
     }
 
-    if (this.reviewMin > 0 && this.reviewMax > 0) {
+    if (this.reviewMin != null && this.reviewMax != null) {
       filteredReview = filterNumbers(this.app.data.review, this.app.sorted.review, this.reviewMin, this.reviewMax);
     }
 
@@ -231,66 +210,28 @@ class SearchResult {
    * 
    * @timecomplexity O(1) - The method creates UI elements and formats strings, all of which are constant time operations.
    */
-  public createRestaurauntInfo(order: number, index: number) {
-    // Create a new div for the restaurant info
+  public createResultElement(order: number, index: number) {
+    const info = this.app.createRestaurantInfo(index);
+
     const div = document.createElement("div");
+    div.className = "result-container";
 
-    // Add bubble-like styles to the main div
-    div.style.border = '1px solid #444';  // Dark border
-    div.style.borderRadius = '15px';  // Rounded corners for the bubble effect
-    div.style.padding = '15px';  // Increased padding for a more spacious look
-    div.style.marginBottom = '10px';  // Space between bubbles
-    div.style.backgroundColor = '#2e2e2e';  // Dark background to match theme
-    div.style.color = '#fff';  // White text for readability
-    div.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';  // Slight shadow for elevation
-
-    // Create individual paragraphs for each piece of information
     const resultSpan = document.createElement("p");
     resultSpan.innerText = `Result #${order + 1}`;
-    resultSpan.style.fontWeight = 'bold';
-    resultSpan.style.fontSize = '1.25rem';  // Adjust font size
-    resultSpan.style.marginBottom = '0.5rem';  // Space below the heading
+    resultSpan.className = "result-title";
 
-    const idSpan = document.createElement("p");
-    idSpan.innerText = `ID: ${this.app.data.ID[index]}`;
-    idSpan.style.fontWeight = '500';  // Medium font weight
-    idSpan.style.color = '#ccc';  // Light gray color
+    const button = document.createElement("button");
+    button.innerText = "View On Map";
+    button.className = "result-map-button";
 
-    const nameSpan = document.createElement("p");
-    nameSpan.innerText = `Name: ${this.app.data.storeName[index]}`;
-    nameSpan.style.fontWeight = '600';  // Semibold font weight
-    nameSpan.style.color = '#e0e0e0';  // Slightly lighter gray
-
-    const typeSpan = document.createElement("p");
-    typeSpan.innerText = `Type: ${this.app.data.type[index]}`;
-    typeSpan.style.fontWeight = '300';  // Light font weight
-    typeSpan.style.color = '#b0b0b0';  // Lighter gray for less emphasis
-
-    const costSpan = document.createElement("p");
-    costSpan.innerText = `Cost: $${this.app.data.cost[index].toFixed(2)}`;
-    costSpan.style.fontWeight = 'bold';  // Bold font weight
-    costSpan.style.color = '#4caf50';  // Green color for cost
-
-    const reviewSpan = document.createElement("p");
-    reviewSpan.innerText = `Review: ${this.app.data.review[index].toFixed(1)}`;
-    reviewSpan.style.fontWeight = '600';  // Semibold font weight
-    reviewSpan.style.color = '#2196F3';  // Blue color for reviews
-
-    const positionSpan = document.createElement("p");
-    positionSpan.innerText = `Position: (x: ${this.app.data.x[index]*App.UNIT_SCALE}m, y: ${this.app.data.y[index]*App.UNIT_SCALE}m)`;
-    positionSpan.style.fontWeight = '500';  // Medium font weight
-    positionSpan.style.color = '#ccc';  // Light gray color
-
-    // Append spans to the div
     div.appendChild(resultSpan);
-    div.appendChild(idSpan);
-    div.appendChild(nameSpan);
-    div.appendChild(typeSpan);
-    div.appendChild(costSpan);
-    div.appendChild(reviewSpan);
-    div.appendChild(positionSpan);
+    div.appendChild(info);
+    div.appendChild(button);
 
-    // Append the styled div to the results container
+    button.addEventListener("click", () => {
+      this.app.displayMap.viewRestaurant(index);
+    });
+
     SEARCH_RESULTS.appendChild(div);
   }
 
@@ -314,7 +255,7 @@ class SearchResult {
 
       if (current >= this.finalCount || current < 0) break; // Break if current index is out of bounds.
 
-      this.createRestaurauntInfo(current, this.final[current]); // Load the restaurant info.
+      this.createResultElement(current, this.final[current]); // Load the restaurant info.
     }
   }
 }

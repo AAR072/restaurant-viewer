@@ -75,7 +75,7 @@ function computeAllPairDistances(TNodes: TNode[]): number[][] {
     for (let j = 0; j < n; j++) {
       dist[i][j] = Infinity;
     }
-  }  
+  }
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n; j++) {
       if (i !== j) {
@@ -104,7 +104,7 @@ function findMinimumDistanceToTypesAndEnd(graph: Graph, startId: number, endId: 
   }
 
   // DP array to track the minimum distance
-  const dp: number[][] = []; 
+  const dp: number[][] = [];
   const previous: number[][] = [];
   for (let i = 0; i < n; i++) {
     dp[i] = [];
@@ -183,21 +183,21 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
   });
 
   // DP array to track the minimum distance
-const dp: number[][] = [];
-for (let i = 0; i < n; i++) {
-  dp[i] = [];
-  for (let j = 0; j < (1 << categories.length); j++) {
-    dp[i][j] = Infinity;
+  const dp: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    dp[i] = [];
+    for (let j = 0; j < (1 << categories.length); j++) {
+      dp[i][j] = Infinity;
+    }
   }
-}
 
-const previous: number[][] = [];
-for (let i = 0; i < n; i++) {
-  previous[i] = [];
-  for (let j = 0; j < (1 << categories.length); j++) {
-    previous[i][j] = -1;
+  const previous: number[][] = [];
+  for (let i = 0; i < n; i++) {
+    previous[i] = [];
+    for (let j = 0; j < (1 << categories.length); j++) {
+      previous[i][j] = -1;
+    }
   }
-}
 
   // Start with the start node's category marked as visited
   const startMask = categoryMap[TNodes[startId].type];
@@ -253,16 +253,16 @@ for (let i = 0; i < n; i++) {
   return { distance: minDistance, path };
 }
 function goFrugal(
-  xData: number[], 
-  yData: number[], 
-  typesData: string[], 
-  currentX: number, 
+  xData: number[],
+  yData: number[],
+  typesData: string[],
+  currentX: number,
   currentY: number,
   combinations: string[][],
   budget: number,
-  sortedData:Uint32Array,
+  sortedData: Uint32Array,
   fast: boolean = true
-): { distance: number; path: TNode[]; possible: boolean} {
+): { distance: number; path: TNode[]; possible: boolean } {
   const sortedX: number[] = [];
   const sortedY: number[] = [];
   let speed;
@@ -273,7 +273,7 @@ function goFrugal(
   }
 
   const sortedTypes: string[] = [];
-    for (let i = 0; i < speed + 10; i++) {
+  for (let i = 0; i < speed + 10; i++) {
     let index = sortedData[i];
     sortedX[i] = xData[index];
     sortedY[i] = yData[index];
@@ -281,42 +281,42 @@ function goFrugal(
   }
 
 
-  let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
+  let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
+    TNodes[i] = { id: i, x: sortedX[i], y: sortedY[i], type: sortedTypes[i] };
   }
   let graph: Graph = {
     TNodes,
     categories: [""]
   };
   const deepCopy = JSON.parse(JSON.stringify(combinations));
-  let best = {distance: Infinity, path: [TNodes[0]] , possible: false};
+  let best = { distance: Infinity, path: [TNodes[0]], possible: false };
   for (let i = 0; i < deepCopy.length; i++) {
-    graph = {TNodes, categories: deepCopy[i]}
-    graph.categories[graph.categories.length] = "START";  
-    let result = findMinimumDistanceAnywhere(graph, 0); 
+    graph = { TNodes, categories: deepCopy[i] }
+    graph.categories[graph.categories.length] = "START";
+    let result = findMinimumDistanceAnywhere(graph, 0);
     if (result.distance < best.distance) {
-      best.path = result.path; 
+      best.path = result.path;
       best.distance = result.distance;
     }
   }
   if (best.distance == Infinity) {
-    return {distance: Infinity, path: [], possible: false};
+    return { distance: Infinity, path: [], possible: false };
   }
   let distanceInKm = best.distance / 50;
   if (distanceInKm >= budget * 2) {
-    return {distance: best.distance, path: best.path, possible: false};
-  } 
-  return {distance: best.distance, path: best.path, possible: true};
+    return { distance: best.distance, path: best.path, possible: false };
+  }
+  return { distance: best.distance, path: best.path, possible: true };
 
 
 }
 function savingFuel(
-  categories: string[], 
-  xData: number[], 
-  yData: number[], 
-  typesData: string[], 
-  currentX: number, 
+  categories: string[],
+  xData: number[],
+  yData: number[],
+  typesData: string[],
+  currentX: number,
   currentY: number,
   targetX: number,
   targetY: number,
@@ -343,27 +343,15 @@ function savingFuel(
     sortedTypes[i] = typesData[index];
   }
 
-  let TNodes:  TNode[] = [{id: 0, x: currentX, y: currentY, type: "START"}];
+  let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = {id: i, x: sortedX[i], y:sortedY[i], type: sortedTypes[i]};
+    TNodes[i] = { id: i, x: sortedX[i], y: sortedY[i], type: sortedTypes[i] };
   }
-  TNodes[speed] = {id: speed, x: targetX, y:targetY, type: "END"}
+  TNodes[speed] = { id: speed, x: targetX, y: targetY, type: "END" }
   let graph: Graph = {
     TNodes,
-    categories: deepCopy 
+    categories: deepCopy
   };
   const result = findMinimumDistanceToTypesAndEnd(graph, 0, speed);
   return result;
 }
-const uniqueCombinations = getCombinations(cuisines);
-// Example
-// const t0 = performance.now();
-// console.log(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,0,0, app.sorted.distSorted));
-// console.log(performance.now() - t0);
-// console.log("GO FRUGAL!");
-// const t1 = performance.now();
-// console.log(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted));
-// console.log(performance.now() - t1);
-
-
-

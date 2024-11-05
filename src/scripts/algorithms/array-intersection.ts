@@ -60,13 +60,13 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     }
 
     const t1 = performance.now();
-    logTask("Get Intersections", t1 - t0, `Found intersection in an array and sorted with custom parameters`);
+    logTask("Array Intersection", t1 - t0, `Found intersections between arrays and sorted them in custom order`);
 
     return sorted;
   }
 
   const t2 = performance.now();
-  logTask("Get Intersections", t2 - t0, `Found intersection in an array`);
+  logTask("Array Intersection", t2 - t0, `Found intersections between arrays`);
 
   return new Uint32Array(duplicates);
 }

@@ -1,10 +1,14 @@
 :root {
   --background-color: rgb(20, 20, 20);
-  --sidebar-color: rgb(44, 44, 44);
+  --sidebar-color: rgb(34, 34, 34);
   --bubble-color: rgb(36, 36, 36);
-  --secondary-color: rgb(41, 41, 41);
+  --secondary-color: rgb(83, 83, 83);
   --detail-color: rgb(228, 228, 228);
-  --secondary-detail-color: rgb(175, 175, 175);
+  --secondary-detail-color: rgb(168, 168, 168);
+  --cost-color: rgb(0, 185, 154);
+  --review-color: rgb(212, 200, 26);
+  --interact-color: rgb(22, 84, 255);
+  --warning-color: rgb(190, 7, 47);
 }
 
 * {
@@ -25,24 +29,25 @@ button, input, select {
   background-color: var(--secondary-color);
 }
 
-button, select {
+button, select, option {
   border: 2px solid var(--secondary-detail-color);
   background-color: var(--secondary-color);
   height: 30px;
-}
-
-input::placeholder {
-  color: var(--secondary-detail-color);
+  cursor: pointer;
 }
 
 input[type="text"] {
-  width: 100%;
   height: 20px;
   background: none;
+  color: var(--secondary-detail-color)
 }
 
 input[type="text"]:focus {
   border-bottom: 2px solid var(--detail-color);
+}
+
+input::placeholder {
+  color: var(--secondary-color);
 }
 
 .main-container {
@@ -71,9 +76,48 @@ input[type="text"]:focus {
   padding: 15px;
 }
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  display: flex;
+  width: 100%;
+  height: auto;
+}
+
+.dropdown-text {
+  text-align: center;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.dropdown-arrow {
+  width: 20px;
+  height: 100%;
+}
+
+.dropdown-content {
+  overflow-y: hidden;
+  transition: height 0.3s ease;
+}
+
+.dropdown.hide .dropdown-content {
+  height: 0 !important;
+}
+
+.dropdown.hide .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
 /*#region Search Section*/
 .search-container {
   display: flex;
+}
+
+.search-container input[type="text"] {
+  width: 100%;
 }
 
 .search-input-container {
@@ -97,6 +141,7 @@ input[type="text"]:focus {
   background: none;
   cursor: pointer;
   border: none;
+  border-radius: 5px;
   position: relative;
   display: inline-flex;
 }
@@ -110,6 +155,7 @@ input[type="text"]:focus {
   position: absolute;
   top: 5px;
   left: 5px;
+  transition: border-color 0.2s;
 }
 .search-icon::after {
   content: "";
@@ -122,6 +168,13 @@ input[type="text"]:focus {
   border-radius: 2px;
   transform: rotate(45deg);
   transform-origin: top left;
+  transition: background-color 0.2s;
+}
+.search-icon:hover::before {
+  border-color: var(--interact-color);
+}
+.search-icon:hover::after {
+  background-color: var(--interact-color);
 }
 
 .clear-icon::before, .clear-icon::after {
@@ -133,12 +186,16 @@ input[type="text"]:focus {
   border-radius: 2px;
   top: 18px;
   left: 2px;
+  transition: background-color 0.2s;
 }
 .clear-icon::before {
   transform: rotate(45deg);
 }
 .clear-icon::after {
   transform: rotate(-45deg);
+}
+.clear-icon:hover::before, .clear-icon:hover::after {
+  background-color: var(--warning-color);
 }
 /*#endregion Search Section*/
 
@@ -166,7 +223,14 @@ input[type="text"]:focus {
   right: 25%;
   border-radius: 5px;
   position: absolute;
-  background-color: rgb(0, 60, 255);
+}
+
+.double-slider .progress.cost {
+  background-color: var(--cost-color);
+}
+
+.double-slider .progress.review {
+  background-color: var(--review-color);
 }
 
 .double-slider input[type="range"] {
@@ -174,43 +238,82 @@ input[type="text"]:focus {
   position: absolute;
   height: 10px;
   width: 100%;
-
   pointer-events: none;
-
   appearance: none;
   background: none;
 }
 
 .double-slider input[type="range"]::-webkit-slider-thumb {
-  pointer-events: all;
-
   appearance: none;
-
+  pointer-events: all;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--detail-color);
+  background-color: var(--detail-color);
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .double-slider input[type="range"]::-moz-range-thumb {
   pointer-events: all;
-
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--secondary-detail-color);
+  background-color: var(--secondary-detail-color);
   cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.double-slider input[type="range"]:hover::-webkit-slider-thumb {
+  background-color: var(--interact-color);
+}
+
+.double-slider input[type="range"]:hover::-webkit-slider-thumb {
+  background-color: var(--interact-color);
 }
 /*#endregion Filter Section*/
 
 /*#region Browse/Sort Section*/
-.result-container {
+.browse-container {
   flex-grow: 1;
   margin-left: 20px;
   margin-right: 20px;
 }
+
+.page-input {
+  width: 50px;
+}
 /*#endregion Browse/Sort Section*/
+
+/*#region Results Section*/
+.results-container {
+  display: block;
+  overflow-y: auto;
+}
+
+.result-container {
+  border-bottom: 1px solid var(--detail-color);
+  padding: 20px;
+}
+
+.result-container p {
+  margin: 5px;
+}
+
+.result-title {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 10px !important;
+}
+
+.result-cost {
+  color: var(--cost-color);
+}
+
+.result-review {
+  color: var(--review-color);
+}
+/*#endregion Results Section*/
 
 .map-container {
   flex-grow: 1;
@@ -219,7 +322,10 @@ input[type="text"]:focus {
 
 .map-info {
   position: absolute;
-  background-color: red;
+  background-color: var(--secondary-color);
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid var(--detail-color);
 }
 
 .map-main-info {
@@ -248,201 +354,28 @@ input[type="text"]:focus {
   cursor: grab;
 }
 
-/* Sidebar for filters */
-.bar-panel {
-  height: 100%;
-  width: 250px;
-  background-color: red;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 10px;
-  gap: 10px;
-}
-
-/* .bubble {
-  flex: 1;
-  background-color: var(--bubble-color);
-  overflow-y: auto;
-} */
-
-.sidebar h2 {
-  margin-bottom: 20px;
-}
-
-.filter-item {
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.filter-item:hover {
-  background-color: var(--hover-background);
-}
-
-/* Main Content */
-.main-content {
+/*#region Debug Section*/
+.debug-section {
   flex: 1;
   margin-left: 20px;
   margin-right: 20px;
-  height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
-.in-text-input {
-  background-color: red;
-}
-
-/* Search and Filter Section */
-.search-section,
-.filter-section,
-.sort-section,
-.performance-section,
-.test-section,
-.browse-section {
-  background-color: var(--sidebar-background);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.search-section input,
-.search-section select,
-.filter-section input,
-.filter-section select,
-.sort-section select,
-.browse-section input {
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--filter-background);
-  color: var(--text-color);
-  margin-right: 10px;
-  margin-bottom: 10px;
-  display: inline-block;
-}
-
-.search-section button,
-.filter-section button,
-.sort-section button,
-.browse-section button {
-  padding: 10px 20px;
-  border: none;
-  background-color: var(--button-background);
-  color: var(--text-color);
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.search-section button:hover,
-.filter-section button:hover,
-.sort-section button:hover,
-.browse-section button:hover {
-  background-color: var(--button-hover-background);
-}
-
-/* Results grid */
-.results {
-  background-color: var(--filter-background);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-/* Footer */
-.footer {
-  margin-top: 30px;
-  text-align: center;
-  color: var(--footer-color);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .container {
-    flex-direction: column;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-}
-
-.skeleton-loader {
+.log-task-container {
   display: flex;
   flex-direction: column;
+  padding-top: 10px;
   gap: 10px;
 }
 
-.skeleton-bubble {
-  background-color: #444;
-  /* Dark background for the skeleton */
-  border-radius: 15px;
-  /* Rounded corners */
-  height: 100px;
-  /* Height of the skeleton item */
-  width: 100%;
-  /* Full width */
-  animation: pulse 1.5s infinite;
-  /* Animation for the loading effect */
+.log-task {
+  display: block;
+  position: relative;
 }
 
-@keyframes pulse {
-  0% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.7;
-  }
-}
-
-.skeleton-bubble:nth-child(1) {
-  height: 80px;
-}
-
-.skeleton-bubble:nth-child(2) {
-  height: 60px;
-}
-
-.skeleton-bubble:nth-child(3) {
-  height: 100px;
-}
-
-.skeleton-bubble:nth-child(4) {
-  height: 70px;
-}
-
-/* Important is very bad but I am lazy */
-.error-button {
-  background-color: var(--error-color) !important;
-  /* Set the background to the error color */
-  color: #fff !important;
-  /* Set text color to white */
-  border: none !important;
-  padding: 10px 20px !important;
-  border-radius: 4px !important;
-  cursor: pointer !important;
-}
-
-.error-button:hover {
-  opacity: 0.8 !important;
-  /* Dim effect on hover */
-  background-color: #d32f2f !important;
-  /* Manually specify a darker shade of red */
-}
-
-.perflog {
-  margin-top: 10px;
-}
-
-.perflog.fade-out {
-  transition: all 1s ease;
+.log-task.fade-out {
+  transition: opacity 0.5s ease, margin 0.5s ease 0.5s;
   opacity: 0;
-  max-height: 0;
-  margin-top: 0;
 }
+/*#endregion Debug Section*/

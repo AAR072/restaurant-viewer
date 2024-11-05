@@ -97,7 +97,7 @@ function tests(div: any | null) {
 
   // Test 5: Frugal Test 
   let expectedString = '{"distance":28.081848859886076,"path":[{"id":12,"x":19,"y":20,"type":"Chinese"},{"id":11,"x":17,"y":17,"type":"Burger"},{"id":7,"x":16,"y":15,"type":"Indian"},{"id":1,"x":8,"y":5,"type":"Korean"},{"id":0,"x":0,"y":0,"type":"START"}],"possible":true}'
-  let out = JSON.stringify(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, uniqueCombinations, 1, app.sorted.distSorted, true));
+  let out = JSON.stringify(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, getCombinations(["Pizza", "Burger", "Italian", "Japanese"]), 1, app.sorted.distSorted, true));
   if ( out === expectedString) {
     outPutResults(div, "Go Frugal Test", true, `Success`);
   } else {

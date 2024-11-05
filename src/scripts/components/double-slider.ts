@@ -51,7 +51,6 @@ class DoubleSlider {
     });
 
     minSlider.addEventListener("mouseup", () => {
-      console.log("TEST");
       this.fireListener();
     });
 
@@ -111,8 +110,8 @@ class DoubleSlider {
     this.minTextDisplay.style.left = pctLeft + "%";
     this.maxTextDisplay.style.right = pctRight + "%";
 
-    this.minText.style.width = (this.minText.value.length*8) + "px";
-    this.maxText.style.width = (this.maxText.value.length*8) + "px";
+    this.minText.style.width = (this.minText.value.length*8.5) + "px";
+    this.maxText.style.width = (this.maxText.value.length*8.5) + "px";
   }
 
   private fireListener() {

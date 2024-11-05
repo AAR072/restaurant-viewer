@@ -6,7 +6,6 @@ const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
 const SEARCH_Y_INPUT = document.getElementById("search-y") as HTMLInputElement;
 const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
 const SEARCH_CLEAR_BUTTON = document.getElementById("search-clear") as HTMLButtonElement;
-const TESTING_BUTTON = document.getElementById("test-button") as HTMLInputElement;
 
 const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
 const COST_RANGE = document.getElementById("cost-range") as HTMLDivElement;
@@ -20,6 +19,9 @@ const NEXT_PAGE_BUTTON = document.getElementById("next-page") as HTMLButtonEleme
 const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonElement;
 const PAGE_NUMBER_INPUT = document.getElementById("page-number-input") as HTMLInputElement;
 const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
+
+const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
+const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButtonElement;
 // #endregion
 
 // Our database after it is sorted
@@ -190,11 +192,44 @@ class App {
    * 
    * @timecomplexity O(n) - The method updates the location and calls `updateDistance()`, which is assumed to iterate through the restaurant list, resulting in a linear time complexity.
    */
-  changeLocation(x: number, y: number) {
+  public changeLocation(x: number, y: number) {
     this.locationX = x; // Update the X location.
     this.locationY = y; // Update the Y location.
 
     this.updateDistances(); // Recalculate distances based on the new location.
+  }
+
+  public createRestaurantInfo(index: number) {
+    const div = document.createElement("div");
+
+    const idSpan = document.createElement("p");
+    idSpan.innerText = `ID: ${this.data.ID[index]}`;
+
+    const nameSpan = document.createElement("p");
+    nameSpan.innerText = `Name: ${this.data.storeName[index]}`;
+
+    const typeSpan = document.createElement("p");
+    typeSpan.innerText = `Type: ${this.data.type[index]}`;
+
+    const costSpan = document.createElement("p");
+    costSpan.innerText = `Cost: $${this.data.cost[index].toFixed(2)}`;
+    costSpan.className = "result-cost";
+
+    const reviewSpan = document.createElement("p");
+    reviewSpan.innerText = `Review: ${this.data.review[index].toFixed(1)}`;
+    reviewSpan.className = "result-review";
+
+    const positionSpan = document.createElement("p");
+    positionSpan.innerText = `Position: (x: ${this.data.x[index]*App.UNIT_SCALE}m, y: ${this.data.y[index]*App.UNIT_SCALE}m)`;
+
+    div.appendChild(idSpan);
+    div.appendChild(nameSpan);
+    div.appendChild(typeSpan);
+    div.appendChild(costSpan);
+    div.appendChild(reviewSpan);
+    div.appendChild(positionSpan);
+
+    return div;
   }
 
   /**
@@ -206,11 +241,14 @@ class App {
     // TESTING_BUTTON.addEventListener("click", () => {
     //   tests(document.getElementById("testing-div"));
     // });
+
     SEARCH_BUTTON.addEventListener("click", () => {
       const nameInput = SEARCH_NAME_INPUT.value;
       const idInput = SEARCH_ID_INPUT.value;
       const xInput = parseInt(SEARCH_X_INPUT.value)/App.UNIT_SCALE;
       const yInput = parseInt(SEARCH_Y_INPUT.value)/App.UNIT_SCALE;
+
+      if (nameInput == "" && idInput == "" && isNaN(xInput) && isNaN(yInput)) return;
 
       const total: Uint32Array[] = [];
       let totalPointer = 0;
@@ -239,23 +277,33 @@ class App {
       }
 
       this.currentSearch = new SearchResult(this, results);
+      this.displayMap.clearPath();
     });
     
     SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
+      SEARCH_NAME_INPUT.value = "";
+      SEARCH_ID_INPUT.value = "";
+      SEARCH_X_INPUT.value = "";
+      SEARCH_Y_INPUT.value = "";
+
       this.currentSearch = new SearchResult(this, this.sorted.storeName);
+      this.displayMap.clearPath();
     });
 
     TYPE_SELECT.addEventListener("input", () => {
       this.currentSearch.setTypeFilter(TYPE_SELECT.value);
     });
 
+    this.costSlider.addListener((min: number, max: number) => {
+      this.currentSearch.setCostRange(min, max);
+    });
+
+    this.reviewSlider.addListener((min: number, max: number) => {
+      this.currentSearch.setReviewRange(min, max);
+    });
+
     SORT_SELECT.addEventListener("input", () => {
-      const value = SORT_SELECT.value as SortFieldType;
-
-      if (value == "review") this.currentSearch.toggleDirection(); // set to descending
-      else this.currentSearch.toggleDirection(); // otherwise set to ascending
-
-      this.currentSearch.changeSort(value as SortFieldType);
+      this.currentSearch.changeSort(SORT_SELECT.value as SortFieldType);
     });
 
     SORT_DIRECTION.addEventListener("click", () => {
@@ -290,6 +338,34 @@ class App {
 
         if (!isNaN(input)) this.currentSearch.setPage(input - 1);
       }
+    });
+
+    FRUGAL_BUTTON.addEventListener("click", () => {
+      const result = goFrugal(this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, getCombinations(this.sorted.cuisines), 100, this.sorted.distSorted);
+      const path = result.path;
+      const results = new Uint32Array(4);
+
+      for (let i = 0; i < 4; i++) {
+        results[i] = path[i + 1].id;
+      }
+
+      this.currentSearch = new SearchResult(this, results);
+      this.displayMap.setPath(path);
+    });
+
+    SAVE_FUEL_BUTTON.addEventListener("click", () => {
+      const result = savingFuel(["Pizza", "Coffee", "Chinese", "Indian", "Italian", "Mexican"],
+        this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, 0, 100, this.sorted.distSorted
+      );
+      const path = result.path;
+      const results = new Uint32Array(4);
+
+      for (let i = 0; i < 4; i++) {
+        results[i] = path[i + 1].id;
+      }
+
+      this.currentSearch = new SearchResult(this, results);
+      this.displayMap.setPath(path);
     });
   }
 }

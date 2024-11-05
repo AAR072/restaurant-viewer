@@ -13,6 +13,30 @@
 <body>
   <div class="main-container">
     <div class="sidebar">
+      <div class="dropdown">
+        <button class="dropdown-button" type="button">
+          <span class="dropdown-text">TEST</span>
+          <span class="dropdown-arrow">&#11205;</span>
+        </button>
+        <div class="dropdown-content">
+          TEST2<br>
+          TEST3<br>
+          TEST4
+        </div>
+      </div>
+
+      <div class="dropdown">
+        <button class="dropdown-button" type="button">
+          <span class="dropdown-text">TEST</span>
+          <span class="dropdown-arrow">&#11205;</span>
+        </button>
+        <div class="dropdown-content">
+          TEST2<br>
+          TEST3<br>
+          TEST4
+        </div>
+      </div>
+
       <div class="bubble search-container">
         <div class="search-input-container">
           <input class="search-input-input" id="search-name" type="text" placeholder="Name"/>
@@ -22,9 +46,14 @@
         </div>
 
         <div class="search-icons-container">
-          <button id="search-button" class="search-icon-button search-icon" title="search"></button>
-          <button id="search-clear" class="search-icon-button clear-icon" title="clear"></button>
+          <button id="search-button" class="search-icon-button search-icon" type="button"></button>
+          <button id="search-clear" class="search-icon-button clear-icon" type="button"></button>
         </div>
+      </div>
+
+      <div class="bubble">
+        <button id="frugal-button" type="button">Go Frugal</button>
+        <button id="save-fuel-button" type="button">Saving Fuel</button>
       </div>
 
       <div class="bubble filter-container">
@@ -34,9 +63,12 @@
         </select>
 
         <div id="cost-range" class="double-slider">
+          <!-- use content editable span for growing/shrinking typed values -->
+          <!-- <span class="slider-min-input" contenteditable="true"></span> -->
+
           <span class="slider-min-text">$<input class="slider-min-input" type="text"/></span>
           <span class="slider-max-text">$<input class="slider-max-input" type="text"/></span>
-          <div class="progress"></div>
+          <div class="progress cost"></div>
           <input class="min-range" type="range">
           <input class="max-range" type="range">
         </div>
@@ -44,23 +76,42 @@
         <div id="review-range" class="double-slider">
           <span class="slider-min-text">&#9733<input class="slider-min-input" type="text"/></span>
           <span class="slider-max-text">&#9733<input class="slider-max-input" type="text"/></span>
-          <div class="progress"></div>
+          <div class="progress review"></div>
           <input class="min-range" type="range">
           <input class="max-range" type="range">
         </div>
       </div>
 
-      <div class="result-container">
+      <div class="browse-container">
         <div>
-          <label for="sort-select">Sort By</label>
+          <label for="sort-select">Sort By:</label>
+
           <select id="sort-select" name="Sort By">
             <option value="storeName">Alphabetical Order</option>
             <option value="cost">Price</option>
             <option value="review">Review</option>
           </select>
+        
           <button id="sort-direction">Ascending</button>
         </div>
+
+        <div>
+          <label for="page-size">Page Size:</label>
+          <input id="page-size" class="page-input" type="text" placeholder="(1 - 100)" value="0"/>
+          <br>
+
+          <label for="page-number-input">Page:</label>
+          <input id="page-number-input" class="page-input" type="text" value="0"/>
+          <span>/</span>
+          <span id="page-count">0</span>
+          <br>
+
+          <button id="prev-page">Previous Page</button>
+          <button id="next-page">Next Page</button>
+        </div>
       </div>
+
+      <div id="search-results" class="results-container"></div>
     </div>
 
     <div id="map-container" class="map-container">
@@ -78,6 +129,21 @@
         <button>Center</button>
         <br>
         <button>Default Focus</button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="debug-section">
+        <label for="auto-performance-clear">Auto Clear:</label>
+        <input id="auto-performance-clear" type="checkbox" checked="true">
+        <br>
+        <button id="clear-performance-log">Clear All</button>
+
+        <div id="performance-log-container" class="log-task-container"></div>
+      </div>
+
+      <div class="debug-section">
+
       </div>
     </div>
   </div>
@@ -133,15 +199,10 @@
         <button id="prev-page">Previous Page</button>
         <button id="next-page">Next Page</button>
       </div>
-
-      <!-- Results Section -->
-      <div id="search-results" class="results">
-        <div class="skeleton-loader"></div>
-      </div>
     </div>
 
     <!-- Performance Section -->
-    <div class="sidebar performance-section" hidden>
+    <!-- <div class="sidebar performance-section" hidden>
       <h2>Performance</h2>
       <label style="color:var(--warning-color);" for="disable-performance-clear">Disable Auto Clear:</label>
       <input id="disable-performance-clear" type="checkbox">
@@ -149,7 +210,7 @@
       <br>
       <button id="clear-performance-log" class="error-button">Clear All</button>
       <ul id="task-container"></ul>
-    </div>
+    </div> -->
   </div>
 
   <script src="./dist/DO_NOT_TOUCH.js"></script>

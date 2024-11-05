@@ -7,11 +7,9 @@ const MAP_POSITION_Y = document.getElementById("map-position-y") as HTMLInputEle
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
-const TIME_SEED = Date.now();
+function constantRandom(seed: number, index: number): number {
+  const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
 
-function constantRandom(seed: number, index: number) {
-  const hash = (seed * 0x5bd1e995) ^ (index * 0x9e3779b9);
-  
   return (hash & 3);
 }
 
@@ -95,6 +93,8 @@ class DisplayMap {
   public visibleRests: number[];
   public infoIndex: number | null = null;
   public infoDisplay: HTMLDivElement | null = null;
+
+  public currentPath: TNode[] | null = null;
 
   constructor(public app: App) {
     this.context = MAP_CANVAS.getContext("2d")!;
@@ -260,14 +260,50 @@ class DisplayMap {
     this.render();
   }
 
-  private drawLine(x0: number, y0: number, x1: number, y1: number, style: string, width: number) {
-    this.context.strokeStyle = style;
-    this.context.lineWidth = width;
+  public viewRestaurant(index: number) {
+    const x = this.app.data.x[index];
+    const y = this.app.data.y[index];
 
+    this.cameraX = x;
+    this.cameraY = y;
+    this.zoom = DisplayMap.MIN_ZOOM;
+    this.setRangeScale();
+    this.render();
+  }
+
+  public setPath(path: TNode[]) {
+    const first = path[path.length - 1];
+
+    this.currentPath = path;
+
+    this.cameraX = first.x;
+    this.cameraY = first.y;
+    this.zoom = DisplayMap.MIN_ZOOM;
+    this.setRangeScale();
+    this.render();
+  }
+
+  public clearPath() {
+    this.currentPath = null;
+    this.render();
+  }
+
+  private drawLine(x0: number, y0: number, x1: number, y1: number, style: string, width: number) {
     this.context.beginPath();
     this.context.moveTo(x0, y0);
     this.context.lineTo(x1, y1);
+
+    this.context.strokeStyle = style;
+    this.context.lineWidth = width;
     this.context.stroke();
+  }
+
+  public drawCricle(x: number, y: number, r: number, style: string) {
+    this.context.beginPath();
+    this.context.arc(x, y, r, 0, Math.PI*2);
+
+    this.context.fillStyle = style;
+    this.context.fill();
   }
 
   private getScreenPos(x: number, y: number): number[] {
@@ -280,7 +316,6 @@ class DisplayMap {
   private render() {
     this.context.clearRect(0, 0, this.width, this.height);
     this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
-    this.context.fillStyle = "rgba(255, 255, 255, 0.5)";
 
     const screenRect = new Rectangle(
       this.cameraX - this.range*this.aspectRatio,
@@ -333,6 +368,18 @@ class DisplayMap {
       this.drawLine(0, screenY, this.width, screenY, style, lineWidth);
     }
 
+    if (this.currentPath) {
+      for (let i = 0; i < this.currentPath.length - 1; i++) {
+        const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
+        const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
+        
+        this.drawLine(x0, y0, x1, y1, "rgb(0, 50, 255)", 5);
+        this.drawCricle(x0, y0, 10, "rgb(255, 0, 0)");
+
+        if (i == this.currentPath.length - 2) this.drawCricle(x1, y1, 10, "rgb(255, 0, 0)");
+      }
+    }
+
     const zoomDepth = Math.log(this.mapRect.h/this.range)/Math.log(2) + 1;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);
     const restCount = floor(4**(zoomDepth - quadDepth));
@@ -355,6 +402,7 @@ class DisplayMap {
       const [screenX, screenY] = this.getScreenPos(this.app.data.x[restIndex], this.app.data.y[restIndex]);
 
       this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_WIDTH/2, screenY - DisplayMap.ICON_HEIGHT, DisplayMap.ICON_WIDTH, DisplayMap.ICON_HEIGHT);
+      this.context.fillStyle = "rgba(255, 255, 255, 0.5)";
       this.context.fillText(this.app.data.storeName[restIndex], screenX + DisplayMap.ICON_WIDTH/2 + 4, screenY - DisplayMap.ICON_HEIGHT/2);
     }
   }
@@ -366,36 +414,15 @@ class DisplayMap {
     }
   }
   
-  private createInfo(index: number, left: number, top: number) {
+  private displayRestaurantInfo(index: number, left: number, top: number) {
+    const info = this.app.createRestaurantInfo(index);
+
     const div = document.createElement("div");
     div.className = "map-info";
     div.style.left = left + "px";
     div.style.top = top + "px";
 
-    const id = document.createElement("p");
-    id.innerText = "ID: " + this.app.data.ID[index];
-
-    const name = document.createElement("p");
-    name.innerText = "Name: " + this.app.data.storeName[index];
-
-    const type = document.createElement("p");
-    type.innerText = "Type: " + this.app.data.type[index];
-
-    const cost = document.createElement("p");
-    cost.innerText = "Cost: $" + this.app.data.cost[index].toFixed(2);
-
-    const review = document.createElement("p");
-    review.innerText = "Review: " + this.app.data.review[index].toFixed(1);
-
-    const position = document.createElement("p");
-    position.innerText = `Position: (x: ${this.app.data.x[index]*App.UNIT_SCALE}m, y: ${this.app.data.y[index]*App.UNIT_SCALE}m)`
-
-    div.appendChild(id);
-    div.appendChild(name);
-    div.appendChild(type);
-    div.appendChild(cost);
-    div.appendChild(review);
-    div.appendChild(position);
+    div.appendChild(info);
 
     MAP_CONTAINER.appendChild(div);
 
@@ -444,7 +471,7 @@ class DisplayMap {
       this.clearInfo();
     });
 
-    document.addEventListener("mousemove", (event: MouseEvent) => {
+    MAP_CANVAS.addEventListener("mousemove", (event: MouseEvent) => {
       if (mouseX && mouseY) {
         const diffX = event.clientX - mouseX;
         const diffY = event.clientY - mouseY;
@@ -464,16 +491,18 @@ class DisplayMap {
       }
     });
 
-    document.addEventListener("mouseup", (event: MouseEvent) => {
+    MAP_CANVAS.addEventListener("mouseup", (event: MouseEvent) => {
       const clickedRest = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top)
 
       if (clickedRest > 0) {
         const [screenX, screenY] = this.getScreenPos(this.app.data.x[clickedRest], this.app.data.y[clickedRest]);
 
-        this.createInfo(clickedRest, screenX, screenY);
+        this.displayRestaurantInfo(clickedRest, screenX, screenY);
         this.infoIndex = clickedRest;
       }
+    });
 
+    document.addEventListener("mouseup", () => {
       MAP_CANVAS.classList.remove("drag");
 
       mouseX = null;

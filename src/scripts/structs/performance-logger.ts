@@ -1,51 +1,28 @@
-const DISABLE_CLEAR_CHECKBOX = document.getElementById("disable-performance-clear") as HTMLInputElement;
+const AUTO_CLEAR_CHECKBOX = document.getElementById("auto-performance-clear") as HTMLInputElement;
 const CLEAR_ALL_BUTTON = document.getElementById("clear-performance-log") as HTMLButtonElement;
-const TASK_CONTAINER = document.getElementById("task-container") as HTMLUListElement;
+const PERFORMANCE_CONTAINER = document.getElementById("performance-log-container") as HTMLDivElement;
 
-// use queue to store current "log elements", when checkbox is active clear
-// add X button on individual performance tasks to clear them
-// add clear all button
-// queue timeouts as well so that they can be cleared
+const LOG_QUEUE_SIZE: number = 30;
+const LOG_TASK_DURATION = 5000;
+const LOG_TASK_FADE_DURATION = 1000;
 
-const LOG_QUEUE_SIZE: number = 20;
-const LOG_CLEAR_INTERVAL = 2000;
+const timeouts: number[] = [];
+let timeoutPointer = 0;
 
-const logQueue: LogItem[] = new Array(LOG_QUEUE_SIZE);
-let logQueueStart = 0;
-let logQueueLength = 0;
+function clearTask(element: HTMLDivElement) {
+  element.style.marginBottom = (-element.clientHeight - 10) + "px";
+  element.classList.add("fade-out");
 
-interface LogItem {
-  count: number;
-  element: HTMLLIElement;
+  window.setTimeout(() => {
+    element.remove();
+  }, LOG_TASK_FADE_DURATION);
 }
 
-function getQueueIndex(count: number): number {
-  return (logQueueStart + count) % LOG_QUEUE_SIZE;
-}
+function createTimeout(element: HTMLDivElement) {
+  timeouts[timeoutPointer++] = window.setTimeout(() => {
+    clearTask(element);
 
-function clearTask() {
-  const item = logQueue[logQueueStart];
-  delete logQueue[logQueueStart];
-
-  logQueueStart = (logQueueStart + 1) % LOG_QUEUE_SIZE;
-  logQueueLength--;
-
-  if (item) {
-    item.element.style.height = item.element.offsetHeight + "px";
-    item.element.classList.add("fade-out");
-
-    window.setTimeout(() => {
-      item.element.remove();
-    }, LOG_CLEAR_INTERVAL);
-  }
-}
-
-let clearIntervalId: number | null;
-
-function startAutoClearTimer() {
-  clearTask();
-
-  clearIntervalId = window.setInterval(clearTask, LOG_CLEAR_INTERVAL);
+  }, LOG_TASK_DURATION);
 }
 
 /**
@@ -54,7 +31,6 @@ function startAutoClearTimer() {
  *
  * @param {string} name - The name of the task to be logged.
  * @param {number} time - The time spent on the task, in milliseconds.
- * @param {number} timestamp - The timestamp representing when the task was logged (in milliseconds since the Unix epoch).
  * @param {string} description - A brief description of the task.
  *
  * @example
@@ -62,59 +38,54 @@ function startAutoClearTimer() {
  * // This will create a new task box inside the element with id "taskContainer"
  */
 function logTask(name: string, time: number, description: string) {
-  const currentTime = Date.now();
+  const logItem = document.createElement("div");
+  logItem.className = "log-task";
 
-  // Create a new div element to represent the task
-  const taskDiv = document.createElement("li");
-  taskDiv.className = "perflog";
-  taskDiv.style.border = '1px solid #444';  // Use a darker border color
-  taskDiv.style.padding = '10px';
-  taskDiv.style.marginBottom = '10px';
-  taskDiv.style.borderRadius = '5px';
-  taskDiv.style.backgroundColor = '#2e2e2e';  // Match the dark background of the theme
-  taskDiv.style.color = '#fff';  // Ensure text is white for readability
+  const nameSpan = document.createElement("p");
+  nameSpan.innerText = name;
 
-  // taskDiv.style.
+  const timeSpan = document.createElement("p");
+  timeSpan.innerText = `Task Duration: ${time.toFixed(2)}ms`;
   
-  // Add task details inside the taskDiv
-  taskDiv.innerHTML = `
-  <h4 style="color: #4caf50;">${name}</h4>  <!-- Green heading to match button color -->
-  <p>Time spent: ${time} milliseconds</p>
-  <p>Description: ${description}</p>
-  <p>Logged at: ${currentTime.toLocaleString()}</p>
-  `;
+  const descSpan = document.createElement("p");
+  descSpan.innerText = description;
 
-  // Append the taskDiv to the target div
-  TASK_CONTAINER.appendChild(taskDiv);
+  const dateSpan = document.createElement("p");
+  dateSpan.innerHTML = "Logged At: " + new Date().toLocaleTimeString();
 
-  const logItem: LogItem = {
-    count: logQueueLength,
-    element: taskDiv
-  };
+  const deleteButton = document.createElement("button");
+  deleteButton.innerText = "Clear";
 
-  while (logQueueLength >= LOG_QUEUE_SIZE - 1) {
-    clearTask();
-  }
+  logItem.appendChild(nameSpan);
+  logItem.appendChild(timeSpan);
+  logItem.appendChild(descSpan);
+  logItem.appendChild(dateSpan);
+  logItem.appendChild(deleteButton);
 
-  logQueue[getQueueIndex(logQueueLength++)] = logItem;
+  PERFORMANCE_CONTAINER.appendChild(logItem);
 
-  if (!clearIntervalId) startAutoClearTimer();
+  deleteButton.addEventListener("click", () => {
+    clearTask(logItem);
+  });
+
+  if (AUTO_CLEAR_CHECKBOX.checked) createTimeout(logItem);
 }
 
-DISABLE_CLEAR_CHECKBOX.addEventListener("input", () => {
-  if (DISABLE_CLEAR_CHECKBOX.checked) {
-    if (clearIntervalId) {
-      window.clearInterval(clearIntervalId);
-
-      clearIntervalId = null;
+AUTO_CLEAR_CHECKBOX.addEventListener("input", () => {
+  if (AUTO_CLEAR_CHECKBOX.checked) {
+    for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
+      createTimeout(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
     }
 
   } else {
-    startAutoClearTimer();
+    for (let i = 0; i < timeoutPointer; i++) {
+      window.clearTimeout(timeouts[i]);
+    }
   }
 });
 
 CLEAR_ALL_BUTTON.addEventListener("click", () => {
-  TASK_CONTAINER.innerHTML = "";
-  while (logQueueLength > 0) clearTask();
+  for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
+    clearTask(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
+  }
 });
