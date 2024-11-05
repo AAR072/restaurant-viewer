@@ -14,10 +14,10 @@ const REVIEW_RANGE = document.getElementById("review-range") as HTMLDivElement;
 const SORT_SELECT = document.getElementById("sort-select") as HTMLSelectElement;
 const SORT_DIRECTION = document.getElementById("sort-direction") as HTMLButtonElement;
 
-const PAGE_SIZE_INPUT = document.getElementById("page-size") as HTMLSpanElement;
+const PAGE_SIZE_SPAN = document.getElementById("page-size") as HTMLSpanElement;
 const NEXT_PAGE_BUTTON = document.getElementById("next-page") as HTMLButtonElement;
 const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonElement;
-const PAGE_NUMBER_INPUT = document.getElementById("page-number-input") as HTMLSpanElement;
+const PAGE_NUMBER_SPAN = document.getElementById("page-number-input") as HTMLSpanElement;
 const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
 const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
@@ -67,6 +67,8 @@ class App {
 
   public costSlider: DoubleSlider;
   public reviewSlider: DoubleSlider;
+  public pageSizeTextbox: ScalingTextbox;
+  public pageTextbox: ScalingTextbox;
 
   /**
    * Initializes the App with the given data and sorts it accordingly.
@@ -98,10 +100,6 @@ class App {
     // Calculate and update distances based on current location.
     this.updateDistances();
 
-    // Initialize the current search with store names and an empty query.
-    this.currentSearch = new SearchResult(this, this.sorted.storeName);
-    this.displayMap = new DisplayMap(this);
-
     this.costSlider = new DoubleSlider(COST_RANGE,
       this.data.cost[this.sorted.cost[0]],
       this.data.cost[this.sorted.cost[App.RESTAURANT_COUNT - 1]],
@@ -114,10 +112,17 @@ class App {
       1
     );
 
+    this.pageSizeTextbox = new ScalingTextbox(PAGE_SIZE_SPAN, 0);
+    this.pageTextbox = new ScalingTextbox(PAGE_NUMBER_SPAN, 0);
+
+    // Initialize the current search with store names and an empty query.
+    this.currentSearch = new SearchResult(this, this.sorted.storeName);
+    this.displayMap = new DisplayMap(this);
+
     this.initInput(); // Set up input handling for searches.
   }
 
-  createTypeOption(name: string) {
+  public createTypeOption(name: string) {
     const option = document.createElement("option");
     option.innerText = name;
     option.value = name;
@@ -132,7 +137,7 @@ class App {
    * @timecomplexity O(n) - The method loops through `App.restaurantCount`, performing constant time operations for each restaurant.
    */
 
-  getCuisineTypeIndex(cuisineName: string): number {
+  public getCuisineTypeIndex(cuisineName: string): number {
     for (let i = 0; i < this.sorted.cuisines.length; i++) {
       if (this.sorted.cuisines[i] == cuisineName) return i;
     }
@@ -140,11 +145,11 @@ class App {
     return -1;
   }
 
-  getCuisineTypeArr(cuisineName: string): number[] {
+  public getCuisineTypeArr(cuisineName: string): number[] {
     return this.sorted.type[this.getCuisineTypeIndex(cuisineName)];
   }
 
-  loadTypes() {
+  public loadTypes() {
     const typePointers: number[] = [];
     let cuisinePointer = 0;
 
@@ -175,7 +180,7 @@ class App {
    * 
    * @timecomplexity O(n) - The distance calculation iterates over the list of restaurants, resulting in a linear time complexity.
    */
-  updateDistances() {
+  public updateDistances() {
     for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
@@ -242,7 +247,7 @@ class App {
     //   tests(document.getElementById("testing-div"));
     // });
 
-    SEARCH_BUTTON.addEventListener("click", () => {
+    const searchCallback = () => {
       const nameInput = SEARCH_NAME_INPUT.value;
       const idInput = SEARCH_ID_INPUT.value;
       const xInput = parseInt(SEARCH_X_INPUT.value)/App.UNIT_SCALE;
@@ -278,6 +283,20 @@ class App {
 
       this.currentSearch = new SearchResult(this, results);
       this.displayMap.clearPath();
+    }
+
+    SEARCH_BUTTON.addEventListener("click", searchCallback);
+
+    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key == "Enter") searchCallback();
+    });
+
+    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key == "Enter") searchCallback();
+    });
+
+    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (event.key == "Enter") searchCallback();
     });
     
     SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
@@ -310,26 +329,9 @@ class App {
       this.currentSearch.toggleDirection();
     });
 
-    const changePageSize = () => {
-      let input = parseInt(PAGE_SIZE_INPUT.innerText);
-
-      if (!isNaN(input)) this.currentSearch.changePageSize(input);
-    }
-
-    PAGE_SIZE_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-
-        changePageSize();
-
-      } else if (isNaN(parseInt(event.key)) && event.key != ".") {
-        event.preventDefault();
-      }
+    this.pageSizeTextbox.addListener(() => {
+      if (this.pageSizeTextbox.value != null) this.currentSearch.changePageSize(this.pageSizeTextbox.value);
     });
-
-    PAGE_SIZE_INPUT.addEventListener("blur", () => {
-      changePageSize();
-    })
 
     NEXT_PAGE_BUTTON.addEventListener("click", () => {
       this.currentSearch.incrementPage(1);
@@ -339,14 +341,8 @@ class App {
       this.currentSearch.incrementPage(-1);
     });
 
-    PAGE_NUMBER_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.key == "Enter") {
-        event.preventDefault();
-
-        const input = parseInt(PAGE_NUMBER_INPUT.innerText);
-
-        if (!isNaN(input)) this.currentSearch.setPage(input - 1);
-      }
+    this.pageTextbox.addListener(() => {
+      if (this.pageTextbox.value != null) this.currentSearch.setPage(this.pageTextbox.value);
     });
 
     FRUGAL_BUTTON.addEventListener("click", () => {

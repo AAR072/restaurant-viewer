@@ -129,36 +129,5 @@ function sortStrings(data: string[], outSorted?: Uint32Array): Uint32Array {
     if (aVal < bVal) return -1;
     else if (aVal > bVal) return 1;
     else return 0;
-    // const aLen = aVal.length;
-    // const bLen = bVal.length;
-
-    // for (let i = 0; i < aLen; i++) {
-    //   if (i > bLen) return -1;
-
-    //   const aChar = aVal[i];
-    //   const bChar = bVal[i];
-
-    //   if (aChar < bChar) {
-    //     return -1;
-
-    //   } else if (aChar > bChar) {
-    //     return 1;
-    //   }
-    // }
-
-    // // // If all characters up to len match, determine based on length
-    // // if (comparison === 0 && vLen !== len) {
-    // //   comparison = vLen < len ? -1 : 1;
-    // // }
-
-    // // if (comparison == 0) return 0;
-
-    // // for (let i = 0; i < len; i++) {
-    // //   if (i >= vLen || value[i].toLowerCase() != searchInput[i].toLowerCase()) {
-    // //     return comparison;
-    // //   }
-    // // }
-
-    // return 0;
   }, outSorted);
 }

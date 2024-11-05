@@ -51,7 +51,7 @@ function logTask(name: string, time: number, description: string) {
   descSpan.innerText = description;
 
   const dateSpan = document.createElement("p");
-  dateSpan.innerHTML = "Logged At: " + new Date().toLocaleTimeString();
+  dateSpan.innerHTML = "Logged At: " + new Date().toLocaleTimeString(); // make it show milliseconds
 
   const deleteButton = document.createElement("button");
   deleteButton.innerText = "Clear";

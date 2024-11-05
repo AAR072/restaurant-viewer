@@ -11,4 +11,12 @@ interface Data {
 
 const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data; // Load data from JSON file.
 
+let testCheck = new Checklist(document.getElementById("test-checklist") as HTMLDivElement, true);
+for (let i = 0; i < 10; i++) {
+  testCheck.addOption("option" + i, false, "Option " + i);
+}
+testCheck.addListener((output) => {
+  console.log(output);
+});
+
 const app = new App(data);

@@ -298,7 +298,7 @@ class DisplayMap {
     this.context.stroke();
   }
 
-  public drawCricle(x: number, y: number, r: number, style: string) {
+  public drawCircle(x: number, y: number, r: number, style: string) {
     this.context.beginPath();
     this.context.arc(x, y, r, 0, Math.PI*2);
 
@@ -374,9 +374,9 @@ class DisplayMap {
         const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
         
         this.drawLine(x0, y0, x1, y1, "rgb(0, 50, 255)", 5);
-        this.drawCricle(x0, y0, 10, "rgb(255, 0, 0)");
+        this.drawCircle(x0, y0, 10, "rgb(255, 0, 0)");
 
-        if (i == this.currentPath.length - 2) this.drawCricle(x1, y1, 10, "rgb(255, 0, 0)");
+        if (i == this.currentPath.length - 2) this.drawCircle(x1, y1, 10, "rgb(255, 0, 0)");
       }
     }
 
@@ -428,13 +428,11 @@ class DisplayMap {
     const infoWidth = div.offsetWidth;
     const infoHeight = div.offsetHeight;
 
-    if (left + infoWidth > this.width) left -= infoWidth;
-    if (top + infoHeight > this.height) top -= infoHeight;
-
     left = clamp(left, 0, this.width);
     top = clamp(top, 0, this.height);
 
-    console.log(left, top, this.width, this.height);
+    if (left + infoWidth > this.width) left -= infoWidth;
+    if (top + infoHeight > this.height) top -= infoHeight;
 
     div.style.left = left + "px";
     div.style.top = top + "px";

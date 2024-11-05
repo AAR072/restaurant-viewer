@@ -120,9 +120,7 @@ class SearchResult {
    * @timecomplexity O(1) - Simple arithmetic and assignments lead to constant time complexity.
    */
   public setPage(n: number) {
-    n = clamp(n, 0, this.pageCount - 1); // Ensure n is within valid range.
-
-    if (n == this.page) return; // Return if no change.
+    n = clamp(n - 1, 0, this.pageCount - 1); // Ensure n is within valid range.
 
     this.page = n; // Update the current page.
     this.displayUpdate(); // Update page info display.
@@ -223,7 +221,8 @@ class SearchResult {
     const button = document.createElement("button");
     button.innerText = "View On Map";
     button.className = "result-map-button";
-
+    button.type = "button";
+    
     div.appendChild(resultSpan);
     div.appendChild(info);
     div.appendChild(button);
@@ -241,8 +240,8 @@ class SearchResult {
    * @timecomplexity O(n) - Where n is the page size. The method loops through the page size to load results, hence linear time.
    */
   public displayUpdate() {
-    PAGE_SIZE_INPUT.innerText = SearchResult.pageSize.toString(); // Update page size input.
-    PAGE_NUMBER_INPUT.innerText = (this.page + 1).toString(); // Update current page number (1-based index).
+    this.app.pageSizeTextbox.setValue(SearchResult.pageSize); // Update page size input.
+    this.app.pageTextbox.setValue(this.page + 1); // Update current page number (1-based index).
     PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
 
     SORT_DIRECTION.innerText = this.descending ? "Descending" : "Ascending"; // Update sort order display.

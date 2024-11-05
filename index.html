@@ -13,6 +13,8 @@
 <body>
   <div class="main-container">
     <div class="sidebar">
+      <div id="test-checklist"></div>
+
       <div class="search-container">
         <div class="search-input-container">
           <input class="search-input-input" id="search-name" type="text" placeholder="Name"/>
@@ -53,19 +55,16 @@
             </select>
 
             <div id="cost-range" class="double-slider">
-              <!-- use content editable span for growing/shrinking typed values -->
-              <!-- <span class="slider-min-input" contenteditable="true"></span> -->
-
-              <span class="slider-min-text">$<input class="slider-min-input" type="text"/></span>
-              <span class="slider-max-text">$<input class="slider-max-input" type="text"/></span>
+              <span class="slider-min-text">$<span></span></span>
+              <span class="slider-max-text">$<span></span></span>
               <div class="progress cost"></div>
               <input class="min-range" type="range">
               <input class="max-range" type="range">
             </div>
 
             <div id="review-range" class="double-slider">
-              <span class="slider-min-text">&#9733<input class="slider-min-input" type="text"/></span>
-              <span class="slider-max-text">&#9733<input class="slider-max-input" type="text"/></span>
+              <span class="slider-min-text">&#9733<span></span></span>
+              <span class="slider-max-text">&#9733<span></span></span>
               <div class="progress review"></div>
               <input class="min-range" type="range">
               <input class="max-range" type="range">
@@ -88,13 +87,14 @@
         </div>
 
         <div>
-          <label for="page-size">Page Size:</label>
-          <span id="page-size" class="page-input" type="text" placeholder="(1 - 100)" value="0" contenteditable="true"></span>
+          <!-- fix spacing here with labels n stuff -->
+          <label for="page-size">Page Size: </label>
+          <span id="page-size" span-placeholder="(1 - 100)" value="0"></span>
           <br>
 
-          <label for="page-number-input">Page:</label>
-          <span id="page-number-input" class="page-input" type="text" value="0" contenteditable="true"></span>
-          <span>/</span>
+          <label for="page-number-input">Page: </label>
+          <span id="page-number-input"></span>
+          <span> / </span>
           <span id="page-count">0</span>
           <br>
 
@@ -149,8 +149,10 @@
   <script src="./dist/scripts/algorithms/array-intersection.js"></script>
   <script src="./dist/scripts/algorithms/tsp.js"></script>
 
+  <script src="./dist/scripts/components/scaling-textbox.js"></script>
   <script src="./dist/scripts/components/double-slider.js"></script>
   <script src="./dist/scripts/components/dropdown.js"></script>
+  <script src="./dist/scripts/components/checklist.js"></script>
 
   <script src="./dist/scripts/structs/search-result.js"></script>
   <script src="./dist/scripts/structs/display-map.js"></script>

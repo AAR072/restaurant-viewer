@@ -36,20 +36,6 @@ button, select, option {
   cursor: pointer;
 }
 
-input[type="text"] {
-  height: 20px;
-  background: none;
-  color: var(--secondary-detail-color)
-}
-
-input[type="text"]:focus {
-  border-bottom: 2px solid var(--detail-color);
-}
-
-input::placeholder {
-  color: var(--secondary-color);
-}
-
 .main-container {
   display: flex;
   width: 100%;
@@ -65,6 +51,24 @@ input::placeholder {
   gap: 10px;
   padding-top: 10px;
 }
+
+/*#region Scaling Textbox*/
+.scaling-textbox {
+  width: auto;
+  height: auto;
+  color: var(--interact-color);
+  outline: none;
+}
+
+.scaling-textbox:focus {
+  border-bottom: 2px solid var(--detail-color);
+}
+
+.scaling-textbox:empty {
+  content: attr(span-placeholder);
+  color: var(--secondary-color);
+}
+/*#endregion*/
 
 /*#region Dropdown*/
 .dropdown {
@@ -116,11 +120,17 @@ input::placeholder {
   width: auto;
   margin-left: 20px;
   margin-right: 20px;
-  padding: 12px;
 }
 
 .search-container input[type="text"] {
   width: 100%;
+  height: 20px;
+  background: none;
+  color: var(--secondary-detail-color);
+}
+
+.search-container input[type="text"]:focus {
+  border-bottom: 2px solid var(--detail-color);
 }
 
 .search-input-container {
@@ -128,14 +138,17 @@ input::placeholder {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  padding: 12px;
 }
 
 .search-icons-container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
   width: auto;
-  gap: 5px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-right: 15px;
 }
 
 .search-icon-button {
@@ -143,7 +156,7 @@ input::placeholder {
   height: 30px;
   cursor: pointer;
   border: none;
-  /* background: none; */
+  background: none;
   position: relative;
   display: inline-flex;
 }
@@ -199,10 +212,11 @@ input::placeholder {
 .clear-icon:hover::before, .clear-icon:hover::after {
   background-color: var(--warning-color);
 }
-/*#endregion Search Section*/
+/*#endregion*/
 
 /*#region Filter*/
 .filter-container {
+  overflow-x: hidden;
   padding: 20px;
 }
 
@@ -282,19 +296,8 @@ input::placeholder {
 /*#region Browse/Sort*/
 .browse-container {
   flex-grow: 1;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
-.page-input {
-  width: auto;
-  height: auto;
-  color: var(--interact-color);
-  outline: none;
-}
-
-.page-input:focus {
-  border-bottom: 2px solid var(--detail-color);
+  padding-left: 20px;
+  padding-right: 20px;
 }
 /*#endregion Browse/Sort Section*/
 
@@ -302,6 +305,7 @@ input::placeholder {
 .results-container {
   display: block;
   overflow-y: auto;
+  border-top: 1px solid var(--detail-color);
 }
 
 .result-container {

@@ -10,25 +10,28 @@ class DoubleSlider {
   public maxSlider: HTMLInputElement;
   public minTextDisplay: HTMLSpanElement;
   public maxTextDisplay: HTMLSpanElement;
-  public minText: HTMLInputElement;
-  public maxText: HTMLInputElement;
+  public minTextbox: ScalingTextbox;
+  public maxTextbox: ScalingTextbox;
   public eventCallback: DSCallback;
 
   constructor(
     public element: HTMLDivElement,
     public rangeMin: number,
     public rangeMax: number,
-    public decimals: number
+    public decimalPlaces: number
   ) {
     const progress = element.querySelector(".progress") as HTMLDivElement;
     const minSlider = element.querySelector(".min-range") as HTMLInputElement;
     const maxSlider = element.querySelector(".max-range") as HTMLInputElement;
     const minTextDisplay = element.querySelector(".slider-min-text") as HTMLSpanElement;
     const maxTextDisplay = element.querySelector(".slider-max-text") as HTMLSpanElement;
-    const minText = element.querySelector(".slider-min-input") as HTMLInputElement;
-    const maxText = element.querySelector(".slider-max-input") as HTMLInputElement;
+    const minTextSpan = minTextDisplay.querySelector("span")!;
+    const maxTextSpan = maxTextDisplay.querySelector("span")!;
 
-    this.interval = 10**-decimals;
+    this.minTextbox = new ScalingTextbox(minTextSpan, decimalPlaces);
+    this.maxTextbox = new ScalingTextbox(maxTextSpan, decimalPlaces);
+
+    this.interval = 10**-decimalPlaces;
 
     minSlider.min = maxSlider.min = rangeMin.toString();
     minSlider.max = maxSlider.max = rangeMax.toString();
@@ -39,8 +42,6 @@ class DoubleSlider {
     this.maxSlider = maxSlider;
     this.minTextDisplay = minTextDisplay;
     this.maxTextDisplay = maxTextDisplay;
-    this.minText = minText;
-    this.maxText = maxText;
 
     minSlider.addEventListener("input", () => {
       this.updateSlider(parseFloat(minSlider.value), parseFloat(maxSlider.value), true);
@@ -56,39 +57,26 @@ class DoubleSlider {
 
     maxSlider.addEventListener("mouseup", () => {
       this.fireListener();
-    })
+    });
 
-    minText.addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.key != "Enter") return;
-
-      this.updateSlider(parseFloat(minText.value), parseFloat(maxText.value), true);
+    this.minTextbox.addListener(() => {
+      this.updateSlider(this.minTextbox.value, this.maxTextbox.value, true);
       this.fireListener();
     });
 
-    minText.addEventListener("blur", () => {
-      this.updateSlider(parseFloat(minText.value), parseFloat(maxText.value), true);
-      this.fireListener();
-    });
-
-    maxText.addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.key != "Enter") return;
-
-      this.updateSlider(parseFloat(minText.value), parseFloat(maxText.value), false);
-      this.fireListener();
-    });
-
-    maxText.addEventListener("blur", () => {
-      this.updateSlider(parseFloat(minText.value), parseFloat(maxText.value), false);
+    this.maxTextbox.addListener(() => {
+      this.updateSlider(this.minTextbox.value, this.maxTextbox.value, false);
       this.fireListener();
     });
 
     this.updateSlider(this.rangeMin, this.rangeMax, false);
   }
 
-  private updateSlider(minVal: number, maxVal: number, min: boolean) {
-    if (isNaN(minVal)) minVal = this.min;
-    if (isNaN(maxVal)) maxVal = this.max;
+  private getRangePct(value: number) {
+    return (value - this.rangeMin)/(this.rangeMax - this.rangeMin);
+  }
 
+  private updateSlider(minVal: number, maxVal: number, min: boolean) {
     if (min) minVal = getMin(minVal, maxVal - this.interval);
     else maxVal = getMax(maxVal, minVal + this.interval);
 
@@ -98,20 +86,20 @@ class DoubleSlider {
     this.min = minVal;
     this.max = maxVal;
 
-    const pctLeft = (minVal/this.rangeMax)*100;
-    const pctRight = (1 - maxVal/this.rangeMax)*100;
+    const pctLeft = this.getRangePct(minVal)*100;
+    const pctRight = (1 - this.getRangePct(maxVal))*100;
 
-    this.minSlider.value = this.minText.value = minVal.toFixed(this.decimals).toString();
-    this.maxSlider.value = this.maxText.value = maxVal.toFixed(this.decimals).toString();
+    this.minTextbox.setValue(minVal);
+    this.maxTextbox.setValue(maxVal);
+
+    this.minSlider.value = minVal.toString();
+    this.maxSlider.value = maxVal.toString();
 
     this.progress.style.left = pctLeft + "%";
     this.progress.style.right = pctRight + "%";
 
     this.minTextDisplay.style.left = pctLeft + "%";
     this.maxTextDisplay.style.right = pctRight + "%";
-
-    this.minText.style.width = (this.minText.value.length*8.5) + "px";
-    this.maxText.style.width = (this.maxText.value.length*8.5) + "px";
   }
 
   private fireListener() {
