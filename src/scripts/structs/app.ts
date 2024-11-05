@@ -14,10 +14,10 @@ const REVIEW_RANGE = document.getElementById("review-range") as HTMLDivElement;
 const SORT_SELECT = document.getElementById("sort-select") as HTMLSelectElement;
 const SORT_DIRECTION = document.getElementById("sort-direction") as HTMLButtonElement;
 
-const PAGE_SIZE_INPUT = document.getElementById("page-size") as HTMLInputElement;
+const PAGE_SIZE_INPUT = document.getElementById("page-size") as HTMLSpanElement;
 const NEXT_PAGE_BUTTON = document.getElementById("next-page") as HTMLButtonElement;
 const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonElement;
-const PAGE_NUMBER_INPUT = document.getElementById("page-number-input") as HTMLInputElement;
+const PAGE_NUMBER_INPUT = document.getElementById("page-number-input") as HTMLSpanElement;
 const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
 const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
@@ -311,13 +311,20 @@ class App {
     });
 
     const changePageSize = () => {
-      let input = Number(PAGE_SIZE_INPUT.value);
+      let input = parseInt(PAGE_SIZE_INPUT.innerText);
 
       if (!isNaN(input)) this.currentSearch.changePageSize(input);
     }
 
     PAGE_SIZE_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
-      if (event.key == "Enter") changePageSize();
+      if (event.key == "Enter") {
+        event.preventDefault();
+
+        changePageSize();
+
+      } else if (isNaN(parseInt(event.key)) && event.key != ".") {
+        event.preventDefault();
+      }
     });
 
     PAGE_SIZE_INPUT.addEventListener("blur", () => {
@@ -334,7 +341,9 @@ class App {
 
     PAGE_NUMBER_INPUT.addEventListener("keypress", (event: KeyboardEvent) => {
       if (event.key == "Enter") {
-        const input = Number(PAGE_NUMBER_INPUT.value);
+        event.preventDefault();
+
+        const input = parseInt(PAGE_NUMBER_INPUT.innerText);
 
         if (!isNaN(input)) this.currentSearch.setPage(input - 1);
       }

@@ -241,8 +241,8 @@ class SearchResult {
    * @timecomplexity O(n) - Where n is the page size. The method loops through the page size to load results, hence linear time.
    */
   public displayUpdate() {
-    PAGE_SIZE_INPUT.value = String(SearchResult.pageSize); // Update page size input.
-    PAGE_NUMBER_INPUT.value = String(this.page + 1); // Update current page number (1-based index).
+    PAGE_SIZE_INPUT.innerText = SearchResult.pageSize.toString(); // Update page size input.
+    PAGE_NUMBER_INPUT.innerText = (this.page + 1).toString(); // Update current page number (1-based index).
     PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
 
     SORT_DIRECTION.innerText = this.descending ? "Descending" : "Ascending"; // Update sort order display.

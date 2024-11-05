@@ -419,14 +419,25 @@ class DisplayMap {
 
     const div = document.createElement("div");
     div.className = "map-info";
-    div.style.left = left + "px";
-    div.style.top = top + "px";
-
     div.appendChild(info);
 
     MAP_CONTAINER.appendChild(div);
 
     this.infoDisplay = div;
+
+    const infoWidth = div.offsetWidth;
+    const infoHeight = div.offsetHeight;
+
+    if (left + infoWidth > this.width) left -= infoWidth;
+    if (top + infoHeight > this.height) top -= infoHeight;
+
+    left = clamp(left, 0, this.width);
+    top = clamp(top, 0, this.height);
+
+    console.log(left, top, this.width, this.height);
+
+    div.style.left = left + "px";
+    div.style.top = top + "px";
   }
 
   private getClickedLocation(mouseX: number, mouseY: number): number {
@@ -452,7 +463,7 @@ class DisplayMap {
     let mouseX: number | null;
     let mouseY: number | null;
 
-    new ResizeObserver(([canvasEntry]) => {
+    new ResizeObserver(() => {
       this.setDimensions(MAP_CANVAS.getBoundingClientRect());
       this.render();
 

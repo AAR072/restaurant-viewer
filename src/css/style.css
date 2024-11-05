@@ -7,7 +7,7 @@
   --secondary-detail-color: rgb(168, 168, 168);
   --cost-color: rgb(0, 185, 154);
   --review-color: rgb(212, 200, 26);
-  --interact-color: rgb(22, 84, 255);
+  --interact-color: rgb(76, 124, 255);
   --warning-color: rgb(190, 7, 47);
 }
 
@@ -62,20 +62,11 @@ input::placeholder {
   box-sizing: border-box;
   width: 400px;
   background-color: var(--sidebar-color);
-  gap: 20px;
-  padding-top: 20px;
+  gap: 10px;
+  padding-top: 10px;
 }
 
-.bubble {
-  border-radius: 15px;
-  border: 2px solid var(--detail-color);
-  background-color: var(--bubble-color);
-  width: auto;
-  margin-left: 20px;
-  margin-right: 20px;
-  padding: 15px;
-}
-
+/*#region Dropdown*/
 .dropdown {
   position: relative;
   display: inline-block;
@@ -85,22 +76,26 @@ input::placeholder {
   display: flex;
   width: 100%;
   height: auto;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--detail-color);
 }
 
 .dropdown-text {
   text-align: center;
   flex-grow: 1;
-  height: 100%;
+  height: auto;
 }
 
 .dropdown-arrow {
   width: 20px;
-  height: 100%;
+  height: auto;
 }
 
 .dropdown-content {
   overflow-y: hidden;
-  transition: height 0.3s ease;
+  transition: height 0.3s ease, margin 0.3s ease;
+  border-bottom: 1px solid var(--detail-color);
 }
 
 .dropdown.hide .dropdown-content {
@@ -110,10 +105,18 @@ input::placeholder {
 .dropdown.hide .dropdown-arrow {
   transform: rotate(180deg);
 }
+/*#endregion*/
 
-/*#region Search Section*/
+/*#region Search*/
 .search-container {
   display: flex;
+  border-radius: 20px;
+  border: 1px solid var(--detail-color);
+  background-color: var(--bubble-color);
+  width: auto;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 12px;
 }
 
 .search-container input[type="text"] {
@@ -136,35 +139,34 @@ input::placeholder {
 }
 
 .search-icon-button {
-  width: 40px;
-  height: 40px;
-  background: none;
+  width: 30px;
+  height: 30px;
   cursor: pointer;
   border: none;
-  border-radius: 5px;
+  /* background: none; */
   position: relative;
   display: inline-flex;
 }
 
 .search-icon::before {
   content: "";
-  width: 16px;
-  height: 16px;
-  border: 4px solid var(--detail-color);
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--detail-color);
   border-radius: 50%;
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 4px;
+  left: 4px;
   transition: border-color 0.2s;
 }
 .search-icon::after {
   content: "";
-  width: 16px;
-  height: 4px;
+  width: 12px;
+  height: 2px;
   background-color: var(--detail-color);
   position: absolute;
-  top: 22px;
-  left: 24px;
+  top: 17px;
+  left: 18px;
   border-radius: 2px;
   transform: rotate(45deg);
   transform-origin: top left;
@@ -179,12 +181,12 @@ input::placeholder {
 
 .clear-icon::before, .clear-icon::after {
   content: "";
-  width: 36px;
-  height: 4px;
+  width: 26px;
+  height: 2px;
   background-color: var(--detail-color);
   position: absolute;
   border-radius: 2px;
-  top: 18px;
+  top: 14px;
   left: 2px;
   transition: background-color 0.2s;
 }
@@ -199,7 +201,11 @@ input::placeholder {
 }
 /*#endregion Search Section*/
 
-/*#region Filter Section*/
+/*#region Filter*/
+.filter-container {
+  padding: 20px;
+}
+
 .double-slider {
   position: relative;
   height: 10px;
@@ -273,7 +279,7 @@ input::placeholder {
 }
 /*#endregion Filter Section*/
 
-/*#region Browse/Sort Section*/
+/*#region Browse/Sort*/
 .browse-container {
   flex-grow: 1;
   margin-left: 20px;
@@ -281,11 +287,18 @@ input::placeholder {
 }
 
 .page-input {
-  width: 50px;
+  width: auto;
+  height: auto;
+  color: var(--interact-color);
+  outline: none;
+}
+
+.page-input:focus {
+  border-bottom: 2px solid var(--detail-color);
 }
 /*#endregion Browse/Sort Section*/
 
-/*#region Results Section*/
+/*#region Results*/
 .results-container {
   display: block;
   overflow-y: auto;
@@ -315,6 +328,7 @@ input::placeholder {
 }
 /*#endregion Results Section*/
 
+/*#region Map*/
 .map-container {
   flex-grow: 1;
   position: relative;
@@ -353,8 +367,9 @@ input::placeholder {
 #map-canvas.click {
   cursor: grab;
 }
+/*#endregion*/
 
-/*#region Debug Section*/
+/*#region Debug*/
 .debug-section {
   flex: 1;
   margin-left: 20px;
@@ -378,4 +393,4 @@ input::placeholder {
   transition: opacity 0.5s ease, margin 0.5s ease 0.5s;
   opacity: 0;
 }
-/*#endregion Debug Section*/
+/*#endregion Debug*/
