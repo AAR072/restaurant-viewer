@@ -369,17 +369,18 @@ class DisplayMap {
     }
 
     if (this.currentPath) {
-      for (let i = 0; i < this.currentPath.length - 1; i++) {
+      for (let i = 0; i < this.currentPath.length; i++) {
         const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
-        const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
-        
-        this.drawLine(x0, y0, x1, y1, "rgb(255, 255, 255)", 5);
-        this.drawCricle(x0, y0, 10, "#edab00");
-        this.drawLine(x0, y0, x1, y1, "rgb(0, 50, 255)", 5);
-        this.drawCircle(x0, y0, 10, "rgb(255, 0, 0)");
 
-        if (i == this.currentPath.length - 2) this.drawCricle(x1, y1, 10, "#edab00");
-        if (i == this.currentPath.length - 2) this.drawCircle(x1, y1, 10, "rgb(255, 0, 0)");
+        if (i < this.currentPath.length - 1) {
+          const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
+
+          this.drawLine(x0, y0, x1, y1, "rgb(255, 255, 255)", 5);
+        }
+        
+        this.drawCircle(x0, y0, 10, "#edab00");
+
+        // if (i == this.currentPath.length - 2) this.drawCircle(x1, y1, 10, "#edab00");
       }
     }
 
