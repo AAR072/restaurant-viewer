@@ -1,14 +1,14 @@
 :root {
   --background-color: rgb(20, 20, 20);
-  --sidebar-color: rgb(34, 34, 34);
+  --sidebar-color: rgb(20, 20, 20);
   --bubble-color: rgb(36, 36, 36);
   --secondary-color: rgb(83, 83, 83);
   --detail-color: rgb(228, 228, 228);
   --secondary-detail-color: rgb(168, 168, 168);
-  --cost-color: rgb(0, 185, 154);
-  --review-color: rgb(212, 200, 26);
-  --interact-color: rgb(76, 124, 255);
-  --warning-color: rgb(190, 7, 47);
+  --cost-color: rgb(44, 187, 93);
+  --review-color: rgb(255, 201, 38);
+  --interact-color: rgb(10, 132, 255);
+  --warning-color: rgb(239, 71, 67);
 }
 
 * {
@@ -26,15 +26,22 @@ body {
 button, input, select {
   outline: none;
   border: none;
-  background-color: var(--secondary-color);
+  background-color: #ffffff1a;
 }
 
 button, select, option {
-  border: 2px solid var(--secondary-detail-color);
-  background-color: var(--secondary-color);
-  height: 30px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff1a;
   cursor: pointer;
 }
+button:hover, select:hover, option:hover {
+  background-color: #3A3A3A;
+}
+
 
 input[type="text"] {
   height: 20px;

@@ -201,27 +201,26 @@ class App {
 
   public createRestaurantInfo(index: number) {
     const div = document.createElement("div");
-
+ 
     const idSpan = document.createElement("p");
-    idSpan.innerText = `ID: ${this.data.ID[index]}`;
+    idSpan.innerHTML = `<strong>ID:</strong> ${this.data.ID[index]}`;
 
     const nameSpan = document.createElement("p");
-    nameSpan.innerText = `Name: ${this.data.storeName[index]}`;
+    nameSpan.innerHTML = `<strong>Name:</strong> <em>${this.data.storeName[index]}</em>`;
 
     const typeSpan = document.createElement("p");
-    typeSpan.innerText = `Type: ${this.data.type[index]}`;
+    typeSpan.innerHTML = `<strong>Type:</strong> <em>${this.data.type[index]}</em>`;
 
     const costSpan = document.createElement("p");
-    costSpan.innerText = `Cost: $${this.data.cost[index].toFixed(2)}`;
+    costSpan.innerHTML = `<strong>Cost:</strong> $${this.data.cost[index].toFixed(2)}`;
     costSpan.className = "result-cost";
 
     const reviewSpan = document.createElement("p");
-    reviewSpan.innerText = `Review: ${this.data.review[index].toFixed(1)}`;
+    reviewSpan.innerHTML = `<strong>Review:</strong> ${this.data.review[index].toFixed(1)}`;
     reviewSpan.className = "result-review";
 
     const positionSpan = document.createElement("p");
-    positionSpan.innerText = `Position: (x: ${this.data.x[index]*App.UNIT_SCALE}m, y: ${this.data.y[index]*App.UNIT_SCALE}m)`;
-
+    positionSpan.innerHTML = `<strong>Position:</strong> (x: ${this.data.x[index] * App.UNIT_SCALE}m, y: ${this.data.y[index] * App.UNIT_SCALE}m)`;
     div.appendChild(idSpan);
     div.appendChild(nameSpan);
     div.appendChild(typeSpan);
