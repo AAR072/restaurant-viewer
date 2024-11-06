@@ -278,8 +278,33 @@ class DisplayMap {
 
     this.currentPath = path;
 
-    this.cameraX = first.x;
-    this.cameraY = first.y;
+    const lerpFactor = 0.1;  // Adjust this to control smoothness
+    const threshold = 0.1;   // Threshold to consider the target reached
+    let obj = this;
+
+    // Animation loop
+    function moveLoop() {
+
+      // Gradually move cameraX and cameraY towards first.x and first.y
+      if (Math.abs(first.x - obj.cameraX) > threshold || Math.abs(first.y - obj.cameraY) > threshold) {
+        console.log(obj.cameraX, obj.cameraY);
+
+        // Adjusted lerp factor based on deltaTime
+        const adjustedLerpFactor = lerpFactor;
+
+        obj.cameraX += (first.x - obj.cameraX) * adjustedLerpFactor;
+        obj.cameraY += (first.y - obj.cameraY) * adjustedLerpFactor;
+        obj.render();
+        requestAnimationFrame(moveLoop);
+      } else {
+        obj.cameraX = first.x;
+        obj.cameraY = first.y;
+        obj.render();
+      }
+    };
+    moveLoop();
+    // Once the camera is close enough to the target, stop moving
+
     this.zoom = DisplayMap.MIN_ZOOM;
     this.setRangeScale();
     this.render();
