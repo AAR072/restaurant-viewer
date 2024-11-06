@@ -3,27 +3,45 @@ type ChecklistCallback = (selections: string[] | null) => any;
 class Checklist {
   public checked: string[] = [];
   public checkCount: number = 0;
+  public anyCheckbox?: HTMLInputElement;
 
   private callback: ChecklistCallback;
 
-  constructor(public element: HTMLDivElement, anyOption: boolean) {
-    if (anyOption) this.addOption("any", true, "Any")
+  constructor(public element: HTMLDivElement, anyOption: boolean, public maxOptions?: number) {
+    if (anyOption) {
+      this.anyCheckbox = this.createCheckbox("Any");
+      this.anyCheckbox.checked = true;
+
+      this.anyCheckbox.addEventListener("input", () => {
+        this.fireListener();
+      });
+    }
   }
 
-  private checkOption(name: string, isAny: boolean, check: boolean) {
-    if (isAny) {
-      if (this.callback) {
-        if (check) this.callback(null);
-        else this.callback(this.checked);
-      }
+  private createCheckbox(display: string): HTMLInputElement {
+    const container = document.createElement("div");
+    
+    const label = document.createElement("label");
+    label.innerText = display;
 
-      return;
-    }
+    const checkbox = document.createElement("input") as HTMLInputElement;
+    checkbox.type = "checkbox";
 
+    container.appendChild(checkbox);
+    container.appendChild(label);
+
+    this.element.appendChild(container);
+
+    return checkbox;
+  }
+
+  private checkOption(name: string, check: boolean) {
     if (check) {
       this.checked[this.checkCount++] = name;
 
     } else {
+      if (this.maxOptions != null && this.checkCount >= this.maxOptions) return;
+
       for (let i = 0; i < this.checkCount; i++) {
         if (this.checked[i] == name) {
           this.checked[i] = this.checked[this.checkCount - 1];
@@ -36,6 +54,13 @@ class Checklist {
     }
 
     if (this.callback) this.callback(this.checked);
+  }
+
+  private fireListener() {
+    if (!this.callback) return;
+
+    if (this.anyCheckbox && this.anyCheckbox.checked) this.callback(null);
+    else this.callback(this.checked);
   }
 
   public addOption(name: string, isAny: boolean, displayName: string) {
@@ -53,7 +78,7 @@ class Checklist {
     container.appendChild(label);
 
     checkbox.addEventListener("input", () => {
-      this.checkOption(name, isAny, checkbox.checked);
+      this.checkOption(name, checkbox.checked);
     });
 
     this.element.appendChild(container);

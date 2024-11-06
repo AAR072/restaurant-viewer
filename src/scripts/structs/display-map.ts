@@ -108,6 +108,8 @@ class DisplayMap {
     
     this.loadQuadTree();
 
+    this.range 
+
     this.setDimensions(MAP_CANVAS.getBoundingClientRect());
     this.setRangeScale();
     this.centerCamera();

@@ -12,7 +12,7 @@ type FilterCallback = (i: number) => number
  */
 function getSubArray(indices: Uint32Array, min: number, max: number): Uint32Array {
   // We change the start and end of the array in place to save time. We just spliced in constant time!
-  return new Uint32Array(indices.buffer, min * Uint32Array.BYTES_PER_ELEMENT, max - min + 1);
+  return new Uint32Array(indices.buffer, min*Uint32Array.BYTES_PER_ELEMENT, max - min + 1);
 }
 
 /**
@@ -36,6 +36,9 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
   while (low < high) {
     const middle = (low + high + (isMaximum ? 1 : 0)) >>> 1;
     const result = filter(indices[middle]);
+
+    if (result > 0) high = middle + 1;
+    else low = middle;
 
     if (isMaximum) {
       if (result > 0) high = middle - 1;

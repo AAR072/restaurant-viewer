@@ -19,18 +19,19 @@ type SortFieldType = "storeName" | "cost" | "review";
  * @param {string} defaultSort - The field used for sorting results.
  */
 class SearchResult {
+  static MIN_PAGE_SIZE: number = 1; // Minimum page size.
+  static MAX_PAGE_SIZE: number = 100; // Maximum page size.
+
   static pageSize: number = 10; // Default number of results per page.
-  static minPageSize: number = 1; // Minimum page size.
-  static maxPageSize: number = 100; // Maximum page size. 
 
   public includesAll: boolean; // Whether or not the results include all of the values.
 
   public sort: SortFieldType = "storeName";
   public typeFilter: string = "";
-  public costMin: number;
-  public costMax: number;
-  public reviewMin: number;
-  public reviewMax: number;
+  public costMin: number | null = null;
+  public costMax: number | null = null;
+  public reviewMin: number | null = null;
+  public reviewMax: number | null = null;
 
   public final: Uint32Array; // Sorted array of result indices.
   public finalCount: number;
@@ -51,22 +52,22 @@ class SearchResult {
     this.updateFinal();
   }
 
-  static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
+  // static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
 
-  }
+  // }
 
   public setTypeFilter(type: string) {
     this.typeFilter = type;
     this.updateFinal();
   }
 
-  public setCostRange(min: number, max: number) {
+  public setCostRange(min: number | null, max: number | null) {
     this.costMin = min;
     this.costMax = max;
     this.updateFinal();
   }
 
-  public setReviewRange(min: number, max: number) {
+  public setReviewRange(min: number | null, max: number | null) {
     this.reviewMin = min;
     this.reviewMax = max;
     this.updateFinal();
@@ -95,8 +96,9 @@ class SearchResult {
    * @timecomplexity O(1) - The method consists of simple arithmetic operations and assignments.
    */
   public changePageSize(n: number) {
-    SearchResult.pageSize = clamp(n, SearchResult.minPageSize, SearchResult.maxPageSize); // Update static page size.
+    SearchResult.pageSize = clamp(n, SearchResult.MIN_PAGE_SIZE, SearchResult.MAX_PAGE_SIZE); // Update static page size.
 
+    this.updatePageCount();
     this.displayUpdate();
   }
 
@@ -244,7 +246,9 @@ class SearchResult {
     this.app.pageTextbox.setValue(this.page + 1); // Update current page number (1-based index).
     PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
 
-    SORT_DIRECTION.innerText = this.descending ? "Descending" : "Ascending"; // Update sort order display.
+    if (this.descending) SORT_DIRECTION.classList.add("descending");
+    else SORT_DIRECTION.classList.remove("descending");
+
     SEARCH_RESULTS.innerHTML = ""; // Clear previous results.
 
     // Loop through the number of results per page and load them.

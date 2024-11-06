@@ -1,4 +1,4 @@
-type DSCallback = (min: number, max: number) => any;
+type DSCallback = (min: number, max: number, fullRange: boolean) => any;
 
 class DoubleSlider {
   public min: number = 0;
@@ -103,7 +103,7 @@ class DoubleSlider {
   }
 
   private fireListener() {
-    if (this.eventCallback) this.eventCallback(this.min, this.max);
+    if (this.eventCallback) this.eventCallback(this.min, this.max, (this.min == this.rangeMin && this.max == this.rangeMax));
   }
 
   public addListener(callback: DSCallback) {

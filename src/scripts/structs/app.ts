@@ -218,11 +218,11 @@ class App {
 
     const costSpan = document.createElement("p");
     costSpan.innerHTML = `<strong>Cost:</strong> $${this.data.cost[index].toFixed(2)}`;
-    costSpan.className = "result-cost";
+    costSpan.className = "cost-color";
 
     const reviewSpan = document.createElement("p");
     reviewSpan.innerHTML = `<strong>Review:</strong> &#9733;${this.data.review[index].toFixed(1)}`;
-    reviewSpan.className = "result-review";
+    reviewSpan.className = "review-color";
 
     const positionSpan = document.createElement("p");
     positionSpan.innerHTML = `<strong>Position:</strong> (x: ${this.data.x[index] * App.UNIT_SCALE}m, y: ${this.data.y[index] * App.UNIT_SCALE}m)`;
@@ -313,11 +313,23 @@ class App {
       this.currentSearch.setTypeFilter(TYPE_SELECT.value);
     });
 
-    this.costSlider.addListener((min: number, max: number) => {
+    this.costSlider.addListener((min: number, max: number, fullRange: boolean) => {
+      if (fullRange) {
+        this.currentSearch.setReviewRange(null, null);
+
+        return;
+      }
+
       this.currentSearch.setCostRange(min, max);
     });
 
-    this.reviewSlider.addListener((min: number, max: number) => {
+    this.reviewSlider.addListener((min: number, max: number, fullRange: boolean) => {
+      if (fullRange) {
+        this.currentSearch.setReviewRange(null, null);
+
+        return;
+      }
+
       this.currentSearch.setReviewRange(min, max);
     });
 

@@ -30,7 +30,30 @@ button, input, select {
 }
 
 button, select {
+  transition: color 0.2s ease;
   cursor: pointer;
+}
+
+select option {
+  background-color: var(--bubble-color);
+}
+
+button:hover, select:hover {
+  color: var(--interact-color);
+}
+
+*::-webkit-scrollbar {
+  margin-left: -6px;
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bubble-color);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-color);
+  border-radius: 4px;
 }
 
 .main-container {
@@ -46,7 +69,6 @@ button, select {
   width: 400px;
   background-color: var(--sidebar-color);
   gap: 20px;
-  padding-top: 10px;
 }
 
 /*#region Scaling Textbox*/
@@ -74,6 +96,7 @@ button, select {
   height: auto;
   background: none;
   border: none;
+  padding-bottom: 5px;
   border-bottom: 1px solid var(--detail-color);
 }
 
@@ -81,21 +104,25 @@ button, select {
   text-align: center;
   flex-grow: 1;
   height: auto;
+  font-size: 18px;
 }
 
 .dropdown-arrow {
   width: 20px;
   height: auto;
+  transition: transform 0.2s ease;
 }
 
 .dropdown-content {
   overflow-y: hidden;
-  transition: height 0.3s ease, margin 0.3s ease;
+  transition: height 0.3s ease;
   border-bottom: 1px solid var(--detail-color);
 }
 
 .dropdown.hide .dropdown-content {
+  margin-top: -1px;
   height: 0 !important;
+  transition: height 0.3s ease, margin 0s 0.3s;
 }
 
 .dropdown.hide .dropdown-arrow {
@@ -112,6 +139,7 @@ button, select {
   width: auto;
   margin-left: 20px;
   margin-right: 20px;
+  margin-top: 20px;
 }
 
 .search-container input[type="text"] {
@@ -157,7 +185,7 @@ button, select {
   content: "";
   width: 12px;
   height: 12px;
-  border: 3px solid var(--detail-color);
+  border: 2px solid var(--detail-color);
   border-radius: 50%;
   position: absolute;
   top: 4px;
@@ -170,8 +198,8 @@ button, select {
   height: 2px;
   background-color: var(--detail-color);
   position: absolute;
-  top: 17px;
-  left: 18px;
+  top: 16px;
+  left: 17px;
   border-radius: 2px;
   transform: rotate(45deg);
   transform-origin: top left;
@@ -287,25 +315,55 @@ button, select {
 
 /*#region Browse/Sort*/
 .browse-container {
-  flex-grow: 1;
   padding-left: 20px;
   padding-right: 20px;
+}
+
+.sort-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+#sort-direction .arrow {
+  display: inline-block;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#sort-direction.descending .arrow {
+  transform: rotate(180deg);
+}
+
+#sort-direction:hover .arrow {
+  color: var(--interact-color);
 }
 
 .page-container {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
+  height: auto;
 }
 
 .page-container button {
   transition: color 0.2s ease;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .page-container button:hover {
   color: var(--interact-color);
 }
-/*#endregion Browse/Sort Section*/
+
+.page-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+/*#endregion*/
 
 /*#region Results*/
 .results-container {
@@ -315,6 +373,8 @@ button, select {
 }
 
 .result-container {
+  display: flex;
+  flex-direction: column;
   border-bottom: 1px solid var(--detail-color);
   padding: 20px;
 }
@@ -326,15 +386,31 @@ button, select {
 .result-title {
   text-align: center;
   font-size: 20px;
-  margin-bottom: 10px !important;
+  margin-bottom: 12px !important;
 }
 
-.result-cost {
+.cost-color {
   color: var(--cost-color);
 }
 
-.result-review {
+.review-color {
   color: var(--review-color);
+}
+
+.result-map-button {
+  border: 2px solid rgb(124, 0, 0);
+  background-color: rgb(238, 0, 0);
+  color: rgb(124, 0, 0);
+  font-weight: bold;
+  padding: 8px;
+  border-radius: 20px;
+  margin-top: 12px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.result-map-button:hover {
+  color: white;
 }
 /*#endregion Results Section*/
 
@@ -380,11 +456,12 @@ button, select {
 /*#endregion*/
 
 /*#region Debug*/
-.debug-section {
+.debug-container {
   flex: 1;
-  margin-left: 20px;
-  margin-right: 20px;
   overflow-y: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
 }
 
 .log-task-container {

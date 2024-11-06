@@ -54,6 +54,8 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
     let sortedPointer = 0;
     
     for (let i = 0; i < indexRange; i++) {
+      if (sortedPointer >= dupePointer) break;
+
       const value = sortBy[i];
 
       if (hashTable[value] == dataSetCount) sorted[sortedPointer++] = value;
