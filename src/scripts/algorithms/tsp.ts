@@ -150,26 +150,26 @@ function findMinimumDistanceToTypesAndEnd(graph: Graph, startId: number, endId: 
   dp[startId][startMask] = 0;
 
   // Iterate through all TNodes and category combinations
-for (let mask = 0; mask < (1 << categories.length); mask++) {
-  for (let currentTNode = 0; currentTNode < n; currentTNode++) {
-    if (dp[currentTNode][mask] < Infinity) {
-      // Check each TNode for potential paths
-      for (let nextTNode = 0; nextTNode < n; nextTNode++) {
-        if (nextTNode !== currentTNode) {
-          const nextMask = mask | categoryMap[TNodes[nextTNode].type]; // Update visited categories
-          const newDistance = dp[currentTNode][mask] + dist[currentTNode][nextTNode];
-          
-          // Check if this new distance is an improvement
-          if (newDistance < dp[nextTNode][nextMask]) {
-            // Perform the update
-            dp[nextTNode][nextMask] = newDistance;
-            previous[nextTNode][nextMask] = currentTNode; // Store the previous TNode
+  for (let mask = 0; mask < (1 << categories.length); mask++) {
+    for (let currentTNode = 0; currentTNode < n; currentTNode++) {
+      if (dp[currentTNode][mask] < Infinity) {
+        // Check each TNode for potential paths
+        for (let nextTNode = 0; nextTNode < n; nextTNode++) {
+          if (nextTNode !== currentTNode) {
+            const nextMask = mask | categoryMap[TNodes[nextTNode].type]; // Update visited categories
+            const newDistance = dp[currentTNode][mask] + dist[currentTNode][nextTNode];
+
+            // Check if this new distance is an improvement
+            if (newDistance < dp[nextTNode][nextMask]) {
+              // Perform the update
+              dp[nextTNode][nextMask] = newDistance;
+              previous[nextTNode][nextMask] = currentTNode; // Store the previous TNode
+            }
           }
         }
       }
     }
   }
-}
 
   // Find the minimum distance to the specified endId with all categories visited
   const allCategoriesMask = (1 << categories.length) - 1;
@@ -298,6 +298,13 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
   }
 
   // Reverse the path to get it from start to end
+  ptr = 0;
+let temp;
+  for (let i = 0; i < path.length / 2; i++) {
+    temp = path[i];
+    path[i] = path[path.length - 1 - i];
+    path[path.length - 1 - i] = temp;
+  }
   // path.reverse();
 
   return { distance: minDistance, path };
@@ -343,6 +350,7 @@ function goFrugal(
   sortedData: Uint32Array,
   fast: boolean = true
 ): { distance: number; path: TNode[]; possible: boolean } {
+  const t0 = performance.now();
   const sortedX: number[] = [];
   const sortedY: number[] = [];
   let speed;
@@ -387,7 +395,9 @@ function goFrugal(
   if (distanceInKm >= budget * 2) {
     return { distance: best.distance, path: best.path, possible: false };
   }
+  const t1 = performance.now();
   console.log({ distance: best.distance, path: best.path, possible: true })
+  logTask("Go Frugal", t1 - t0, `Found the best restaurants when starting at (${currentX}, ${currentY}).`);
   return { distance: best.distance, path: best.path, possible: true };
 }
 
@@ -424,6 +434,7 @@ function savingFuel(
   sortedData: Uint32Array,
   fast: boolean = true
 ): { distance: number; path: TNode[] } {
+  const t0 = performance.now();
   const sortedX = [];
   const sortedY = [];
   const sortedTypes = [];
@@ -443,7 +454,6 @@ function savingFuel(
     sortedY[i] = yData[index];
     sortedTypes[i] = typesData[index];
   }
-
   let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
     TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
@@ -454,5 +464,7 @@ function savingFuel(
     categories: deepCopy
   };
   const result = findMinimumDistanceToTypesAndEnd(graph, 0, speed);
+  const t1 = performance.now();
+  logTask("Saving Fuel", t1 - t0, `Found the best restaurants when starting at (${currentX}, ${currentY}) and ending at (${targetX}, ${targetY}).`);
   return result;
 }

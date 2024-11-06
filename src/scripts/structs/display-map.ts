@@ -105,7 +105,7 @@ class DisplayMap {
       app.data.y[app.sorted.y[0]],
       app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]] + 1
     );
-    
+
     this.loadQuadTree();
 
     this.range 
@@ -124,14 +124,14 @@ class DisplayMap {
     const gridY = floor(y/this.qtLeafSizeY);
 
     let index = 0;
-    
+
     for (let i = 0; i < DisplayMap.QT_SUBDIVISIONS; i++) {
       const xBit = (gridX >> i) & 1;
       const yBit = (gridY >> i) & 1;
-      
+
       index |= (xBit << (2*i)) | (yBit << (2*i + 1));
     }
-    
+
     return index;
   }
 
@@ -274,7 +274,7 @@ class DisplayMap {
   }
 
   public setPath(path: TNode[]) {
-    const first = path[path.length - 1];
+    const first = path[0];
 
     this.currentPath = path;
 
@@ -289,7 +289,6 @@ class DisplayMap {
     this.currentPath = null;
     this.render();
   }
-
   private drawLine(x0: number, y0: number, x1: number, y1: number, style: string, width: number) {
     this.context.beginPath();
     this.context.moveTo(x0, y0);
@@ -370,7 +369,8 @@ class DisplayMap {
       this.drawLine(0, screenY, this.width, screenY, style, lineWidth);
     }
 
-    if (this.currentPath) {
+    // Then, update your path-drawing code
+  if (this.currentPath) {
       for (let i = 0; i < this.currentPath.length; i++) {
         const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
 
@@ -419,7 +419,7 @@ class DisplayMap {
       this.infoDisplay.remove();
     }
   }
-  
+
   private displayRestaurantInfo(index: number, left: number, top: number) {
     const info = this.app.createRestaurantInfo(index);
 
@@ -497,12 +497,12 @@ class DisplayMap {
         const scaleRatio = this.height/(this.range*2);
 
         this.panCamera(-diffX/scaleRatio, diffY/scaleRatio);
-        
+
       } else {
         const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
 
         if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
-        else MAP_CANVAS.classList.remove("hover");
+          else MAP_CANVAS.classList.remove("hover");
       }
     });
 
