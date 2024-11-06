@@ -348,6 +348,8 @@ function goFrugal(
   combinations: string[][],
   budget: number,
   sortedData: Uint32Array,
+  endingX: number,
+  endingY: number,
   fast: boolean = true
 ): { distance: number; path: TNode[]; possible: boolean } {
   const t0 = performance.now();
@@ -373,6 +375,7 @@ function goFrugal(
   for (let i = 1; i < speed; i++) {
     TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
   }
+  TNodes[speed] = { id: speed, x: endingX, y: endingY, type: "END" };
   let graph: Graph = {
     TNodes,
     categories: [""]
@@ -382,7 +385,7 @@ function goFrugal(
   for (let i = 0; i < deepCopy.length; i++) {
     graph = { TNodes, categories: deepCopy[i] }
     graph.categories[graph.categories.length] = "START";
-    let result = findMinimumDistanceAnywhere(graph, 0);
+    let result = findMinimumDistanceToTypesAndEnd(graph, 0, speed);
     if (result.distance < best.distance) {
       best.path = result.path;
       best.distance = result.distance;

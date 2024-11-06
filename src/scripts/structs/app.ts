@@ -358,7 +358,7 @@ class App {
     });
 
     FRUGAL_BUTTON.addEventListener("click", () => {
-      const result = goFrugal(this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, getCombinations(this.sorted.cuisines), 100, this.sorted.distSorted);
+      const result = goFrugal(this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, getCombinations(this.sorted.cuisines), 100, this.sorted.distSorted, 0, 100);
       const path = result.path;
       const results = new Uint32Array(4);
 

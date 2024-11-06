@@ -287,7 +287,6 @@ class DisplayMap {
 
       // Gradually move cameraX and cameraY towards first.x and first.y
       if (Math.abs(first.x - obj.cameraX) > threshold || Math.abs(first.y - obj.cameraY) > threshold) {
-        console.log(obj.cameraX, obj.cameraY);
 
         // Adjusted lerp factor based on deltaTime
         const adjustedLerpFactor = lerpFactor;
