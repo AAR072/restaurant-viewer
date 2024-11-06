@@ -274,7 +274,7 @@ function goFrugal(
 
   let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = { id: i-1, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
+    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
   }
   let graph: Graph = {
     TNodes,
@@ -337,7 +337,7 @@ function savingFuel(
 
   let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = { id: i-1, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
+    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
   }
   TNodes[speed] = { id: speed, x: targetX, y: targetY, type: "END" }
   let graph: Graph = {
