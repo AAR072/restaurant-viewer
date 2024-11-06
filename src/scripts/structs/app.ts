@@ -211,21 +211,22 @@ class App {
     idSpan.innerHTML = `<strong>ID:</strong> ${this.data.ID[index]}`;
 
     const nameSpan = document.createElement("p");
-    nameSpan.innerHTML = `<strong>Name:</strong> <em>${this.data.storeName[index]}</em>`;
+    nameSpan.innerHTML = `<strong>Name:</strong> ${this.data.storeName[index]}`;
 
     const typeSpan = document.createElement("p");
-    typeSpan.innerHTML = `<strong>Type:</strong> <em>${this.data.type[index]}</em>`;
+    typeSpan.innerHTML = `<strong>Type:</strong> ${this.data.type[index]}`;
 
     const costSpan = document.createElement("p");
     costSpan.innerHTML = `<strong>Cost:</strong> $${this.data.cost[index].toFixed(2)}`;
     costSpan.className = "result-cost";
 
     const reviewSpan = document.createElement("p");
-    reviewSpan.innerHTML = `<strong>Review:</strong> ${this.data.review[index].toFixed(1)}`;
+    reviewSpan.innerHTML = `<strong>Review:</strong> &#9733;${this.data.review[index].toFixed(1)}`;
     reviewSpan.className = "result-review";
 
     const positionSpan = document.createElement("p");
     positionSpan.innerHTML = `<strong>Position:</strong> (x: ${this.data.x[index] * App.UNIT_SCALE}m, y: ${this.data.y[index] * App.UNIT_SCALE}m)`;
+
     div.appendChild(idSpan);
     div.appendChild(nameSpan);
     div.appendChild(typeSpan);

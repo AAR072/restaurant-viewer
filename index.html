@@ -63,8 +63,8 @@
             </div>
 
             <div id="review-range" class="double-slider">
-              <span class="slider-min-text">&#9733<span></span></span>
-              <span class="slider-max-text">&#9733<span></span></span>
+              <span class="slider-min-text">&#9733;<span></span></span>
+              <span class="slider-max-text">&#9733;<span></span></span>
               <div class="progress review"></div>
               <input class="min-range" type="range">
               <input class="max-range" type="range">
@@ -86,20 +86,20 @@
           <button id="sort-direction">Ascending</button>
         </div>
 
-        <div>
-          <!-- fix spacing here with labels n stuff -->
-          <label for="page-size">Page Size: </label>
-          <span id="page-size" span-placeholder="(1 - 100)" value="0"></span>
-          <br>
+        <div class="page-container">
+          <button id="prev-page" class="page-button" type="button">&#11207;</button>
 
-          <label for="page-number-input">Page: </label>
-          <span id="page-number-input"></span>
-          <span> / </span>
-          <span id="page-count">0</span>
-          <br>
+          <div>
+            <label for="page-size">Results Per Page:</label>
+            <span id="page-size"></span>
+            <br>
+            <span>Page</span>
+            <span id="page-number-input"></span>
+            <span>/</span>
+            <span id="page-count"></span>
+          </div>
 
-          <button id="prev-page">Previous Page</button>
-          <button id="next-page">Next Page</button>
+          <button id="next-page" class="page-button" type="button">&#11208;</button>
         </div>
       </div>
 
