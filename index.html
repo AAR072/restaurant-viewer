@@ -100,7 +100,7 @@
           </span>
 
           <button id="sort-direction" class="sort-direction">
-            <span id="sort-dir-text"></span> 
+            <span id="sort-dir-text" class="sort-dir-text"></span> 
             <span class="sort-dir-arrow">&#11205;</span>
           </button>
         </div>
@@ -132,17 +132,20 @@
     <div id="map-container" class="map-container">
       <canvas id="map-canvas"></canvas>
 
-      <div class="map-main-info" hidden>
-        <label for="map-grid-scale">Grid Scale</label>
-        <span id="map-grid-scale"></span>
-        <br>
-  
-        <label>Position: </label>
-        <span>(x: <input id="map-position-x"/>m, y: <input id="map-position-y"/>m)</span>
-        <br>
-  
+      <div class="map-top-bar">
+        <div class="map-bar-item">
+          <span>Your Location: </span>
+          <span>(x: <span id="location-x"></span>m, y: <span id="location-y"></span>m)</span>
+        </div>
+      </div>
+
+      <div class="map-bottom-bar">
+        <div>
+          <span>Grid Square Size</span>
+          <span id="map-grid-scale"></span>
+        </div>
+
         <button>Center</button>
-        <br>
         <button>Default Focus</button>
       </div>
     </div>

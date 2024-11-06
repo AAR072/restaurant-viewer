@@ -106,3 +106,7 @@ function getDistance(x0: number, y0: number, x1: number, y1: number): number {
 function geoSeries(r: number, n: number) {
   return (r**n - 1)/(r - 1);
 }
+
+function lerp(n0: number, n1: number, t: number) {
+  return n0 + (n1 - n0)*t;
+}

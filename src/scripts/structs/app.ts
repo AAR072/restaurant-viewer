@@ -24,6 +24,9 @@ const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElem
 
 const SAVE_FUEL_CHECKLIST = document.getElementById("save-fuel-checklist") as HTMLDivElement;
 const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButtonElement;
+
+const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
+const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
 // #endregion
 
 // Our database after it is sorted
@@ -75,6 +78,9 @@ class App {
 
   public fuelSaveChecklist: Checklist;
 
+  public locationXTextbox: ScalingTextbox;
+  public locationYTextbox: ScalingTextbox;
+
   /**
    * Initializes the App with the given data and sorts it accordingly.
    *
@@ -102,7 +108,9 @@ class App {
 
     this.loadTypes();
 
-    // Calculate and update distances based on current location.
+    this.locationXTextbox = new ScalingTextbox(LOCATION_X, 0);
+    this.locationYTextbox = new ScalingTextbox(LOCATION_Y, 0);
+
     this.updateDistances();
 
     this.costSlider = new DoubleSlider(COST_RANGE,
@@ -188,6 +196,9 @@ class App {
    * @timecomplexity O(n) - The distance calculation iterates over the list of restaurants, resulting in a linear time complexity.
    */
   public updateDistances() {
+    this.locationXTextbox.setValue(this.locationX*App.UNIT_SCALE);
+    this.locationYTextbox.setValue(this.locationY*App.UNIT_SCALE);
+
     for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
@@ -400,6 +411,26 @@ class App {
 
       this.currentSearch = new SearchResult(this, new Uint32Array(results));
       this.displayMap.setPath(path);
+    });
+
+    this.locationXTextbox.addListener(() => {
+      const value = this.locationXTextbox.value/App.UNIT_SCALE;
+
+      if (this.locationX == value) return;
+
+      this.locationX = value;
+
+      this.updateDistances();
+    });
+
+    this.locationYTextbox.addListener(() => {
+      const value = this.locationYTextbox.value/App.UNIT_SCALE;
+
+      if (this.locationY == value) return;
+
+      this.locationY = value;
+
+      this.updateDistances();
     });
   }
 }
