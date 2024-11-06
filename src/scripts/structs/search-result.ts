@@ -245,10 +245,18 @@ class SearchResult {
     this.app.pageSizeTextbox.setValue(SearchResult.pageSize); // Update page size input.
     this.app.pageTextbox.setValue(this.page + 1); // Update current page number (1-based index).
     PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
-
-    if (this.descending) SORT_DIRECTION.classList.add("descending");
-    else SORT_DIRECTION.classList.remove("descending");
-
+    let element = document.getElementById("directionTest");
+    if (this.descending) {
+      SORT_DIRECTION.classList.add("descending");
+      if (element){
+      element.innerText = "Descending";
+      }
+    } else { 
+      SORT_DIRECTION.classList.remove("descending");
+      if (element){
+      element.innerText = "Ascending";
+      }
+    }
     SEARCH_RESULTS.innerHTML = ""; // Clear previous results.
 
     // Loop through the number of results per page and load them.
