@@ -21,6 +21,8 @@ const PAGE_NUMBER_SPAN = document.getElementById("page-number-input") as HTMLSpa
 const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
 const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
+
+const SAVE_FUEL_CHECKLIST = document.getElementById("save-fuel-checklist") as HTMLDivElement;
 const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButtonElement;
 // #endregion
 
@@ -67,8 +69,11 @@ class App {
 
   public costSlider: DoubleSlider;
   public reviewSlider: DoubleSlider;
+
   public pageSizeTextbox: ScalingTextbox;
   public pageTextbox: ScalingTextbox;
+
+  public fuelSaveChecklist: Checklist;
 
   /**
    * Initializes the App with the given data and sorts it accordingly.
@@ -118,6 +123,8 @@ class App {
     // Initialize the current search with store names and an empty query.
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
     this.displayMap = new DisplayMap(this);
+
+    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
 
     this.initInput(); // Set up input handling for searches.
   }
@@ -370,18 +377,28 @@ class App {
       this.displayMap.setPath(path);
     });
 
-    SAVE_FUEL_BUTTON.addEventListener("click", () => {
-      const result = savingFuel(["Pizza", "Coffee", "Chinese", "Indian", "Italian", "Mexican"],
-        this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, 0, 100, this.sorted.distSorted
-      );
-      const path = result.path;
-      const results = new Uint32Array(4);
+    this.fuelSaveChecklist.addListener((value: string[] | null) => {
+      if (!value || value.length < 1) SAVE_FUEL_BUTTON.disabled = true;
+      else SAVE_FUEL_BUTTON.disabled = false;
+    });
 
-      for (let i = 0; i < 4; i++) {
-        results[i] = path[i + 1].id;
+    SAVE_FUEL_BUTTON.disabled = true;
+
+    SAVE_FUEL_BUTTON.addEventListener("click", () => {
+      const selected = this.fuelSaveChecklist.value;
+      console.log(selected)
+
+      if (!selected || selected.length < 1) return;
+
+      const result = savingFuel(selected, this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, 0, 100, this.sorted.distSorted);
+      const path = result.path;
+      const results = [];
+
+      for (let i = 1; i < path.length - 1; i++) {
+        results[i] = path[i].id;
       }
 
-      this.currentSearch = new SearchResult(this, results);
+      this.currentSearch = new SearchResult(this, new Uint32Array(results));
       this.displayMap.setPath(path);
     });
   }

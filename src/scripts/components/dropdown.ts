@@ -1,11 +1,16 @@
 class Dropdown {
   static currentDropdown: Dropdown | null = null;
 
+  public content: HTMLDivElement;
+
   constructor(public element: HTMLDivElement) {
     const button = element.querySelector(".dropdown-button") as HTMLButtonElement;
     const content = element.querySelector(".dropdown-content") as HTMLDivElement;
 
-    content.style.height = (content.scrollHeight) + "px";
+    this.content = content;
+
+    this.updateHeight();
+
     element.classList.add("hide");
 
     button.addEventListener("click", () => {
@@ -22,13 +27,19 @@ class Dropdown {
     });
   }
 
+  private updateHeight() {
+    this.content.style.height = (this.content.scrollHeight) + "px";
+  }
+
   public up() {
+    this.updateHeight();
     this.element.classList.add("hide");
     
     Dropdown.currentDropdown = null;
   }
 
   public down() {
+    this.updateHeight();
     this.element.classList.remove("hide");
 
     Dropdown.currentDropdown = this;

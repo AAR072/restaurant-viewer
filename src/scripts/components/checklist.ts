@@ -14,6 +14,7 @@ class Checklist {
 
   public checked: boolean[];
   public checkCount: number = 0;
+  public value: string[] | null;
 
   private callback: ChecklistCallback;
 
@@ -74,10 +75,8 @@ class Checklist {
   }
 
   private update() {
-    console.log(this.checkCount);
-
     if (this.anyOption && this.anyOption.checked) {
-      if (this.callback) this.callback(null);
+      this.value = null;
 
     } else {
       const selected: string[] = new Array(this.checkCount);
@@ -101,8 +100,10 @@ class Checklist {
         }
       }
 
-      if (this.callback) this.callback(selected);
+      this.value = selected;
     }
+
+    if (this.callback) this.callback(this.value);
   }
 
   private createOption(index: number) {
@@ -112,7 +113,7 @@ class Checklist {
 
     this.optionInputs[index] = checkbox;
     this.optionInputs[index] = checkbox;
-
+    
     checkbox.addEventListener("input", () => {
       this.checkOption(index);
     });

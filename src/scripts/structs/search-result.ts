@@ -1,5 +1,7 @@
 const SEARCH_RESULTS = document.getElementById("search-results") as HTMLDivElement;
 
+const SORT_DIR_TEXT = document.getElementById("sort-dir-text") as HTMLDivElement;
+
 type SortFieldType = "storeName" | "cost" | "review";
 
 /**
@@ -245,18 +247,16 @@ class SearchResult {
     this.app.pageSizeTextbox.setValue(SearchResult.pageSize); // Update page size input.
     this.app.pageTextbox.setValue(this.page + 1); // Update current page number (1-based index).
     PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
-    let element = document.getElementById("directionTest");
+
     if (this.descending) {
       SORT_DIRECTION.classList.add("descending");
-      if (element){
-      element.innerText = "Descending";
-      }
-    } else { 
+      SORT_DIR_TEXT.innerText = "Descending";
+
+    } else {
       SORT_DIRECTION.classList.remove("descending");
-      if (element){
-      element.innerText = "Ascending";
-      }
+      SORT_DIR_TEXT.innerText = "Ascending"
     }
+
     SEARCH_RESULTS.innerHTML = ""; // Clear previous results.
 
     // Loop through the number of results per page and load them.

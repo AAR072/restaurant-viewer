@@ -34,6 +34,11 @@ button, select {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: none;
+  color: var(--secondary-color) !important;
+}
+
 select option {
   background-color: var(--bubble-color);
 }
@@ -326,16 +331,16 @@ button:hover, select:hover {
   margin-bottom: 18px;
 }
 
-#sort-direction .arrow {
+.sort-direction .sort-dir-arrow {
   display: inline-block;
   transition: transform 0.2s ease, color 0.2s ease;
 }
 
-#sort-direction.descending .arrow {
+.sort-direction.descending .sort-dir-arrow {
   transform: rotate(180deg);
 }
 
-#sort-direction:hover .arrow {
+.sort-direction:hover .sort-dir-arrow {
   color: var(--interact-color);
 }
 
@@ -482,3 +487,16 @@ background-color: #3A3A3A;
   opacity: 0;
 }
 /*#endregion Debug*/
+
+/*#region Path Search*/
+.path-search-container {
+  display: flex;
+  flex-direction: row;
+  padding: 20px;
+  gap: 20px;
+}
+
+.path-search-type {
+  flex-grow: 1;
+}
+/*#endregion*/
