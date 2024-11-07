@@ -287,8 +287,11 @@ class DisplayMap {
   }
 
   public centerCamera() {
-    this.cameraX = (this.mapRect.x0 + this.mapRect.x1)/2;
-    this.cameraY = (this.mapRect.y0 + this.mapRect.y1)/2;
+    this.animateCamera((this.mapRect.x0 + this.mapRect.x1)/2, (this.mapRect.y0 + this.mapRect.y1)/2, DisplayMap.MAX_ZOOM);
+  }
+
+  public focusCamera(x: number, y: number){
+    this.animateCamera(x, y, DisplayMap.MAX_ZOOM / 2);
   }
 
   public panCamera(x: number, y: number) {

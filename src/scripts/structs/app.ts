@@ -27,6 +27,9 @@ const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButt
 
 const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
 const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
+
+const CENTER_BUTTON = document.getElementById("center-button") as HTMLButtonElement;
+const FOCUS_BUTTON = document.getElementById("focus-button") as HTMLButtonElement;
 // #endregion
 
 // Our database after it is sorted
@@ -387,6 +390,14 @@ class App {
       this.displayMap.setPath(path);
     });
 
+    CENTER_BUTTON.addEventListener("click", () => {
+      this.displayMap.centerCamera();
+    });
+
+    FOCUS_BUTTON.addEventListener("click", () => {
+      this.displayMap.focusCamera(this.locationX,this.locationY);
+    });
+
     this.fuelSaveChecklist.addListener((value: string[] | null) => {
       if (!value || value.length < 1) SAVE_FUEL_BUTTON.disabled = true;
       else SAVE_FUEL_BUTTON.disabled = false;
@@ -433,3 +444,4 @@ class App {
     });
   }
 }
+
