@@ -140,7 +140,7 @@ class App {
     this.destXTextbox = new ScalingTextbox(DESTINATION_X, 0, 0);
     this.destYTextbox = new ScalingTextbox(DESTINATION_Y, 0, 0);
     this.budgetTextbox = new ScalingTextbox(FRUGAL_BUDGET_SPAN, 0, 10);
-    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
+    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 9);
 
     // Initialize the current search with store names and an empty query.
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
