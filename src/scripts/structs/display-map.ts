@@ -9,6 +9,7 @@ const MAP_SET_DEST = document.getElementById("map-set-dest") as HTMLButtonElemen
 
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
+LOCATION_ICON.alt = "Refresh the page to load icons";
 
 function constantRandom(seed: number, index: number): number {
   const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
@@ -77,7 +78,7 @@ class MapAnimation {
 
   private getTimeProgress(): number {
     if (this.progress > 0.5) return 1/2*((this.progress - 1)*2)**3 + 1;
-    else return 1/2*(this.progress*2)**3;
+      else return 1/2*(this.progress*2)**3;
   }
 
   private animationStep(time: number) {
@@ -303,7 +304,7 @@ class DisplayMap {
 
   public changeZoom(delta: number) {
     this.clearAnimation();
-    
+
     this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
 
     this.setRangeScale();
@@ -450,10 +451,15 @@ class DisplayMap {
         } else {
           this.drawText(`Path Distance: ${round(this.currentPathDist*App.UNIT_SCALE)}m`, x0 + 14, y0, "rgb(150, 150, 150)", "12px Ubuntu");
         }
-        
+
         this.drawCircle(x0, y0, 10, "#edab00");
       }
+      let cl = this.currentPath.length-1;
+      const [x0, y0] = this.getScreenPos(this.currentPath[cl].x, this.currentPath[cl].y);
+      this.drawCircle(x0, y0, 15, "red");
     }
+    const [Sx0,Sy0] = this.getScreenPos(this.app.locationX, this.app.locationY);
+    this.drawCircle(Sx0,Sy0,15,"#15ff0d");
 
     const zoomDepth = Math.log2(this.mapRect.h/this.range) + 1.5;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);

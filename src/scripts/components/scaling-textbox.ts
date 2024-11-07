@@ -37,6 +37,8 @@ class ScalingTextbox {
     else this.setValue(this.value);
 
     if (this.listener) this.listener();
+    // >:)
+    app.displayMap.render();
   }
 
   public addListener(callback: STCallback) {
