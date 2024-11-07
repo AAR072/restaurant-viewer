@@ -454,12 +454,7 @@ class DisplayMap {
 
         this.drawCircle(x0, y0, 10, "#edab00");
       }
-      let cl = this.currentPath.length-1;
-      const [x0, y0] = this.getScreenPos(this.currentPath[cl].x, this.currentPath[cl].y);
-      this.drawCircle(x0, y0, 15, "red");
     }
-    const [Sx0,Sy0] = this.getScreenPos(this.app.locationX, this.app.locationY);
-    this.drawCircle(Sx0,Sy0,15,"#15ff0d");
 
     const zoomDepth = Math.log2(this.mapRect.h/this.range) + 1.5;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);
@@ -485,6 +480,10 @@ class DisplayMap {
       this.context.drawImage(LOCATION_ICON, screenX - LOCATION_ICON.width/2, screenY - LOCATION_ICON.height, LOCATION_ICON.width, LOCATION_ICON.height);
       this.drawText(this.app.data.storeName[restIndex], screenX + LOCATION_ICON.width/2 + 4, screenY - LOCATION_ICON.width/2, "rgb(150, 150, 150", "16px Ubuntu");
     }
+
+    const [userScreenX, userScreenY] = this.getScreenPos(this.app.locationX, this.app.locationY);
+
+    this.drawCircle(userScreenX, userScreenY, 12,"#15ff0d");
   }
 
   private positionMapElement(element: HTMLDivElement, left: number, top: number) {
