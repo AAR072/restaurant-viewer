@@ -165,7 +165,7 @@ class MapAnimation {
 class DisplayMap {
   static ZOOM_SPEED = 0.001;
   static MIN_ZOOM = 1;
-  static MAX_ZOOM = 10;
+  static MAX_ZOOM = 999;
 
   /**
    * Amount of grid squares for half the height of the screen.
@@ -518,7 +518,11 @@ class DisplayMap {
           this.drawText(`Path Distance: ${round(this.currentPathDist*App.UNIT_SCALE)}m`, x0 + 14, y0, "rgb(150, 150, 150)", "12px Ubuntu");
         }
 
-        this.drawCircle(x0, y0, 10, "#edab00");
+        if (i == this.currentPath.length-1) {
+          this.drawCircle(x0, y0, 10, "#edab00");
+        } else {
+          this.drawCircle(x0, y0, 10, "blue");
+        }
       }
     }
 
