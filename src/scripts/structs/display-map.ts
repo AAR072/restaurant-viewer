@@ -158,42 +158,28 @@ class MapAnimation {
   }
 }
 
-/**
- * Represents the application's map, storing all relevant properties and methods.
- */
+/** Represents the application's map, storing all relevant properties and methods. */
 class DisplayMap {
   static ZOOM_SPEED: number = 0.001;
   static MIN_ZOOM: number = 1;
   static MAX_ZOOM: number = 11;
 
-  /**
-   * Amount of grid squares for half the height of the screen.
-   */
+  /** Amount of grid squares for half the height of the screen. */
   static GRID_RANGE_FACTOR: number = 16;
-  /**
-   * Affects the amount of restaurants displayed on the screen.
-   */
+  /** Affects the amount of restaurants displayed on the screen. */
   static DISPLAY_COUNT_FACTOR: number = 1.8;
-  /**
-   * Amount of quadtree subdivisions.
-   */
+  /** Amount of quadtree subdivisions. */
   static QT_SUBDIVISIONS: number = 6;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
-
   public zoom: number = 4;
-  /**
-   * The unit range displayed 
-   */
+
+  /** The unit range displayed */
   public range: number;
-  /**
-   * Factor used to normalize 
-   */
+  /** Factor used to normalize the data coordinate system to pixels and vice versa. */
   public scaleRatio: number;
-  /**
-   * Aspect ratio of the screen (width divided by height).
-   */
+  /** Aspect ratio of the screen (width divided by height). */
   public aspectRatio: number;
 
   public context: CanvasRenderingContext2D;
@@ -201,18 +187,21 @@ class DisplayMap {
   public height: number;
   public bounds: DOMRect;
 
-  /**
-   * The 
-   */
+  /** The rectangle of the map, using the minimum and maximum x and y values of the data as bounds. */
   public mapRect: Rectangle;
 
+  /** The quadtree array, using rectangles to represent each quad. */
   public quadTree: Rectangle[];
+  /** The amount of quads in the quadtree. */
   public qtSize: number;
+  /** The amount of leaves in the quadtree. */
   public qtLeaves: number;
+  /** The restaurants contained each leaf for all of the leaves. */
   public qtRestaurants: number[][];
   public qtLeafSizeX: number;
   public qtLeafSizeY: number;
 
+  /** Currently displayed restaurants, based on the last render call. */
   public visibleRests: number[];
   public infoDisplay: HTMLDivElement | null = null;
   public positionInfoX: number | null = null;
@@ -223,6 +212,10 @@ class DisplayMap {
   public currentPath: TNode[] | null = null;
   public currentPathDist: number | null = null;
 
+  /**
+   * 
+   * @param app The app instance tied to the map
+   */
   constructor(public app: App) {
     this.context = MAP_CANVAS.getContext("2d")!;
 
@@ -251,13 +244,20 @@ class DisplayMap {
     }
   }
 
-  // find index of leaf containing point using morton/z-curve index method
+  /**
+   * Uses the z-curve index method and bit interleaving to find the quad leaf containing a point.
+   * @param x Position x value
+   * @param y Position y value
+   * @returns The index of the quad leaf containing the point (`x`, `y`)
+   * @timecomplexity O(1)
+   */
   private getQuadLeaf(x: number, y: number): number {
-    const gridX = floor(x/this.qtLeafSizeX);
-    const gridY = floor(y/this.qtLeafSizeY);
+    const gridX = floor(x/this.qtLeafSizeX); // Round x coordinate to leaf grid
+    const gridY = floor(y/this.qtLeafSizeY); // Round y coordinate to leaf grid
 
     let index = 0;
 
+    // Interleave gridX and gridY bits to find quad leaf index
     for (let i = 0; i < DisplayMap.QT_SUBDIVISIONS; i++) {
       const xBit = (gridX >> i) & 1;
       const yBit = (gridY >> i) & 1;
@@ -268,6 +268,10 @@ class DisplayMap {
     return index;
   }
 
+  /**
+   * Loads all of the quad tree rectangles and the restaurants contained in each leaf.
+   * @timecomplexity O(n)
+   */
   private loadQuadTree() {
     this.qtSize = geoSeries(4, DisplayMap.QT_SUBDIVISIONS + 1);
     this.qtLeaves = 4**DisplayMap.QT_SUBDIVISIONS;
@@ -289,6 +293,12 @@ class DisplayMap {
     }
   }
 
+  /**
+   * Recursively subdivides a given quad `count` amount of times.
+   * @param quad The quad rectangle being subdivided
+   * @param index The index of the quad being subdivided
+   * @param count The amount of subdivisions left
+   */
   private subdivideQuads(quad: Rectangle, index: number = 0, count: number = DisplayMap.QT_SUBDIVISIONS) {
     if (count < 0) return;
 
@@ -529,16 +539,16 @@ class DisplayMap {
         if (i < this.currentPath.length - 1) {
           const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
 
-          this.drawLine(x0, y0, x1, y1, "rgb(255, 255, 255)", 5);
+          this.drawLine(x0, y0, x1, y1, "white", 5);
 
         } else {
           this.drawText(`Path Distance: ${round(this.currentPathDist*App.UNIT_SCALE)}m`, x0 + 14, y0, "rgb(150, 150, 150)", "12px Ubuntu");
         }
 
-        if (i == this.currentPath.length-1) {
-          this.drawCircle(x0, y0, 10, "#edab00");
+        if (i == 0 || i == this.currentPath.length - 1) {
+          this.drawCircle(x0, y0, 12, "#edab00");
         } else {
-          this.drawCircle(x0, y0, 10, "blue");
+          this.drawCircle(x0, y0, 10, "#259afa");
         }
       }
     }

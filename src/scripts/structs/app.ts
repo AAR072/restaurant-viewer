@@ -27,6 +27,9 @@ const DESTINATION_Y = document.getElementById("path-dest-y") as HTMLSpanElement;
 
 const FRUGAL_BUDGET_SPAN = document.getElementById("frugal-budget") as HTMLSpanElement;
 const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
+const FRUGAL_RESULT = document.getElementById("frugal-result") as HTMLDivElement;
+const FRUGAL_COST = document.getElementById("frugal-cost") as HTMLSpanElement;
+const FRUGAL_SUCCESS = document.getElementById("frugal-success") as HTMLSpanElement;
 
 const SAVE_FUEL_CHECKLIST = document.getElementById("save-fuel-checklist") as HTMLDivElement;
 const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButtonElement;
@@ -386,6 +389,10 @@ class App {
       if (this.pageTextbox.value != null) this.currentSearch.setPage(this.pageTextbox.value);
     });
 
+    let resultCount: number = 0;
+
+    FRUGAL_RESULT.hidden = true;
+
     FRUGAL_BUTTON.addEventListener("click", () => {
       const destX = this.destXTextbox.value/App.UNIT_SCALE;
       const destY = this.destYTextbox.value/App.UNIT_SCALE;
@@ -405,6 +412,21 @@ class App {
 
       this.currentSearch = new SearchResult(this, results);
       this.displayMap.setPath(path, result.distance);
+
+      FRUGAL_RESULT.classList.add("show");
+      FRUGAL_COST.innerText = "$" + (result.distance*App.UNIT_SCALE/1000*0.5).toFixed(2);
+      FRUGAL_SUCCESS.innerText = `Fuel Cost ${result.possible ? "Within" : "Exceeds"} Budget`;
+
+      if (result.possible) FRUGAL_SUCCESS.classList.remove("unsuccessful");
+      else FRUGAL_SUCCESS.classList.add("unsuccessful");
+
+      resultCount++;
+
+      window.setTimeout(() => {
+        resultCount--;
+
+        if (resultCount == 0) FRUGAL_RESULT.classList.remove("show");
+      }, 3000)
     });
 
     this.fuelSaveChecklist.addListener((value: string[] | null) => {

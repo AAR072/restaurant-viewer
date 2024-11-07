@@ -622,4 +622,27 @@ button:hover, select:hover {
   gap: 10px;
   padding: 10px;
 }
+
+.frugal-result {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.frugal-result.show {
+  display: flex;
+}
+
+.frugal-cost {
+  color: var(--cost-color);
+}
+
+.frugal-success {
+  color: var(--interact-color);
+}
+
+.frugal-success.unsuccessful {
+  color: var(--warning-color);
+}
 /*#endregion*/
