@@ -399,7 +399,6 @@ function goFrugal(
     return { distance: best.distance, path: best.path, possible: false };
   }
   const t1 = performance.now();
-  console.log({ distance: best.distance, path: best.path, possible: true })
   logTask("Go Frugal", t1 - t0, `Found the best restaurants when starting at (${currentX}, ${currentY}).`);
   return { distance: best.distance, path: best.path, possible: true };
 }

@@ -2,10 +2,12 @@ const MAP_CONTAINER = document.getElementById("map-container") as HTMLDivElement
 const MAP_CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
 const MAP_GRID_SCALE = document.getElementById("map-grid-scale") as HTMLSpanElement;
 
-const LOCATION_ICON = new Image();
-LOCATION_ICON.src = "assets/location-icon.png";
+const MAP_INFO = document.getElementById("map-info") as HTMLDivElement;
+const MAP_INFO_POS = document.getElementById("map-info-pos") as HTMLParagraphElement;
+const MAP_SET_LOCATION = document.getElementById("map-set-location") as HTMLButtonElement;
+const MAP_SET_DEST = document.getElementById("map-set-dest") as HTMLButtonElement;
 
-const USER_LOCATION_ICON = new Image();
+const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
 function constantRandom(seed: number, index: number): number {
@@ -104,8 +106,6 @@ class MapAnimation {
 }
 
 class DisplayMap {
-  static TEXT_SIZE = 16;
-
   static ZOOM_SPEED = 0.001;
   static MIN_ZOOM = 1;
   static MAX_ZOOM = 10;
@@ -137,10 +137,13 @@ class DisplayMap {
 
   public visibleRests: number[];
   public infoDisplay: HTMLDivElement | null = null;
+  public positionInfoX: number | null = null;
+  public positionInfoY: number | null = null;
 
   public animation: MapAnimation | null = null;
 
   public currentPath: TNode[] | null = null;
+  public currentPathDist: number | null = null;
 
   constructor(public app: App) {
     this.context = MAP_CANVAS.getContext("2d")!;
@@ -292,8 +295,8 @@ class DisplayMap {
   public panCamera(x: number, y: number) {
     this.clearAnimation();
 
-    this.cameraX = clamp(this.cameraX + x, this.mapRect.x0, this.mapRect.x1);
-    this.cameraY = clamp(this.cameraY + y, this.mapRect.y0, this.mapRect.y1);
+    this.cameraX += x;
+    this.cameraY += y;
 
     this.render();
   }
@@ -307,7 +310,9 @@ class DisplayMap {
     this.render();
   }
 
-  public animateCamera(goalX: number, goalY: number, goalZoom: number) {
+  public animateCamera(goalX: number, goalY: number, goalZoom: number = DisplayMap.MIN_ZOOM) {
+    this.clearAnimation();
+
     const initialX = this.cameraX;
     const initialY = this.cameraY;
     const initialZoom = this.zoom;
@@ -332,18 +337,20 @@ class DisplayMap {
     const x = this.app.data.x[index];
     const y = this.app.data.y[index];
 
-    this.animateCamera(x, y, DisplayMap.MIN_ZOOM);
+    this.animateCamera(x, y);
   }
 
-  public setPath(path: TNode[]) {
-    const first = path[0];
+  public setPath(path: TNode[], dist: number) {
+    const last = path[path.length - 1];
 
     this.currentPath = path;
-    this.animateCamera(first.x, first.y, DisplayMap.MIN_ZOOM);
+    this.currentPathDist = dist;
+    this.animateCamera(last.x, last.y);
   }
 
   public clearPath() {
     this.currentPath = null;
+    this.currentPathDist = null;
     this.render();
   }
 
@@ -365,6 +372,12 @@ class DisplayMap {
     this.context.fill();
   }
 
+  public drawText(text: string, x: number, y: number, style: string, font: string) {
+    this.context.fillStyle = style;
+    this.context.font = font;
+    this.context.fillText(text, x, y);
+  }
+
   private getScreenPos(x: number, y: number): number[] {
     return [
       this.width/2 + (x - this.cameraX)*this.scaleRatio,
@@ -372,9 +385,8 @@ class DisplayMap {
     ]
   }
 
-  private render() {
+  public render() {
     this.context.clearRect(0, 0, this.width, this.height);
-    this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
 
     const screenRect = new Rectangle(
       this.cameraX - this.range*this.aspectRatio,
@@ -426,7 +438,7 @@ class DisplayMap {
     }
 
     // Then, update your path-drawing code
-    if (this.currentPath) {
+    if (this.currentPath && this.currentPathDist) {
       for (let i = 0; i < this.currentPath.length; i++) {
         const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
 
@@ -434,6 +446,9 @@ class DisplayMap {
           const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
 
           this.drawLine(x0, y0, x1, y1, "rgb(255, 255, 255)", 5);
+
+        } else {
+          this.drawText(`Path Distance: ${round(this.currentPathDist*App.UNIT_SCALE)}m`, x0 + 14, y0, "rgb(150, 150, 150)", "12px Ubuntu");
         }
         
         this.drawCircle(x0, y0, 10, "#edab00");
@@ -462,16 +477,22 @@ class DisplayMap {
       const [screenX, screenY] = this.getScreenPos(this.app.data.x[restIndex], this.app.data.y[restIndex]);
 
       this.context.drawImage(LOCATION_ICON, screenX - LOCATION_ICON.width/2, screenY - LOCATION_ICON.height, LOCATION_ICON.width, LOCATION_ICON.height);
-      this.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-      this.context.fillText(this.app.data.storeName[restIndex], screenX + LOCATION_ICON.width/2 + 4, screenY - LOCATION_ICON.width/2);
+      this.drawText(this.app.data.storeName[restIndex], screenX + LOCATION_ICON.width/2 + 4, screenY - LOCATION_ICON.width/2, "rgb(150, 150, 150", "16px Ubuntu");
     }
   }
 
-  private clearInfo() {
-    if (this.infoDisplay) {
-      this.infoDisplay.remove();
-      this.infoDisplay = null;
-    }
+  private positionMapElement(element: HTMLDivElement, left: number, top: number) {
+    const divWidth = element.offsetWidth;
+    const divHeight = element.offsetHeight;
+
+    left = clamp(left, 0, this.width);
+    top = clamp(top, 0, this.height);
+
+    if (left + divWidth > this.width) left -= divWidth;
+    if (top + divHeight > this.height) top -= divHeight;
+
+    element.style.left = left + "px";
+    element.style.top = top + "px";
   }
 
   private displayRestaurantInfo(index: number, left: number, top: number) {
@@ -484,18 +505,33 @@ class DisplayMap {
     MAP_CONTAINER.appendChild(div);
 
     this.infoDisplay = div;
+    this.positionMapElement(div, left, top);
+  }
 
-    const infoWidth = div.offsetWidth;
-    const infoHeight = div.offsetHeight;
+  private clearInfo() {
+    if (this.infoDisplay) {
+      this.infoDisplay.remove();
+      this.infoDisplay = null;
+    }
+  }
 
-    left = clamp(left, 0, this.width);
-    top = clamp(top, 0, this.height);
+  private displayPositionInfo(left: number, top: number) {
+    const x = (left - this.width/2)/this.scaleRatio + this.cameraX;
+    const y = (this.height/2 - top)/this.scaleRatio + this.cameraY;
 
-    if (left + infoWidth > this.width) left -= infoWidth;
-    if (top + infoHeight > this.height) top -= infoHeight;
+    MAP_INFO.hidden = false;
+    MAP_INFO_POS.innerText = `(${round(x*App.UNIT_SCALE)}m, ${round(y*App.UNIT_SCALE)}m)`;
 
-    div.style.left = left + "px";
-    div.style.top = top + "px";
+    this.positionInfoX = x;
+    this.positionInfoY = y;
+    this.positionMapElement(MAP_INFO, left, top);
+  }
+
+  private clearPositionInfo() {
+    MAP_INFO.hidden = true;
+
+    this.positionInfoX = null;
+    this.positionInfoY = null;
   }
 
   private getClickedLocation(mouseX: number, mouseY: number): number {
@@ -506,9 +542,9 @@ class DisplayMap {
         const index = visible[i];
         const [screenX, screenY] = this.getScreenPos(this.app.data.x[index], this.app.data.y[index]);
         const diffX = abs(mouseX - screenX);
-        const diffY = abs(mouseY - screenY + LOCATION_ICON.width/2);
+        const diffY = abs(mouseY - screenY + LOCATION_ICON.height/2);
 
-        if (diffX <= LOCATION_ICON.width/2 && diffY <= LOCATION_ICON.width/2) {
+        if (diffX <= LOCATION_ICON.width/2 && diffY <= LOCATION_ICON.height/2) {
           return index;
         }
       }
@@ -538,6 +574,7 @@ class DisplayMap {
       MAP_CANVAS.classList.add("drag");
 
       this.clearInfo();
+      this.clearPositionInfo();
     });
 
     MAP_CANVAS.addEventListener("mousemove", (event: MouseEvent) => {
@@ -556,17 +593,22 @@ class DisplayMap {
         const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
 
         if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
-          else MAP_CANVAS.classList.remove("hover");
+        else MAP_CANVAS.classList.remove("hover");
       }
     });
 
     MAP_CANVAS.addEventListener("mouseup", (event: MouseEvent) => {
-      const clickedRest = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top)
+      if (event.button == 0) {
+        const clickedRest = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top)
 
-      if (clickedRest > 0) {
-        const [screenX, screenY] = this.getScreenPos(this.app.data.x[clickedRest], this.app.data.y[clickedRest]);
+        if (clickedRest > 0) {
+          const [screenX, screenY] = this.getScreenPos(this.app.data.x[clickedRest], this.app.data.y[clickedRest]);
 
-        this.displayRestaurantInfo(clickedRest, screenX, screenY);
+          this.displayRestaurantInfo(clickedRest, screenX, screenY);
+        }
+
+      } else if (event.button == 2) {
+        this.displayPositionInfo(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
       }
     });
 
@@ -580,6 +622,20 @@ class DisplayMap {
     MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
       this.changeZoom(event.deltaY);
       this.clearInfo();
+    });
+
+    MAP_SET_LOCATION.addEventListener("click", () => {
+      if (this.positionInfoX && this.positionInfoY) {
+        this.app.changeLocation(this.positionInfoX, this.positionInfoY);
+      }
+    });
+
+    MAP_SET_DEST.addEventListener("click", () => {
+      if (this.positionInfoX && this.positionInfoY) {
+        this.app.destXTextbox.setValue(this.positionInfoX*App.UNIT_SCALE);
+        this.app.destYTextbox.setValue(this.positionInfoY*App.UNIT_SCALE);
+        this.app.pathDropdown.down();
+      }
     });
   }
 }

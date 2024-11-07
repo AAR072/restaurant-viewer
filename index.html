@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <div class="dropdown">
+      <div id="path-dropdown" class="dropdown">
         <button class="dropdown-button" type="button">
           <span class="dropdown-text">Path Search</span>
           <span class="dropdown-arrow">&#11205;</span>
@@ -35,19 +35,24 @@
         
         <div class="dropdown-content">
           <div class="path-search-container">
-            <div class="path-search-type">
-              <button id="frugal-button" title="Show the path 4 different restaurant types within your budget." type="button">Go Frugal</button>
+            <div class="path-dest-container">
+              <span>Destination: (<span id="path-dest-x"></span>m, <span id="path-dest-y"></span>m)</span>
             </div>
-  
+
+            <div class="path-search-type">
+              <span>Budget: $<span id="frugal-budget"></span></span>
+              <button id="frugal-button" type="button">Go Frugal</button>
+            </div>
+
             <div class="path-search-type">
               <div id="save-fuel-checklist"></div>
-              <button id="save-fuel-button" title="Show the shortest path to 6 selected restaurant types." type="button">Saving Fuel</button>
+              <button id="save-fuel-button" type="button">Saving Fuel</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="dropdown">
+      <div id="filter-dropdown" class="dropdown">
         <button class="dropdown-button" type="button">
           <span class="dropdown-text">Filter</span>
           <span class="dropdown-arrow">&#11205;</span>
@@ -132,11 +137,20 @@
     <div id="map-container" class="map-container">
       <canvas id="map-canvas"></canvas>
 
+      <div id="map-info" class="map-info" hidden>
+        <p id="map-info-pos"></p>
+        <button id="map-set-location">Set As Location</button>
+        <br>
+        <button id="map-set-dest">Set As Destination</button>
+      </div>
+
       <div class="map-top-bar">
         <div class="map-bar-item">
           <span>Your Location: </span>
           <span>(<span id="location-x"></span>m, <span id="location-y"></span>m)</span>
         </div>
+
+        <button id="location-center" class="map-bar-item">&#10752;</button>
       </div>
 
       <div class="map-bottom-bar">
@@ -146,18 +160,22 @@
       </div>
     </div>
 
-    <div class="sidebar">
+    <div class="sidebar debug-sidebar">
       <div class="debug-container">
-        <label for="auto-performance-clear">Auto Clear:</label>
-        <input id="auto-performance-clear" type="checkbox" checked="true">
-        <br>
-        <button id="clear-performance-log">Clear All</button>
+        <div class="log-controls-container">
+          <button id="clear-performance-log" class="log-clear">Clear All</button>
+
+          <div class="auto-clear-control">
+            <input id="auto-performance-clear" type="checkbox" checked="true">
+            <label>Auto Clear</label>
+          </div>
+        </div>
 
         <div id="performance-log-container" class="log-task-container"></div>
       </div>
 
       <div class="debug-container">
-
+        
       </div>
     </div>
   </div>

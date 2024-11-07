@@ -20,6 +20,13 @@ const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonEleme
 const PAGE_NUMBER_SPAN = document.getElementById("page-number-input") as HTMLSpanElement;
 const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
 
+const PATH_DROPDOWN = document.getElementById("path-dropdown") as HTMLDivElement;
+const FILTER_DROPDOWN = document.getElementById("filter-dropdown") as HTMLDivElement;
+
+const DESTINATION_X = document.getElementById("path-dest-x") as HTMLSpanElement;
+const DESTINATION_Y = document.getElementById("path-dest-y") as HTMLSpanElement;
+
+const FRUGAL_BUDGET_SPAN = document.getElementById("frugal-budget") as HTMLSpanElement;
 const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
 
 const SAVE_FUEL_CHECKLIST = document.getElementById("save-fuel-checklist") as HTMLDivElement;
@@ -27,6 +34,7 @@ const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButt
 
 const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
 const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
+const LOCATION_CENTER = document.getElementById("location-center") as HTMLButtonElement;
 // #endregion
 
 // Our database after it is sorted
@@ -70,12 +78,18 @@ class App {
   public currentSearch: SearchResult; // Holds the current search result.
   public displayMap: DisplayMap;
 
+  public pathDropdown: Dropdown;
+  public filterDropdown: Dropdown;
+
   public costSlider: DoubleSlider;
   public reviewSlider: DoubleSlider;
 
   public pageSizeTextbox: ScalingTextbox;
   public pageTextbox: ScalingTextbox;
 
+  public destXTextbox: ScalingTextbox;
+  public destYTextbox: ScalingTextbox;
+  public budgetTextbox: ScalingTextbox;
   public fuelSaveChecklist: Checklist;
 
   public locationXTextbox: ScalingTextbox;
@@ -113,6 +127,9 @@ class App {
 
     this.updateDistances();
 
+    this.pathDropdown = new Dropdown(PATH_DROPDOWN);
+    this.filterDropdown = new Dropdown(FILTER_DROPDOWN);
+
     this.costSlider = new DoubleSlider(COST_RANGE,
       this.data.cost[this.sorted.cost[0]],
       this.data.cost[this.sorted.cost[App.RESTAURANT_COUNT - 1]],
@@ -128,11 +145,14 @@ class App {
     this.pageSizeTextbox = new ScalingTextbox(PAGE_SIZE_SPAN, 0);
     this.pageTextbox = new ScalingTextbox(PAGE_NUMBER_SPAN, 0);
 
+    this.destXTextbox = new ScalingTextbox(DESTINATION_X, 0, 0);
+    this.destYTextbox = new ScalingTextbox(DESTINATION_Y, 0, 0);
+    this.budgetTextbox = new ScalingTextbox(FRUGAL_BUDGET_SPAN, 0, 10);
+    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
+
     // Initialize the current search with store names and an empty query.
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
     this.displayMap = new DisplayMap(this);
-
-    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
 
     this.initInput(); // Set up input handling for searches.
   }
@@ -376,7 +396,15 @@ class App {
     });
 
     FRUGAL_BUTTON.addEventListener("click", () => {
-      const result = goFrugal(this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, getCombinations(this.sorted.cuisines), 100, this.sorted.distSorted, 0, 100);
+      const destX = this.destXTextbox.value/App.UNIT_SCALE;
+      const destY = this.destYTextbox.value/App.UNIT_SCALE;
+      const budget = this.budgetTextbox.value;
+
+      const result = goFrugal(
+        this.data.x, this.data.y, this.data.type, this.locationX, this.locationY,
+        getCombinations(this.sorted.cuisines), budget, this.sorted.distSorted, destX, destY
+      );
+
       const path = result.path;
       const results = new Uint32Array(4);
 
@@ -385,7 +413,7 @@ class App {
       }
 
       this.currentSearch = new SearchResult(this, results);
-      this.displayMap.setPath(path);
+      this.displayMap.setPath(path, result.distance);
     });
 
     this.fuelSaveChecklist.addListener((value: string[] | null) => {
@@ -396,12 +424,11 @@ class App {
     SAVE_FUEL_BUTTON.disabled = true;
 
     SAVE_FUEL_BUTTON.addEventListener("click", () => {
-      const selected = this.fuelSaveChecklist.value;
-      console.log(selected)
+      const destX = this.destXTextbox.value/App.UNIT_SCALE;
+      const destY = this.destYTextbox.value/App.UNIT_SCALE;
+      const selected = this.fuelSaveChecklist.value!;
 
-      if (!selected || selected.length < 1) return;
-
-      const result = savingFuel(selected, this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, 0, 100, this.sorted.distSorted);
+      const result = savingFuel(selected, this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, destX, destY, this.sorted.distSorted);
       const path = result.path;
       const results = [];
 
@@ -410,7 +437,7 @@ class App {
       }
 
       this.currentSearch = new SearchResult(this, new Uint32Array(results));
-      this.displayMap.setPath(path);
+      this.displayMap.setPath(path, result.distance);
     });
 
     this.locationXTextbox.addListener(() => {
@@ -431,6 +458,10 @@ class App {
       this.locationY = value;
 
       this.updateDistances();
+    });
+
+    LOCATION_CENTER.addEventListener("click", () => {
+      this.displayMap.animateCamera(this.locationX, this.locationY);
     });
   }
 }

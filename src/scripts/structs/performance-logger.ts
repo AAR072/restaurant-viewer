@@ -42,23 +42,25 @@ function logTask(name: string, time: number, description: string) {
   logItem.className = "log-task";
 
   const nameSpan = document.createElement("p");
+  nameSpan.className = "task-title";
   nameSpan.innerText = name;
 
-  const timeSpan = document.createElement("p");
-  timeSpan.innerText = `Task Duration: ${time.toFixed(2)}ms`;
-  
   const descSpan = document.createElement("p");
   descSpan.innerText = description;
 
+  const timeSpan = document.createElement("p");
+  timeSpan.innerHTML = `<bold>Task Duration:<bold> ${time.toFixed(2)}ms`;
+
   const dateSpan = document.createElement("p");
-  dateSpan.innerHTML = "Logged At: " + new Date().toLocaleTimeString(); // make it show milliseconds
+  dateSpan.innerHTML = "<bold>Logged At:<bold> " + new Date().toLocaleTimeString(); // make it show milliseconds
 
   const deleteButton = document.createElement("button");
+  deleteButton.className = "log-clear";
   deleteButton.innerText = "Clear";
 
   logItem.appendChild(nameSpan);
-  logItem.appendChild(timeSpan);
   logItem.appendChild(descSpan);
+  logItem.appendChild(timeSpan);
   logItem.appendChild(dateSpan);
   logItem.appendChild(deleteButton);
 

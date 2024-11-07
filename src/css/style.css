@@ -23,6 +23,12 @@ body {
   overflow: hidden;
 }
 
+h2 {
+  font-size: 18px;
+  font-weight: normal;
+  text-align: center;
+}
+
 button, input, select {
   outline: none;
   border: none;
@@ -42,8 +48,9 @@ button {
 }
 
 button:disabled {
-  cursor: none;
-  color: var(--secondary-color) !important;
+  cursor: default;
+  color: var(--detail-color) !important;
+  opacity: 0.5;
 }
 
 select option {
@@ -75,12 +82,13 @@ button:hover, select:hover {
 }
 
 .sidebar {
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
   width: 400px;
   background-color: var(--sidebar-color);
   gap: 20px;
+  overflow: hidden;
 }
 
 /*#region Scaling Textbox*/
@@ -110,6 +118,7 @@ button:hover, select:hover {
   border: none;
   padding-bottom: 5px;
   border-bottom: 1px solid var(--detail-color);
+  border-radius: 0;
 }
 
 .dropdown-text {
@@ -160,13 +169,12 @@ button:hover, select:hover {
 /*#region Search*/
 .search-container {
   display: flex;
-  border-radius: 20px;
+  border-radius: 16px;
   border: 1px solid var(--detail-color);
   background-color: var(--bubble-color);
   width: auto;
   margin-left: 20px;
   margin-right: 20px;
-  margin-top: 20px;
 }
 
 .search-container input[type="text"] {
@@ -448,9 +456,13 @@ button:hover, select:hover {
 .map-info {
   position: absolute;
   background-color: var(--secondary-color);
-  padding: 5px;
-  border-radius: 5px;
+  padding: 8px;
+  border-radius: 10px;
   border: 1px solid var(--detail-color);
+}
+
+.map-info button {
+  padding: 0;
 }
 
 .map-top-bar, .map-bottom-bar {
@@ -461,6 +473,8 @@ button:hover, select:hover {
   width: 100%;
   left: 0;
   padding: 8px;
+  gap: 10px;
+  pointer-events: none;
 }
 
 .map-top-bar {
@@ -479,6 +493,8 @@ button:hover, select:hover {
   background-color: var(--secondary-color);
   border-radius: 10px;
   padding: 5px;
+  border: 1px solid var(--detail-color);
+  pointer-events: all;
 }
 
 #map-canvas {
@@ -502,16 +518,38 @@ button:hover, select:hover {
 /*#endregion*/
 
 /*#region Debug*/
+.debug-sidebar {
+  width: 300px;
+}
+
 .debug-container {
-  flex: 1;
-  overflow-y: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 20px;
+  height: 50%;
+}
+
+.log-controls-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--detail-color);
+}
+
+.log-clear:hover {
+  color: var(--warning-color);
+}
+
+.auto-clear-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
 .log-task-container {
+  height: 100%;
+  overflow-y: auto;
   display: flex;
+  box-sizing: border-box;
   flex-direction: column;
   padding-top: 10px;
   gap: 10px;
@@ -520,6 +558,27 @@ button:hover, select:hover {
 .log-task {
   display: block;
   position: relative;
+  border-bottom: 1px solid var(--detail-color);
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.log-task p {
+  margin-bottom: 4px;
+}
+
+.log-task .task-title {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.log-task button {
+  margin-top: 5px;
+  margin-bottom: 10px;
+  align-self: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .log-task.fade-out {
@@ -536,7 +595,24 @@ button:hover, select:hover {
   gap: 20px;
 }
 
-.path-search-type {
+.path-dest-container {
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.path-search-type {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  background-color: var(--bubble-color);
+  border-radius: 16px;
+  border: 1px solid var(--detail-color);
+  gap: 10px;
+  padding: 10px;
 }
 /*#endregion*/

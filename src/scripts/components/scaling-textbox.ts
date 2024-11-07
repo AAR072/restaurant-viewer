@@ -5,7 +5,7 @@ class ScalingTextbox {
 
   private listener: STCallback;
 
-  constructor(public element: HTMLSpanElement, public decimalPlaces: number) {
+  constructor(public element: HTMLSpanElement, public decimalPlaces: number, defaultVal?: number) {
     element.className = "scaling-textbox";
     element.contentEditable = "true";
 
@@ -23,6 +23,8 @@ class ScalingTextbox {
     element.addEventListener("blur", () => {
       this.update();
     });
+
+    if (defaultVal != null) this.setValue(defaultVal);
   }
 
   private update() {
@@ -32,6 +34,7 @@ class ScalingTextbox {
     else value = parseInt(this.element.innerText);
 
     if (!isNaN(value)) this.value = value;
+    else this.setValue(this.value);
 
     if (this.listener) this.listener();
   }

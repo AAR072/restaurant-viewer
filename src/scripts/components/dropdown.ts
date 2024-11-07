@@ -14,14 +14,10 @@ class Dropdown {
     element.classList.add("hide");
 
     button.addEventListener("click", () => {
-      const current = Dropdown.currentDropdown;
-
-      if (current == this) {
+      if (Dropdown.currentDropdown == this) {
         this.up();
 
       } else {
-        if (current) current.up();
-
         this.down();
       }
     });
@@ -39,13 +35,11 @@ class Dropdown {
   }
 
   public down() {
+    if (Dropdown.currentDropdown) Dropdown.currentDropdown.up();
+
     this.updateHeight();
     this.element.classList.remove("hide");
 
     Dropdown.currentDropdown = this;
   }
 }
-
-document.querySelectorAll(".dropdown").forEach((element: Element) => {
-  new Dropdown(element as HTMLDivElement);
-});
