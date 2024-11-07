@@ -33,18 +33,23 @@ function binarySearch(indices: Uint32Array, filter: FilterCallback, isMaximum: b
   let low = 0;
   let high = indices.length - 1;
 
+  // standard binary search procedure
   while (low < high) {
     const middle = (low + high + (isMaximum ? 1 : 0)) >>> 1;
     const result = filter(indices[middle]);
 
+    // We move over right pointer past the middle
     if (result > 0) high = middle + 1;
+    // Move over the left pointer
     else low = middle;
 
+    // Searching for highest match
     if (isMaximum) {
       if (result > 0) high = middle - 1;
       else low = middle;
 
     } else {
+      // Lowest match
       if (result < 0) low = middle + 1;
       else high = middle;
     }
