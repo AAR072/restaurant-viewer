@@ -112,6 +112,7 @@ class App {
       distSorted: new Uint32Array(App.RESTAURANT_COUNT), // Array for sorted distances.
     };
 
+    // Creating our components
     this.loadTypes();
 
     this.locationXTextbox = new ScalingTextbox(LOCATION_X, 0);
@@ -149,6 +150,9 @@ class App {
     this.initInput(); // Set up input handling for searches.
   }
 
+  /*
+   * @timecomplexity O(1)
+   */
   public createTypeOption(name: string) {
     const option = document.createElement("option");
     option.innerText = name;
@@ -163,7 +167,6 @@ class App {
    * 
    * @timecomplexity O(n) - The method loops through `App.restaurantCount`, performing constant time operations for each restaurant.
    */
-
   public getCuisineTypeIndex(cuisineName: string): number {
     for (let i = 0; i < this.sorted.cuisines.length; i++) {
       if (this.sorted.cuisines[i] == cuisineName) return i;
@@ -172,10 +175,15 @@ class App {
     return -1;
   }
 
+  /**
+   * @timecomplexity O(1)
+   */
   public getCuisineTypeArr(cuisineName: string): number[] {
     return this.sorted.type[this.getCuisineTypeIndex(cuisineName)];
   }
-
+  /**
+   * @timecomplexity O(n)
+   */
   public loadTypes() {
     const typePointers: number[] = [];
     let cuisinePointer = 0;
@@ -235,7 +243,7 @@ class App {
 
   public createRestaurantInfo(index: number) {
     const div = document.createElement("div");
- 
+
     const idSpan = document.createElement("p");
     idSpan.innerHTML = `<strong>ID:</strong> ${this.data.ID[index]}`;
 
@@ -301,7 +309,7 @@ class App {
 
       if (totalPointer == 1) {
         if (alreadySorted) results = total[0];
-        else results = sortBy(total[0], App.RESTAURANT_COUNT, this.sorted.storeName);
+          else results = sortBy(total[0], App.RESTAURANT_COUNT, this.sorted.storeName);
 
       } else if (totalPointer > 1) {
         results = getIntersections(total, App.RESTAURANT_COUNT, alreadySorted ? undefined : this.sorted.storeName);
@@ -327,7 +335,7 @@ class App {
     SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
       if (event.key == "Enter") searchCallback();
     });
-    
+
     SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
       SEARCH_NAME_INPUT.value = "";
       SEARCH_ID_INPUT.value = "";
@@ -409,7 +417,7 @@ class App {
 
     this.fuelSaveChecklist.addListener((value: string[] | null) => {
       if (!value || value.length < 1) SAVE_FUEL_BUTTON.disabled = true;
-      else SAVE_FUEL_BUTTON.disabled = false;
+        else SAVE_FUEL_BUTTON.disabled = false;
     });
 
     SAVE_FUEL_BUTTON.disabled = true;
