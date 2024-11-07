@@ -72,7 +72,7 @@ class MapAnimation {
 
   private getTimeProgress(): number {
     if (this.progress > 0.5) return 1/2*((this.progress - 1)*2)**3 + 1;
-    else return 1/2*(this.progress*2)**3;
+      else return 1/2*(this.progress*2)**3;
   }
 
   private animationStep(time: number) {
@@ -302,7 +302,7 @@ class DisplayMap {
 
   public changeZoom(delta: number) {
     this.clearAnimation();
-    
+
     this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
 
     this.setRangeScale();
@@ -374,7 +374,8 @@ class DisplayMap {
     ]
   }
 
-  private render() {
+  // this was private before, but causing some issues
+  render() {
     this.context.clearRect(0, 0, this.width, this.height);
     this.context.font = `${DisplayMap.TEXT_SIZE}px Ubuntu`;
 
@@ -429,7 +430,7 @@ class DisplayMap {
 
     // Then, update your path-drawing code
     if (this.currentPath) {
-      for (let i = 0; i < this.currentPath.length; i++) {
+      for (let i = 0; i <= this.currentPath.length-1; i++) {
         const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
 
         if (i < this.currentPath.length - 1) {
@@ -437,10 +438,15 @@ class DisplayMap {
 
           this.drawLine(x0, y0, x1, y1, "rgb(255, 255, 255)", 5);
         }
-        
+
         this.drawCircle(x0, y0, 10, "#edab00");
       }
+      let cl = this.currentPath.length-1;
+      const [x0, y0] = this.getScreenPos(this.currentPath[cl].x, this.currentPath[cl].y);
+      this.drawCircle(x0, y0, 15, "red");
     }
+    const [Sx0,Sy0] = this.getScreenPos(this.app.locationX, this.app.locationY);
+    this.drawCircle(Sx0,Sy0,15,"#15ff0d");
 
     const zoomDepth = Math.log(this.mapRect.h/this.range)/Math.log(2) + 1;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);

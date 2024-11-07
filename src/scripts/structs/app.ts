@@ -132,7 +132,7 @@ class App {
     this.currentSearch = new SearchResult(this, this.sorted.storeName);
     this.displayMap = new DisplayMap(this);
 
-    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
+    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 9);
 
     this.initInput(); // Set up input handling for searches.
   }
@@ -198,7 +198,6 @@ class App {
   public updateDistances() {
     this.locationXTextbox.setValue(this.locationX*App.UNIT_SCALE);
     this.locationYTextbox.setValue(this.locationY*App.UNIT_SCALE);
-
     for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
@@ -218,7 +217,7 @@ class App {
   public changeLocation(x: number, y: number) {
     this.locationX = x; // Update the X location.
     this.locationY = y; // Update the Y location.
-
+    this.displayMap.render();
     this.updateDistances(); // Recalculate distances based on the new location.
   }
 
