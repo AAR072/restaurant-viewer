@@ -1,4 +1,3 @@
-// We link all our html elements here.
 // #region html elements
 const SEARCH_NAME_INPUT = document.getElementById("search-name") as HTMLInputElement;
 const SEARCH_ID_INPUT = document.getElementById("search-id") as HTMLInputElement;
@@ -37,37 +36,30 @@ const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
 const LOCATION_CENTER = document.getElementById("location-center") as HTMLButtonElement;
 // #endregion
 
-// Our database after it is sorted
+/**
+ * Stores all sorted/mutated data
+ * 
+ */
 interface SortedData {
   ID: Uint32Array; // Sorted array of IDs.
   storeName: Uint32Array; // Sorted array of store names.
-  cuisines: string[];
-  type: number[][]; // Dictionary to hold types and their corresponding indices.
+  cuisines: string[]; // The various cuisine types
+  type: number[][]; // Parallel to the cuisines array, stores the indices that correspond to each cuisine type
   cost: Uint32Array; // Sorted array of costs.
   review: Uint32Array; // Sorted array of reviews.
   x: Uint32Array; // Sorted array of x coordinates.
   y: Uint32Array; // Sorted array of y coordinates.
 
-  distData: Float32Array; // Array to hold calculated distances.
-  distSorted: Uint32Array; // Sorted array of distances.
+  distData: Float32Array; // Stores all calculated distances based on x and y data
+  distSorted: Uint32Array; // Stores sorted distances
 }
 
 /**
- * Represents the main application managing restaurant data and search functionalities.
- * 
- * @class
- * @property {Data} data - The unprocessed restaurant data loaded from a JSON file.
- * @property {SortedData} sorted - The processed and sorted data structure for efficient searching and display.
- * @property {number} locationX - The user's current X coordinate for location-based searches.
- * @property {number} locationY - The user's current Y coordinate for location-based searches.
- * @property {number} pageSize - The number of results to display per page.
- * @property {SearchResult} currentSearch - The current search results object, managing pagination and sorting.
- * 
- * @param {Data} data - The unprocessed restaurant data to initialize the app with.
+ * Main application class which stores all global information related to the web app.
  */
 class App {
-  static RESTAURANT_COUNT: number = 100000; // Maximum number of restaurants.
-  static UNIT_SCALE: number = 20;
+  static RESTAURANT_COUNT: number = 100000;
+  static UNIT_SCALE: number = 20; // Scale of x and y data units (every increment of 1 represents 20 meters)
 
   public data: Data; // Holds the original data.
   public sorted: SortedData; // Holds the sorted data.
@@ -464,4 +456,3 @@ class App {
     });
   }
 }
-

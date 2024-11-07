@@ -11,22 +11,36 @@ const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 LOCATION_ICON.alt = "Refresh the page to load icons";
 
+/**
+ * Generates a constant pseudo-random value for constant inputs.
+ * @param seed The seed for the pseudo-random function.
+ * @param index The quad index number, ranging from 0 to 3.
+ * @returns A random value ranging from 0 to 3.
+ */
 function constantRandom(seed: number, index: number): number {
   const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
 
   return (hash & 3);
 }
 
+/**
+ * Randomly splits a number into 4 (equal when possible) parts.
+ * @param count Number to split into 4.
+ * @param seed The seed used to randomize the distribution of the split result (the quadtree index).
+ * @returns A array of length 4, containing 4 values that sum to the count.
+ */
 function randomQuadSplit(count: number, seed: number): Uint32Array {
   const portions = new Uint32Array(4);
   const portion = floor(count/4);
   let remainder = count % 4;
 
+  // Add the quarter portions to the array (initially not randomly distributed).
   for (let i = 0; i < 4; i++) {
     portions[i] = portion + (remainder > 0 ? 1 : 0);
     remainder--;
   }
 
+  // Go through the array and randomly swap values with one another.
   for (let i = 0; i < 4; i++) {
     const newIndex = (i + constantRandom(seed, i)) % 4;
     const temp = portions[i];
@@ -38,10 +52,26 @@ function randomQuadSplit(count: number, seed: number): Uint32Array {
   return portions;
 }
 
+/**
+ * Represents a rectangle with 2d coordinates.
+ */
 class Rectangle {
+  /**
+   * The width of the rectangle.
+   */
   public w: number;
+  /**
+   * The height of the rectangle.
+   */
   public h: number;
 
+  /**
+   * Creates a rectangle based on min and max values for x and y coordinates.
+   * @param x0 The x value of the bottom left corner.
+   * @param x1 The x value of the top right corner.
+   * @param y0 The y value of the bottom left corner.
+   * @param y1 The y value of the top right corner.
+   */
   constructor(
     public x0: number,
     public x1: number,
@@ -52,6 +82,11 @@ class Rectangle {
     this.h = this.y1 - this.y0;
   }
 
+  /**
+   * Determines whether or not two rectangles intersect.
+   * @param rect The other rectangle.
+   * @returns True if they intersect, false if they do not.
+   */
   public intersects(rect: Rectangle): boolean {
     if (this.x1 <= rect.x0 || this.x0 >= rect.x1) return false;
     if (this.y1 <= rect.y0 || this.y0 >= rect.y1) return false;
@@ -60,27 +95,45 @@ class Rectangle {
   }
 }
 
+/**
+ * Starts a cancellable animation, passing the lerp progress value into the animation callback every frame.
+ */
 class MapAnimation {
-  public active: boolean = true;
+  private active: boolean = true;
+  /**
+   * The animation progress, 0 being no progress and 1 being complete.
+   */
   public progress: number = 0;
-  public lastTime: number;
+  private lastTime: number;
 
+  /**
+   * Creates and initializes the animation.
+   * @param callback The callback function for the animation, used to lerp between start and end goal based on progress parameter.
+   * @param duration The duration of the animation in seconds.
+   */
   constructor(
-    private callback: (value: number) => any,
+    private callback: (progress: number) => any,
     private duration: number = 2
   ) {
     requestAnimationFrame((timeStamp: number) => {
       this.lastTime = timeStamp;
-
       this.animationStep(timeStamp);
     });
   }
 
+  /**
+   * Applies easing style and direction to linear progress (time) of animation.
+   * @returns Animation progress with cubic easing style and inout easing direction.
+   */
   private getTimeProgress(): number {
     if (this.progress > 0.5) return 1/2*((this.progress - 1)*2)**3 + 1;
-      else return 1/2*(this.progress*2)**3;
+    else return 1/2*(this.progress*2)**3;
   }
 
+  /**
+   * Increases linear progress of animation based on difference between the current time and the last frame time and the animation duration.
+   * @param time Current timestamp used to calculate delta time.
+   */
   private animationStep(time: number) {
     if (!this.active) return;
 
@@ -106,18 +159,31 @@ class MapAnimation {
   }
 }
 
+/**
+ * Represents the application's map, storing all relevant properties and methods.
+ */
 class DisplayMap {
   static ZOOM_SPEED = 0.001;
   static MIN_ZOOM = 1;
   static MAX_ZOOM = 10;
 
+  /**
+   * Amount of grid squares for half the height of the screen.
+   */
   static GRID_RANGE_FACTOR = 16;
+  static DISPLAY_COUNT_FACTOR = 2;
+  /**
+   * Amount of quadtree subdivisions.
+   */
   static QT_SUBDIVISIONS = 6;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
 
   public zoom: number = 5;
+  /**
+   * The unit range displayed 
+   */
   public range: number;
   public scaleRatio: number;
   public aspectRatio: number;
@@ -456,7 +522,7 @@ class DisplayMap {
       }
     }
 
-    const zoomDepth = Math.log2(this.mapRect.h/this.range) + 1.5;
+    const zoomDepth = Math.log2(this.mapRect.h/this.range) + DisplayMap.DISPLAY_COUNT_FACTOR;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);
     const restCount = floor(4**(zoomDepth - quadDepth));
 
