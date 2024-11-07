@@ -4,6 +4,7 @@ const MAP_GRID_SCALE = document.getElementById("map-grid-scale") as HTMLSpanElem
 
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
+LOCATION_ICON.alt = "Refresh the page to load icons";
 
 function constantRandom(seed: number, index: number): number {
   const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
