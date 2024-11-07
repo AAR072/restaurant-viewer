@@ -9,7 +9,6 @@ const MAP_SET_DEST = document.getElementById("map-set-dest") as HTMLButtonElemen
 
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
-LOCATION_ICON.alt = "Refresh the page to load icons";
 
 /**
  * Generates a constant pseudo-random value for constant inputs.
@@ -163,29 +162,38 @@ class MapAnimation {
  * Represents the application's map, storing all relevant properties and methods.
  */
 class DisplayMap {
-  static ZOOM_SPEED = 0.001;
-  static MIN_ZOOM = 1;
-  static MAX_ZOOM = 10;
+  static ZOOM_SPEED: number = 0.001;
+  static MIN_ZOOM: number = 1;
+  static MAX_ZOOM: number = 11;
 
   /**
    * Amount of grid squares for half the height of the screen.
    */
-  static GRID_RANGE_FACTOR = 16;
-  static DISPLAY_COUNT_FACTOR = 2;
+  static GRID_RANGE_FACTOR: number = 16;
+  /**
+   * Affects the amount of restaurants displayed on the screen.
+   */
+  static DISPLAY_COUNT_FACTOR: number = 1.8;
   /**
    * Amount of quadtree subdivisions.
    */
-  static QT_SUBDIVISIONS = 6;
+  static QT_SUBDIVISIONS: number = 6;
 
   public cameraX: number = 0;
   public cameraY: number = 0;
 
-  public zoom: number = 5;
+  public zoom: number = 4;
   /**
    * The unit range displayed 
    */
   public range: number;
+  /**
+   * Factor used to normalize 
+   */
   public scaleRatio: number;
+  /**
+   * Aspect ratio of the screen (width divided by height).
+   */
   public aspectRatio: number;
 
   public context: CanvasRenderingContext2D;
@@ -193,6 +201,9 @@ class DisplayMap {
   public height: number;
   public bounds: DOMRect;
 
+  /**
+   * The 
+   */
   public mapRect: Rectangle;
 
   public quadTree: Rectangle[];
@@ -231,7 +242,13 @@ class DisplayMap {
     this.setRangeScale();
 
     this.initInput();
-    this.render();
+
+    if (!LOCATION_ICON.complete) {
+      LOCATION_ICON.onload = () => this.render();
+
+    } else {
+      this.render();
+    }
   }
 
   // find index of leaf containing point using morton/z-curve index method

@@ -129,7 +129,7 @@ function filterStrings(data: string[], sortedIndices: Uint32Array, searchInput: 
         return 1;
       }
     }
-
+    
     return 0;
   });
 }

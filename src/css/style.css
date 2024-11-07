@@ -499,6 +499,9 @@ button:hover, select:hover {
   padding: 5px;
   border: 1px solid var(--detail-color);
   pointer-events: all;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 #map-canvas {
