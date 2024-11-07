@@ -5,6 +5,9 @@ const MAP_GRID_SCALE = document.getElementById("map-grid-scale") as HTMLSpanElem
 const LOCATION_ICON = new Image();
 LOCATION_ICON.src = "assets/location-icon.png";
 
+const USER_LOCATION_ICON = new Image();
+LOCATION_ICON.src = "assets/location-icon.png";
+
 function constantRandom(seed: number, index: number): number {
   const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
 
@@ -101,8 +104,6 @@ class MapAnimation {
 }
 
 class DisplayMap {
-  static ICON_WIDTH = LOCATION_ICON.width;
-  static ICON_HEIGHT = LOCATION_ICON.height;
   static TEXT_SIZE = 16;
 
   static ZOOM_SPEED = 0.001;
@@ -151,11 +152,13 @@ class DisplayMap {
       app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]] + 1
     );
 
+    this.cameraX = (this.mapRect.x0 + this.mapRect.x1)/2;
+    this.cameraY = (this.mapRect.y0 + this.mapRect.y1)/2;
+
     this.loadQuadTree();
 
     this.setDimensions(MAP_CANVAS.getBoundingClientRect());
     this.setRangeScale();
-    this.centerCamera();
 
     this.initInput();
     this.render();
@@ -284,11 +287,6 @@ class DisplayMap {
   private setRangeScale() {
     this.range = 2**this.zoom;
     this.scaleRatio = this.height/(this.range*2);
-  }
-
-  public centerCamera() {
-    this.cameraX = (this.mapRect.x0 + this.mapRect.x1)/2;
-    this.cameraY = (this.mapRect.y0 + this.mapRect.y1)/2;
   }
 
   public panCamera(x: number, y: number) {
@@ -442,7 +440,7 @@ class DisplayMap {
       }
     }
 
-    const zoomDepth = Math.log(this.mapRect.h/this.range)/Math.log(2) + 1;
+    const zoomDepth = Math.log2(this.mapRect.h/this.range) + 1.5;
     const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS);
     const restCount = floor(4**(zoomDepth - quadDepth));
 
@@ -463,9 +461,9 @@ class DisplayMap {
       const restIndex = restList[i];
       const [screenX, screenY] = this.getScreenPos(this.app.data.x[restIndex], this.app.data.y[restIndex]);
 
-      this.context.drawImage(LOCATION_ICON, screenX - DisplayMap.ICON_WIDTH/2, screenY - DisplayMap.ICON_HEIGHT, DisplayMap.ICON_WIDTH, DisplayMap.ICON_HEIGHT);
+      this.context.drawImage(LOCATION_ICON, screenX - LOCATION_ICON.width/2, screenY - LOCATION_ICON.height, LOCATION_ICON.width, LOCATION_ICON.height);
       this.context.fillStyle = "rgba(255, 255, 255, 0.5)";
-      this.context.fillText(this.app.data.storeName[restIndex], screenX + DisplayMap.ICON_WIDTH/2 + 4, screenY - DisplayMap.ICON_HEIGHT/2);
+      this.context.fillText(this.app.data.storeName[restIndex], screenX + LOCATION_ICON.width/2 + 4, screenY - LOCATION_ICON.width/2);
     }
   }
 
@@ -508,9 +506,9 @@ class DisplayMap {
         const index = visible[i];
         const [screenX, screenY] = this.getScreenPos(this.app.data.x[index], this.app.data.y[index]);
         const diffX = abs(mouseX - screenX);
-        const diffY = abs(mouseY - screenY + DisplayMap.ICON_HEIGHT/2);
+        const diffY = abs(mouseY - screenY + LOCATION_ICON.width/2);
 
-        if (diffX <= DisplayMap.ICON_WIDTH/2 && diffY <= DisplayMap.ICON_HEIGHT/2) {
+        if (diffX <= LOCATION_ICON.width/2 && diffY <= LOCATION_ICON.width/2) {
           return index;
         }
       }

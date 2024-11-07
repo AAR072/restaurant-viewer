@@ -243,7 +243,7 @@ class App {
     reviewSpan.className = "review-color";
 
     const positionSpan = document.createElement("p");
-    positionSpan.innerHTML = `<strong>Position:</strong> (x: ${this.data.x[index] * App.UNIT_SCALE}m, y: ${this.data.y[index] * App.UNIT_SCALE}m)`;
+    positionSpan.innerHTML = `<strong>Position:</strong> (${this.data.x[index] * App.UNIT_SCALE}m, ${this.data.y[index] * App.UNIT_SCALE}m)`;
 
     div.appendChild(idSpan);
     div.appendChild(nameSpan);
@@ -333,7 +333,7 @@ class App {
 
     this.costSlider.addListener((min: number, max: number, fullRange: boolean) => {
       if (fullRange) {
-        this.currentSearch.setReviewRange(null, null);
+        this.currentSearch.setCostRange(null, null);
 
         return;
       }

@@ -34,6 +34,13 @@ button, select {
   cursor: pointer;
 }
 
+button {
+  padding: 8px;
+  border-radius: 10px;
+  background-color: var(--secondary-color);
+  cursor: pointer;
+}
+
 button:disabled {
   cursor: none;
   color: var(--secondary-color) !important;
@@ -132,6 +139,21 @@ button:hover, select:hover {
 
 .dropdown.hide .dropdown-arrow {
   transform: rotate(180deg);
+}
+/*#endregion*/
+
+/*#region Checklist*/
+.checklist-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.checklist-option {
+  display: inline-block;
+  width: auto;
 }
 /*#endregion*/
 
@@ -331,6 +353,11 @@ button:hover, select:hover {
   margin-bottom: 18px;
 }
 
+.sort-direction {
+  padding: 0;
+  background: none;
+}
+
 .sort-direction .sort-dir-text, .sort-direction .sort-dir-arrow {
   display: inline-block;
   transition: transform 0.2s ease, color 0.2s ease;
@@ -351,8 +378,11 @@ button:hover, select:hover {
   height: auto;
 }
 
+/* add little left/right jolt when pressed if not stupid to implement */
 .page-container button {
   transition: color 0.2s ease;
+  padding: 0;
+  background: none;
   margin-left: 20px;
   margin-right: 20px;
 }
@@ -403,20 +433,9 @@ button:hover, select:hover {
 }
 
 .result-map-button {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  border-radius: 0.5rem;
-  background-color: #ffffff1a;
-  cursor: pointer;
   margin-top: 12px;
   margin-left: auto;
   margin-right: auto;
-}
-
-.result-map-button:hover {
-background-color: #3A3A3A;
 }
 /*#endregion Results Section*/
 
@@ -436,12 +455,12 @@ background-color: #3A3A3A;
 
 .map-top-bar, .map-bottom-bar {
   display: flex;
-  flex-direction: column;
+  box-sizing: border-box;
+  flex-direction: row;
   position: absolute;
   width: 100%;
-  height: 40px;
   left: 0;
-  padding: 5px;
+  padding: 8px;
 }
 
 .map-top-bar {
@@ -450,13 +469,16 @@ background-color: #3A3A3A;
 
 .map-bottom-bar {
   bottom: 0;
+  justify-content: flex-end;
 }
 
 .map-bar-item {
+  display: inline-block;
   height: auto;
   width: auto;
-  background-color: var(--bubble-color);
+  background-color: var(--secondary-color);
   border-radius: 10px;
+  padding: 5px;
 }
 
 #map-canvas {
@@ -509,12 +531,12 @@ background-color: #3A3A3A;
 /*#region Path Search*/
 .path-search-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   padding: 20px;
   gap: 20px;
 }
 
 .path-search-type {
-  flex-grow: 1;
+
 }
 /*#endregion*/

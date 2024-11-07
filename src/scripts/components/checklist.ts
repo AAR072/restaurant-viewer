@@ -19,6 +19,8 @@ class Checklist {
   private callback: ChecklistCallback;
 
   constructor(public element: HTMLDivElement, options: string[], anyOption: boolean, public maxOptions?: number) {
+    element.className = "checklist-container";
+
     if (anyOption) {
       this.anyOption = this.createCheckbox("Any");
       this.anyOption.checked = true;
@@ -42,6 +44,7 @@ class Checklist {
 
   private createCheckbox(display: string): HTMLInputElement {
     const container = document.createElement("div");
+    container.className = "checklist-option";
     
     const label = document.createElement("label");
     label.innerText = display;
