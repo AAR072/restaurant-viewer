@@ -156,8 +156,8 @@ class DisplayMap {
       app.data.y[app.sorted.y[App.RESTAURANT_COUNT - 1]] + 1
     );
 
-    this.cameraX = (this.mapRect.x0 + this.mapRect.x1)/2;
-    this.cameraY = (this.mapRect.y0 + this.mapRect.y1)/2;
+    this.cameraX = this.app.locationX;
+    this.cameraY = this.app.locationY;
 
     this.loadQuadTree();
 
