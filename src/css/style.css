@@ -64,6 +64,7 @@ button:hover, select:hover {
 *::-webkit-scrollbar {
   margin-left: -6px;
   width: 6px;
+  height: 6px;
 }
 
 *::-webkit-scrollbar-track {
@@ -533,6 +534,9 @@ button:hover, select:hover {
 }
 
 .debug-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
   height: 50%;
 }
 
@@ -556,7 +560,7 @@ button:hover, select:hover {
 }
 
 .log-task-container {
-  height: 100%;
+  flex-grow: 1;
   overflow-y: auto;
   display: flex;
   box-sizing: border-box;
@@ -649,9 +653,9 @@ button:hover, select:hover {
   color: var(--warning-color);
 }
 /*#endregion*/
+
 #testing-div {
-  overflow: auto;
-}
-#run-tests {
-  display:flex;
+  padding-left: 20px;
+  padding-right: 20px;
+  overflow-y: auto;
 }

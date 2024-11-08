@@ -489,5 +489,10 @@ class App {
     LOCATION_CENTER.addEventListener("click", () => {
       this.displayMap.animateCamera(this.locationX, this.locationY);
     });
+
+    // Do tests
+    TESTING_BUTTON.addEventListener("click", () => {
+      tests(TESTING_DIV);
+    });
   }
 }
