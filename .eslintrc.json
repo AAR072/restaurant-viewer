@@ -1,3 +1,59 @@
 {
-  "extends": "./node_modules/gts/"
+  "extends": "./node_modules/gts/",
+  "rules": {
+    // File Names
+    "filenames/match-regex": "off",
+
+    // Formatting and Braces
+    "curly": ["error", "multi-line", "consistent"],
+    "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+    "semi": ["error", "always"],
+
+    // Function Arguments (4-space indentation on line wrap, no rule available here, so manual review is needed)
+
+    // Language Features - Identifiers
+    "camelcase": ["error", { "properties": "never" }],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      { "selector": "variable", "format": ["camelCase"] },
+      { "selector": "function", "format": ["camelCase"] },
+      { "selector": "class", "format": ["PascalCase"] },
+      { "selector": "interface", "format": ["PascalCase"] },
+      { "selector": "enum", "format": ["PascalCase"] },
+      { "selector": "enumMember", "format": ["UPPER_CASE"] },
+      { "selector": "typeParameter", "format": ["PascalCase"] }
+    ],
+
+    // Constants
+    "prefer-const": "error",
+    "one-var": ["error", "never"],
+
+    // Type Declarations
+    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/typedef": [
+      "error",
+      {
+        "variableDeclaration": true,
+        "propertyDeclaration": true,
+        "parameter": true,
+        "returnType": true
+      }
+    ],
+
+    // Private Fields
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "PrivateIdentifier",
+        "message": "Use TypeScript's private modifier instead of # syntax for private fields."
+      }
+    ],
+
+    // Trailing Commas
+    "comma-dangle": ["error", "never"],
+
+    // Comments - JSDoc Redundancy
+    "require-jsdoc": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  }
 }
