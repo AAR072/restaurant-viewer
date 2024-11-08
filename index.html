@@ -1,60 +1,60 @@
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Banana Republic Restaurant Finder</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./src/css/style.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banana Republic Restaurant Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/style.css">
+  </head>
 
-<body>
-  <div class="main-container">
-    <div class="sidebar">
-      <div class="search-container">
-        <div class="search-input-container">
-          <input class="search-input-input" id="search-name" type="text" placeholder="Name"/>
-          <input id="search-id" type="text" placeholder="Id"/>
-          <input id="search-x" type="text" placeholder="X"/>
-          <input id="search-y" type="text" placeholder="Y"/>
+  <body>
+    <div class="main-container">
+      <div class="sidebar">
+        <div class="search-container">
+          <div class="search-input-container">
+            <input class="search-input-input" id="search-name" type="text" placeholder="Name"/>
+            <input id="search-id" type="text" placeholder="Id"/>
+            <input id="search-x" type="text" placeholder="X"/>
+            <input id="search-y" type="text" placeholder="Y"/>
+          </div>
+
+          <div class="search-icons-container">
+            <button id="search-button" class="search-icon-button search-icon" title="Search" type="button"></button>
+            <button id="search-clear" class="search-icon-button clear-icon" title="Clear" type="button"></button>
+          </div>
         </div>
 
-        <div class="search-icons-container">
-          <button id="search-button" class="search-icon-button search-icon" title="Search" type="button"></button>
-          <button id="search-clear" class="search-icon-button clear-icon" title="Clear" type="button"></button>
-        </div>
-      </div>
+        <div id="path-dropdown" class="dropdown">
+          <button class="dropdown-button" type="button">
+            <span class="dropdown-text">Path Search</span>
+            <span class="dropdown-arrow">&#11205;</span>
+          </button>
 
-      <div id="path-dropdown" class="dropdown">
-        <button class="dropdown-button" type="button">
-          <span class="dropdown-text">Path Search</span>
-          <span class="dropdown-arrow">&#11205;</span>
-        </button>
-        
-        <div class="dropdown-content">
-          <div class="path-search-container">
-            <div class="path-dest-container">
-              <span>Destination: (<span id="path-dest-x"></span>m, <span id="path-dest-y"></span>m)</span>
-            </div>
-
-            <div class="path-search-type">
-              <span>Budget: $<span id="frugal-budget"></span></span>
-              <button id="frugal-button" type="button">Go Frugal</button>
-              <div id="frugal-result" class="frugal-result">
-                <span>Cost of Fuel: <span id="frugal-cost" class="frugal-cost"></span></span>
-                <span id="frugal-success" class="frugal-success"></span>
+          <div class="dropdown-content">
+            <div class="path-search-container">
+              <div class="path-dest-container">
+                <span>Destination: (<span id="path-dest-x"></span>m, <span id="path-dest-y"></span>m)</span>
               </div>
-            </div>
 
-            <div class="path-search-type">
-              <div id="save-fuel-checklist"></div>
-              <button id="save-fuel-button" type="button">Saving Fuel</button>
+              <div class="path-search-type">
+                <span>Budget: $<span id="frugal-budget"></span></span>
+                <button id="frugal-button" type="button">Go Frugal</button>
+                <div id="frugal-result" class="frugal-result">
+                  <span>Cost of Fuel: <span id="frugal-cost" class="frugal-cost"></span></span>
+                  <span id="frugal-success" class="frugal-success"></span>
+                </div>
+              </div>
+
+              <div class="path-search-type">
+                <div id="save-fuel-checklist"></div>
+                <button id="save-fuel-button" type="button">Saving Fuel</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       <div id="filter-dropdown" class="dropdown">
         <button class="dropdown-button" type="button">
@@ -71,32 +71,32 @@
               </select>
             </div>
 
-            <div id="cost-range" class="double-slider">
-              <span class="slider-min-text cost-color">$
-                <span></span>
-              </span>
-              <span class="slider-max-text cost-color">$
-                <span></span>
-              </span>
-              <div class="progress cost"></div>
-              <input class="min-range" type="range">
-              <input class="max-range" type="range">
-            </div>
+              <div id="cost-range" class="double-slider">
+                <span class="slider-min-text cost-color">$
+                  <span></span>
+                </span>
+                <span class="slider-max-text cost-color">$
+                  <span></span>
+                </span>
+                <div class="progress cost"></div>
+                <input class="min-range" type="range">
+                <input class="max-range" type="range">
+              </div>
 
-            <div id="review-range" class="double-slider">
-              <span class="slider-min-text review-color">&#9733;
-                <span></span>
-              </span>
-              <span class="slider-max-text review-color">&#9733;
-                <span></span>
-              </span>
-              <div class="progress review"></div>
-              <input class="min-range" type="range">
-              <input class="max-range" type="range">
+              <div id="review-range" class="double-slider">
+                <span class="slider-min-text review-color">&#9733;
+                  <span></span>
+                </span>
+                <span class="slider-max-text review-color">&#9733;
+                  <span></span>
+                </span>
+                <div class="progress review"></div>
+                <input class="min-range" type="range">
+                <input class="max-range" type="range">
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       <div class="browse-container">
         <div class="sort-container">
@@ -109,72 +109,72 @@
             </select>
           </span>
 
-          <button id="sort-direction" class="sort-direction">
-            <span id="sort-dir-text" class="sort-dir-text"></span> 
-            <span class="sort-dir-arrow">&#11205;</span>
-          </button>
-        </div>
-
-        <div class="page-container">
-          <button id="prev-page" class="page-button" type="button">&#11207;</button>
-
-          <div class="page-info-container">
-            <div>
-              <label for="page-size">Results Per Page:</label>
-              <span id="page-size"></span>
-            </div>
-
-            <div>
-              <span>Page</span>
-              <span id="page-number-input"></span>
-              <span>/</span>
-              <span id="page-count"></span>
-            </div>
+            <button id="sort-direction" class="sort-direction">
+              <span id="sort-dir-text" class="sort-dir-text"></span> 
+              <span class="sort-dir-arrow">&#11205;</span>
+            </button>
           </div>
 
-          <button id="next-page" class="page-button" type="button">&#11208;</button>
-        </div>
-      </div>
+          <div class="page-container">
+            <button id="prev-page" class="page-button" type="button">&#11207;</button>
 
-      <div id="search-results" class="results-container"></div>
-    </div>
+            <div class="page-info-container">
+              <div>
+                <label for="page-size">Results Per Page:</label>
+                <span id="page-size"></span>
+              </div>
 
-    <div id="map-container" class="map-container">
-      <canvas id="map-canvas"></canvas>
+              <div>
+                <span>Page</span>
+                <span id="page-number-input"></span>
+                <span>/</span>
+                <span id="page-count"></span>
+              </div>
+            </div>
 
-      <div id="map-info" class="map-info" hidden>
-        <p id="map-info-pos"></p>
-        <button id="map-set-location">Set As Location</button>
-        <br>
-        <button id="map-set-dest">Set As Destination</button>
-      </div>
-
-      <div class="map-top-bar">
-        <div class="map-bar-item">
-          <span>Your Location: </span>
-          <span>(<span id="location-x"></span>m, <span id="location-y"></span>m)</span>
-        </div>
-
-        <button id="location-center" class="map-bar-item">&#10752;</button>
-      </div>
-
-      <div class="map-bottom-bar">
-        <div class="map-bar-item">
-          <span>Grid Square Size: <span id="map-grid-scale"></span>m</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar debug-sidebar">
-      <div class="debug-container">
-        <div class="log-controls-container">
-          <button id="clear-performance-log" class="log-clear">Clear All</button>
-
-          <div class="auto-clear-control">
-            <input id="auto-performance-clear" type="checkbox" checked="true">
-            <label>Auto Clear</label>
+            <button id="next-page" class="page-button" type="button">&#11208;</button>
           </div>
         </div>
+
+        <div id="search-results" class="results-container"></div>
+      </div>
+
+      <div id="map-container" class="map-container">
+        <canvas id="map-canvas"></canvas>
+
+        <div id="map-info" class="map-info" hidden>
+          <p id="map-info-pos"></p>
+          <button id="map-set-location">Set As Location</button>
+          <br>
+          <button id="map-set-dest">Set As Destination</button>
+        </div>
+
+        <div class="map-top-bar">
+          <div class="map-bar-item">
+            <span>Your Location: </span>
+            <span>(<span id="location-x"></span>m, <span id="location-y"></span>m)</span>
+          </div>
+
+          <button id="location-center" class="map-bar-item">&#10752;</button>
+        </div>
+
+        <div class="map-bottom-bar">
+          <div class="map-bar-item">
+            <span>Grid Square Size: <span id="map-grid-scale"></span>m</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar debug-sidebar">
+        <div class="debug-container">
+          <div class="log-controls-container">
+            <button id="clear-performance-log" class="log-clear">Clear All</button>
+
+            <div class="auto-clear-control">
+              <input id="auto-performance-clear" type="checkbox" checked="true">
+              <label>Auto Clear</label>
+            </div>
+          </div>
 
         <div id="performance-log-container" class="log-task-container"></div>
       </div>
@@ -189,25 +189,25 @@
     </div>
   </div>
 
-  <script src="./dist/DO_NOT_TOUCH.js"></script>
-  <script src="./dist/scripts/util/utils.js"></script>
+    <script src="./dist/DO_NOT_TOUCH.js"></script>
+    <script src="./dist/scripts/util/utils.js"></script>
 
-  <script src="./dist/scripts/structs/performance-logger.js"></script>
-  <script src="./dist/scripts/algorithms/merge-sort.js"></script>
-  <script src="./dist/scripts/algorithms/binary-search.js"></script>
-  <script src="./dist/scripts/algorithms/array-intersection.js"></script>
-  <script src="./dist/scripts/algorithms/tsp.js"></script>
+    <script src="./dist/scripts/structs/performance-logger.js"></script>
+    <script src="./dist/scripts/algorithms/merge-sort.js"></script>
+    <script src="./dist/scripts/algorithms/binary-search.js"></script>
+    <script src="./dist/scripts/algorithms/array-intersection.js"></script>
+    <script src="./dist/scripts/algorithms/tsp.js"></script>
 
-  <script src="./dist/scripts/components/scaling-textbox.js"></script>
-  <script src="./dist/scripts/components/double-slider.js"></script>
-  <script src="./dist/scripts/components/dropdown.js"></script>
-  <script src="./dist/scripts/components/checklist.js"></script>
+    <script src="./dist/scripts/components/scaling-textbox.js"></script>
+    <script src="./dist/scripts/components/double-slider.js"></script>
+    <script src="./dist/scripts/components/dropdown.js"></script>
+    <script src="./dist/scripts/components/checklist.js"></script>
 
-  <script src="./dist/scripts/structs/search-result.js"></script>
-  <script src="./dist/scripts/structs/display-map.js"></script>
-  <script src="./dist/scripts/structs/app.js"></script>
-  <script src="./dist/scripts/tests/testing.js"></script>
-  <script src="./dist/index.js"></script>
-</body>
+    <script src="./dist/scripts/structs/search-result.js"></script>
+    <script src="./dist/scripts/structs/display-map.js"></script>
+    <script src="./dist/scripts/structs/app.js"></script>
+    <script src="./dist/scripts/tests/testing.js"></script>
+    <script src="./dist/index.js"></script>
+  </body>
 
 </html>
