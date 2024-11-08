@@ -1,4 +1,29 @@
 /**
+ * Returns the values stored in a hash table
+ * @param hash The hash table storing the count of each value.
+ * @param amount The amount of values which meet the requirement in the hash table.
+ * @param required The required value for each index in the hashtable for it to be added.
+ * @param sortBy The array who's order of values is used to order the valid indices in the hash table.
+ * @param indexRange The range of indices of the sorted array.
+ * @returns An array of valid keys in the hash table in order of their order in the `sortBy` array.
+ * @timecomplexity O(n), where n is the index range.
+ */
+function getSorted(hashTable: number[], amount: number, required: number, sortBy: Uint32Array, indexRange: number): Uint32Array {
+  const sorted = new Uint32Array(amount);
+  let sortedPointer = 0;
+  
+  for (let i = 0; i < indexRange; i++) {
+    if (sortedPointer >= amount) break;
+
+    const value = sortBy[i];
+
+    if (hashTable[value] == required) sorted[sortedPointer++] = value;
+  }
+
+  return sorted;
+}
+
+/**
  * Returns the intersection of multiple sorted `Uint32Array` arrays. 
  * It finds common elements that appear in all input arrays.
  *
@@ -52,16 +77,16 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
   }
 
   if (sortBy && dupePointer > 1) {
-    const sorted = new Uint32Array(dupePointer);
-    let sortedPointer = 0;
+    const sorted = getSorted(hashTable, dupePointer, dataSetCount, sortBy, indexRange);//new Uint32Array(dupePointer);
+    // let sortedPointer = 0;
     
-    for (let i = 0; i < indexRange; i++) {
-      if (sortedPointer >= dupePointer) break;
+    // for (let i = 0; i < indexRange; i++) {
+    //   if (sortedPointer >= dupePointer) break;
 
-      const value = sortBy[i];
+    //   const value = sortBy[i];
 
-      if (hashTable[value] == dataSetCount) sorted[sortedPointer++] = value;
-    }
+    //   if (hashTable[value] == dataSetCount) sorted[sortedPointer++] = value;
+    // }
 
     const t1 = performance.now();
     logTask("Array Intersection", t1 - t0, `Found intersections between arrays and sorted them in custom order`);
@@ -84,24 +109,15 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
  * @param sortedIndices - The reference array which defines the desired order of the `indices` array elements.
  * @returns A new `Uint32Array` with elements of `indices` sorted based on `sortedIndices`.
  * 
- * @timecomplexity O(n + m) - Where `n` is the length of the `indices` array and `m` is the length of `sortedIndices`. The hash table lookup for each element is O(1).
+ * @timecomplexity O(n + m), where n is the length of `indices` and m is `indexRange`.
  */
 function sortBy(indices: Uint32Array | number[], indexRange: number, sortedIndices: Uint32Array): Uint32Array {
   const length = indices.length;
-  const hashTable: boolean[] = new Array(indexRange);
+  const hashTable: number[] = new Array(indexRange);
 
   for (let i = 0; i < length; i++) {
-    hashTable[indices[i]] = true;
+    hashTable[indices[i]] = 1;
   }
 
-  const sorted = new Uint32Array(length);
-  let sortedPointer = 0;
-  
-  for (let i = 0; i < indexRange; i++) {
-    const value = sortedIndices[i];
-
-    if (hashTable[value]) sorted[sortedPointer++] = value;
-  }
-
-  return sorted;
+  return getSorted(hashTable, length, 1, sortedIndices, indexRange);
 }
