@@ -37,6 +37,9 @@ const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButt
 const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
 const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
 const LOCATION_CENTER = document.getElementById("location-center") as HTMLButtonElement;
+
+const TESTING_BUTTON = document.getElementById("testing-button") as HTMLButtonElement;
+const TESTING_DIV = document.getElementById("testing-div") as HTMLDivElement;
 // #endregion
 
 /**
@@ -283,9 +286,6 @@ class App {
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
   initInput() {
-    // TESTING_BUTTON.addEventListener("click", () => {
-    //   tests(document.getElementById("testing-div"));
-    // });
 
     const searchCallback = () => {
       const nameInput = SEARCH_NAME_INPUT.value;
@@ -395,6 +395,10 @@ class App {
 
     this.pageTextbox.addListener(() => {
       if (this.pageTextbox.value != null) this.currentSearch.setPage(this.pageTextbox.value);
+    });
+
+    TESTING_BUTTON.addEventListener("click", () => {
+      tests(TESTING_DIV);
     });
 
     let resultCount: number = 0;

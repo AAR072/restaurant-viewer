@@ -96,20 +96,20 @@ function tests(div: any | null) {
   }
 
   // Test 5: Frugal Test 
-  // let expectedString = '{"distance":28.081848859886076,"path":[{"id":12,"x":19,"y":20,"type":"Chinese"},{"id":11,"x":17,"y":17,"type":"Burger"},{"id":7,"x":16,"y":15,"type":"Indian"},{"id":1,"x":8,"y":5,"type":"Korean"},{"id":0,"x":0,"y":0,"type":"START"}],"possible":true}'
-  // let out = JSON.stringify(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, getCombinations(["Pizza", "Burger", "Italian", "Japanese"]), 1, app.sorted.distSorted, true));
-  // if ( out === expectedString) {
-  //   outPutResults(div, "Go Frugal Test", true, `Success`);
-  // } else {
-  //   outPutResults(div, "Go Frugal Test", false, `Expected ${expectedString}, got ${out}`);
-  // }
-  // // Test 6: Saving Fuel Test:
-  // expectedString = '{"distance":1009.4321554472098,"path":[{"id":0,"x":0,"y":0,"type":"START"},{"id":2,"x":11,"y":1,"type":"Coffee"},{"id":15,"x":26,"y":11,"type":"Pizza"},{"id":95,"x":61,"y":30,"type":"Chinese"},{"id":100,"x":999,"y":99,"type":"END"}]}';
-  // out = JSON.stringify(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,999,99, app.sorted.distSorted));
-  //   if ( out === expectedString) {
-  //   outPutResults(div, "Saving Fuel Test", true, `Success`);
-  // } else {
-  //   outPutResults(div, "Saving Fuel Test", false, `Expected ${expectedString}, got ${out}`);
-  // }
+  let expectedString = '{"distance":64.24714107151101,"path":[{"id":0,"x":0,"y":0,"type":"START"},{"id":9,"x":8,"y":21,"type":"Japanese"},{"id":18,"x":19,"y":23,"type":"Italian"},{"id":12,"x":17,"y":17,"type":"Burger"},{"id":1,"x":5,"y":3,"type":"Pizza"},{"id":500,"x":0,"y":0,"type":"END"}],"possible":true}'  
+  let out = JSON.stringify(goFrugal(app.data.x, app.data.y, app.data.type, 0,0, getCombinations(["Pizza", "Burger", "Italian", "Japanese"]), 1, app.sorted.distSorted, 0, 0, false));
+  if ( out === expectedString) {
+    outPutResults(div, "Go Frugal Test", true, `Success`);
+  } else {
+    outPutResults(div, "Go Frugal Test", false, `Expected ${expectedString}, got ${out}`);
+  }
+  // Test 6: Saving Fuel Test:
+  expectedString = '{"distance":1009.4321554472098,"path":[{"id":0,"x":0,"y":0,"type":"START"},{"id":3,"x":11,"y":1,"type":"Coffee"},{"id":16,"x":26,"y":11,"type":"Pizza"},{"id":96,"x":61,"y":30,"type":"Chinese"},{"id":100,"x":999,"y":99,"type":"END"}]}';
+  out = JSON.stringify(savingFuel(["Pizza", "Coffee", "Chinese"], data.x, data.y, data.type, 0,0,999,99, app.sorted.distSorted));
+    if ( out === expectedString) {
+    outPutResults(div, "Saving Fuel Test", true, `Success`);
+  } else {
+    outPutResults(div, "Saving Fuel Test", false, `Expected ${expectedString}, got ${out}`);
+  }
 
 }

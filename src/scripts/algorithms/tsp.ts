@@ -322,6 +322,8 @@ let temp;
  * @param {string[][]} combinations - Array of required type combinations to visit.
  * @param {number} budget - Maximum allowable distance (in kilometers) the path can cover.
  * @param {Uint32Array} sortedData - Sorted indices array to order `xData`, `yData`, and `typesData`.
+ * @param {number} endingX - Target X position
+ * @param {number} endingY - Target Y position
  * @param {boolean} [fast=true] - Flag to determine search speed; `true` for fast, `false` for slower.
  * @returns {{ distance: number, path: TNode[], possible: boolean }} An object with:
  * - `distance`: The shortest distance covered by the path (in arbitrary units).
