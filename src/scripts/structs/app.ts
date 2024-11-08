@@ -452,12 +452,13 @@ class App {
       const results = [];
 
       // Add restaurants on path to array
-      for (let i = 1; i < path.length - 1; i++) {
-        results[i] = path[i].index!;
+      for (let i = 0; i < path.length - 2; i++) {
+        results[i] = path[i + 1].index!;
       }
 
       this.searchResult.setResults(new Uint32Array(results)); // Set restaurants on path as search result
       this.displayMap.setPath(path, result.distance); // Set map path to render
+      FRUGAL_RESULT.classList.remove("show");
     });
 
     // Change user x location

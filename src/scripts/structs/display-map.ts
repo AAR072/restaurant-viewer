@@ -717,8 +717,22 @@ class DisplayMap {
     top = clamp(top, 0, this.height);
 
     // Shift element if necessary so that it does not clip over the screen
-    if (left + divWidth > this.width) left -= divWidth;
-    if (top + divHeight > this.height) top -= divHeight;
+
+    if (left + divWidth > this.width) {
+      left -= divWidth;
+      element.classList.add("right");
+
+    } else {
+      element.classList.remove("right");
+    }
+
+    if (top + divHeight > this.height) {
+      top -= divHeight;
+      element.classList.add("bottom");
+
+    } else {
+      element.classList.remove("bottom");
+    }
 
     element.style.left = left + "px";
     element.style.top = top + "px";
@@ -825,7 +839,7 @@ class DisplayMap {
 
     }).observe(MAP_CANVAS);
 
-    MAP_CANVAS.addEventListener("contextmenu", (event: MouseEvent) => {
+    document.addEventListener("contextmenu", (event: MouseEvent) => {
       event.preventDefault();
     });
 
@@ -874,11 +888,13 @@ class DisplayMap {
       }
     });
 
-    document.addEventListener("mouseup", () => {
+    document.addEventListener("mouseup", (event: MouseEvent) => {
       MAP_CANVAS.classList.remove("drag");
 
       mouseX = null;
       mouseY = null;
+
+      if (event.button == 2) event.preventDefault();
     });
 
     // Prevent zooming in
@@ -888,7 +904,9 @@ class DisplayMap {
 
     MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
       this.changeZoom(event.deltaY);
+
       this.clearInfo();
+      this.clearPositionInfo();
     });
 
     MAP_SET_LOCATION.addEventListener("click", () => {

@@ -465,8 +465,20 @@ button:hover, select:hover {
   position: absolute;
   background-color: var(--secondary-color);
   padding: 8px;
-  border-radius: 10px;
+  border-radius: 0 10px 10px 10px;
   border: 1px solid var(--detail-color);
+}
+
+.map-info.right {
+  border-radius: 10px 0 10px 10px !important;
+}
+
+.map-info.bottom {
+  border-radius: 10px 10px 10px 0 !important;
+}
+
+.map-info.right.bottom {
+  border-radius: 10px 10px 0 10px !important;
 }
 
 .map-info button {
