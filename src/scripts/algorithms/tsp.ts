@@ -42,6 +42,7 @@ function getCombinations(arr: any[]) {
  */
 type TNode = {
   id: number;
+  index?: number;
   x: number;
   y: number;
   type: string;
@@ -355,6 +356,7 @@ function goFrugal(
   const t0 = performance.now();
   const sortedX: number[] = [];
   const sortedY: number[] = [];
+  const indices: number[] = [];
   let speed;
   if (fast) {
     speed = 100;
@@ -368,12 +370,13 @@ function goFrugal(
     sortedX[i] = xData[index];
     sortedY[i] = yData[index];
     sortedTypes[i] = typesData[index];
+    indices[i] = index;
   }
 
 
   let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
+    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1], index: indices[i-1] };
   }
   TNodes[speed] = { id: speed, x: endingX, y: endingY, type: "END" };
   let graph: Graph = {
@@ -440,6 +443,7 @@ function savingFuel(
   const sortedX = [];
   const sortedY = [];
   const sortedTypes = [];
+  const indices = [];
   const deepCopy = JSON.parse(JSON.stringify(categories));
   deepCopy[deepCopy.length] = "START";
   deepCopy[deepCopy.length] = "END";
@@ -455,10 +459,11 @@ function savingFuel(
     sortedX[i] = xData[index];
     sortedY[i] = yData[index];
     sortedTypes[i] = typesData[index];
+    indices[i] = index;
   }
   let TNodes: TNode[] = [{ id: 0, x: currentX, y: currentY, type: "START" }];
   for (let i = 1; i < speed; i++) {
-    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1] };
+    TNodes[i] = { id: i, x: sortedX[i-1], y: sortedY[i-1], type: sortedTypes[i-1], index: indices[i-1] };
   }
   TNodes[speed] = { id: speed, x: targetX, y: targetY, type: "END" }
   let graph: Graph = {

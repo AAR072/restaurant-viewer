@@ -1,14 +1,20 @@
+// #region HTML elements
 const AUTO_CLEAR_CHECKBOX = document.getElementById("auto-performance-clear") as HTMLInputElement;
 const CLEAR_ALL_BUTTON = document.getElementById("clear-performance-log") as HTMLButtonElement;
 const PERFORMANCE_CONTAINER = document.getElementById("performance-log-container") as HTMLDivElement;
+// #endregion
 
-const LOG_QUEUE_SIZE: number = 30;
-const LOG_TASK_DURATION = 5000;
-const LOG_TASK_FADE_DURATION = 1000;
+const LOG_TASK_DURATION = 5000; // Amount of time before a log task is removed.
+const LOG_TASK_FADE_DURATION = 1000; // The duration of the log task fade animation
 
 const timeouts: number[] = [];
 let timeoutPointer = 0;
 
+/**
+ * Fades out and eventually removes the specified task element.
+ * @param element The task element to be removed.
+ * @timecomplexity O(1)
+ */
 function clearTask(element: HTMLDivElement) {
   element.style.marginBottom = (-element.clientHeight - 10) + "px";
   element.classList.add("fade-out");
@@ -18,6 +24,11 @@ function clearTask(element: HTMLDivElement) {
   }, LOG_TASK_FADE_DURATION);
 }
 
+/**
+ * Applies a timer for the removal of a log task element.
+ * @param element The element in which the timer is applied.
+ * @timecomplexity O(1)
+ */
 function createTimeout(element: HTMLDivElement) {
   timeouts[timeoutPointer++] = window.setTimeout(() => {
     clearTask(element);
@@ -26,16 +37,13 @@ function createTimeout(element: HTMLDivElement) {
 }
 
 /**
- * Logs a task and appends the task details to a specified div element on the page.
- * Each task will be removed from the DOM after 5 seconds.
- *
- * @param {string} name - The name of the task to be logged.
- * @param {number} time - The time spent on the task, in milliseconds.
- * @param {string} description - A brief description of the task.
- *
+ * Logs a task and appends the task details the log container div.
+ * @param name The name of the task to be logged.
+ * @param time The time spent on the task, in milliseconds.
+ * @param description A brief description of the task.
+ * @timecomplexity O(1)
  * @example
- * logTask("Example Task", 5000, Date.now(), "This task involved setting up a project.", "taskContainer");
- * // This will create a new task box inside the element with id "taskContainer"
+ * logTask("Example Task", 5000, "This task involved setting up a project.");
  */
 function logTask(name: string, time: number, description: string) {
   const logItem = document.createElement("div");
@@ -74,19 +82,23 @@ function logTask(name: string, time: number, description: string) {
 }
 
 AUTO_CLEAR_CHECKBOX.addEventListener("input", () => {
-  if (AUTO_CLEAR_CHECKBOX.checked) {
+  if (AUTO_CLEAR_CHECKBOX.checked) { // Creates timeouts for all log tasks if checked
     for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
       createTimeout(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
     }
 
-  } else {
+  } else { // Clears all timeouts and empties timeout array when unchecked
     for (let i = 0; i < timeoutPointer; i++) {
       window.clearTimeout(timeouts[i]);
     }
+
+    timeoutPointer = 0;
+    timeouts.length = 0;
   }
 });
 
 CLEAR_ALL_BUTTON.addEventListener("click", () => {
+  // Clears all log tasks inside of the container
   for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
     clearTask(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
   }

@@ -1,33 +1,18 @@
+// #region HTML elements
 const SEARCH_RESULTS = document.getElementById("search-results") as HTMLDivElement;
-
 const SORT_DIR_TEXT = document.getElementById("sort-dir-text") as HTMLDivElement;
+// #endregion
 
 type SortFieldType = "storeName" | "cost" | "review";
 
-/**
- * Represents the results of a search operation, handling pagination, sorting, 
- * and displaying restaurant information.
- * 
- * @class
- * @property {Uint32Array} results - The array of result indices.
- * @property {Uint32Array} sorted - The sorted array of result indices.
- * @property {string} defaultSort - The default field used for sorting results.
- * @property {number} page - The current page number.
- * @property {number} pageCount - The total number of pages.
- * @property {boolean} descending - The flag indicating if the results are sorted in descending order.
- * 
- * @param {App} app - The app instance that contains the data.
- * @param {Uint32Array} results - The array of result indices.
- * @param {string} defaultSort - The field used for sorting results.
- */
+/** Represents the results of a search operation, handling pagination, sorting, and displaying restaurant information. */
 class SearchResult {
-  static MIN_PAGE_SIZE: number = 1; // Minimum page size.
-  static MAX_PAGE_SIZE: number = 100; // Maximum page size.
+  static MIN_PAGE_SIZE: number = 1;
+  static MAX_PAGE_SIZE: number = 100;
 
-  static pageSize: number = 10; // Default number of results per page.
-
-  public includesAll: boolean; // Whether or not the results include all of the values.
-
+  /** The number of results displayed per page. */
+  public pageSize: number = 10;
+  
   public sort: SortFieldType = "storeName";
   public typeFilter: string = "";
   public costMin: number | null = null;
@@ -35,46 +20,118 @@ class SearchResult {
   public reviewMin: number | null = null;
   public reviewMax: number | null = null;
 
-  public final: Uint32Array; // Sorted array of result indices.
+  public results: Uint32Array;
+
+  /** The final filtered and sorted results to be displayed. */
+  public final: Uint32Array;
   public finalCount: number;
 
-  public page: number = 0; // Current page number.
-  public pageCount: number; // Total number of pages.
-  public descending: boolean = false; // Sort order flag.
+  public page: number = 0;
+  public pageCount: number;
+  public descending: boolean = false;
 
   /**
-   * Initializes a new instance of the SearchResult class.
-   * 
-   * @param {App} app - The app instance that contains the data.
-   * @param {Uint32Array} results - The array of result indices.
-   * 
-   * @timecomplexity O(1) - Initialization involves simple assignments and a constant time calculation for `pageCount`.
+   * Initializes the a new search result and displays its results.
+   * @param app The app instance that contains the data.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final call in clear search call.
    */
-  constructor(public app: App, public results: Uint32Array) {
+  constructor(public app: App) {
+    this.clearSearch();
+  }
+
+  /**
+   * Sets the search results array based on name, id, x and y inputs.
+   * @param name The name input.
+   * @param id The id input
+   * @param x The x input.
+   * @param y The y input.
+   * @timecomplexity O(log n) or O(n) depending on amount of valid input parameters, and sort/filters because of update final call.
+   */
+  public setSearch(name: string, id: string, x: number, y: number) {
+    const total: Uint32Array[] = [];
+    let totalPointer = 0;
+    let alreadySorted = false;
+
+    // Add filtered results for the valid search parameters to the total array
+
+    if (name != "") {
+      total[totalPointer++] = filterStrings(this.app.data.storeName, this.app.sorted.storeName, name);
+      alreadySorted = true;
+    }
+
+    if (id != "") total[totalPointer++] = filterStrings(this.app.data.ID, this.app.sorted.ID, id);
+    if (!isNaN(x)) total[totalPointer++] = filterNumbers(this.app.data.x, this.app.sorted.x, x, x);
+    if (!isNaN(y)) total[totalPointer++] = filterNumbers(this.app.data.y, this.app.sorted.y, y, y);
+
+    if (totalPointer == 1) {
+      if (alreadySorted) this.results = total[0]; // Set results to first results if already sorted alphabetically
+      else this.results = sortBy(total[0], App.RESTAURANT_COUNT, this.app.sorted.storeName); // Set results to sorted first results if not sorted
+
+    } else if (totalPointer > 1) { // Get intersections of search parameters if more than one
+      this.results = getIntersections(total, App.RESTAURANT_COUNT, alreadySorted ? undefined : this.app.sorted.storeName);
+    }
+
     this.updateFinal();
   }
 
-  // static fromSearch(app: App, name?: string, id?: string, x?: number, y?: number) {
+  /**
+   * Sets results to all restaurants and displays the update.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
+  public clearSearch() {
+    this.results = this.app.sorted.storeName;
+    this.updateFinal();
+  }
 
-  // }
+  /**
+   * Sets results to the specified results array.
+   * @param results The new search results.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
+  public setResults(results: Uint32Array) {
+    this.results = results;
+    this.updateFinal();
+  }
 
+  /**
+   * Sets the cuisine type filter and displays the changes.
+   * @param type The cuisine type to show.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
   public setTypeFilter(type: string) {
     this.typeFilter = type;
     this.updateFinal();
   }
 
+  /**
+   * Sets the cost range filter and displays the changes.
+   * @param min Minimum cost.
+   * @param max Maximum cost.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
   public setCostRange(min: number | null, max: number | null) {
     this.costMin = min;
     this.costMax = max;
     this.updateFinal();
   }
 
+  /**
+   * Sets the review range filter and displays the results.
+   * @param min Minimum review.
+   * @param max Maximum review.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
   public setReviewRange(min: number | null, max: number | null) {
     this.reviewMin = min;
     this.reviewMax = max;
     this.updateFinal();
   }
 
+  /**
+   * Sets the sort order of the results and displays the changes.
+   * @param newSort The new sort order type.
+   * @timecomplexity O(1), O(log n) or O(n) because of update final.
+   */
   public changeSort(newSort: SortFieldType) {
     this.sort = newSort;
     this.updateFinal();
@@ -82,46 +139,38 @@ class SearchResult {
 
   /**
    * Toggles the sort order between ascending and descending.
-   * 
-   * @timecomplexity O(n) - Calls `loadResults`, which iterates through the current page size, leading to linear time complexity.
+   * @timecomplexity O(n), where n is the page size
    */
   public toggleDirection() {
-    this.descending = !this.descending; // Toggle the order.
-    this.displayUpdate(); // Reload results based on the new order.
+    this.descending = !this.descending; // Toggle the order
+    this.displayUpdate(); // Reload results based on the new order
   }
 
   /**
-   * Changes the number of results displayed per page. Clamps the value to be between 1 and 100.
-   *
-   * @param {number} n - The new page size.
-   * 
-   * @timecomplexity O(1) - The method consists of simple arithmetic operations and assignments.
+   * Changes the number of results displayed per page. Clamps the value to be between 1 and 100
+   * @param {number} n The new page size
+   * @timecomplexity O(n), where n is the page size
    */
   public changePageSize(n: number) {
-    SearchResult.pageSize = clamp(n, SearchResult.MIN_PAGE_SIZE, SearchResult.MAX_PAGE_SIZE); // Update static page size.
-
+    this.pageSize = clamp(n, SearchResult.MIN_PAGE_SIZE, SearchResult.MAX_PAGE_SIZE); // Update page size
     this.updatePageCount();
     this.displayUpdate();
   }
 
   /**
    * Increments or decrements the current page by a specified amount, wrapping around as necessary.
-   * 
-   * @param {number} amount - The amount to change the page by (can be negative).
-   * 
-   * @timecomplexity O(1) - The method consists of simple arithmetic and updates, resulting in constant time operations.
+   * @param amount The amount to change the page by (can be negative).
+   * @timecomplexity O(1)
    */
   public incrementPage(amount: number) {
-    this.page = circleMod(this.page + amount, this.pageCount); // Update page with circular behavior.
-    this.displayUpdate(); // Update page info.
+    this.page = circleMod(this.page + amount, this.pageCount); // Update page with circular behavior
+    this.displayUpdate(); // Update page info
   }
 
   /**
    * Sets the current page to a specified number, clamping the value to valid page indices.
-   * 
-   * @param {number} n - The new page number (0-based index).
-   * 
-   * @timecomplexity O(1) - Simple arithmetic and assignments lead to constant time complexity.
+   * @param n The new page number.
+   * @timecomplexity O(1)
    */
   public setPage(n: number) {
     n = clamp(n - 1, 0, this.pageCount - 1); // Ensure n is within valid range.
@@ -130,11 +179,19 @@ class SearchResult {
     this.displayUpdate(); // Update page info display.
   }
 
+  /**
+   * Updates the page count based on the amount of results.
+   * @timecomplexity O(1)
+   */
   public updatePageCount() {
     this.page = 0;
-    this.pageCount = Math.ceil(this.finalCount / SearchResult.pageSize);
+    this.pageCount = Math.ceil(this.finalCount/this.pageSize);
   }
 
+  /**
+   * Updates the final array to be displayed in the results page.
+   * @timecomplexity O(1), O(log n) or O(n) depending on which sort and filters are being applied.
+   */
   public updateFinal() {
     let filteredType;
     let filteredCost;
@@ -143,14 +200,17 @@ class SearchResult {
     // make sure steps are skipped if results/any filters are empty
     // optimize and cleanup code (fix stuff with number[] | Uint32Array and make sure everything is Uint32Array from initialization )
 
+    // Set type filtered array if type filter
     if (this.typeFilter != "") {
       filteredType = this.app.getCuisineTypeArr(this.typeFilter);
     }
 
+    // Set cost filtered array if cost range
     if (this.costMin != null && this.costMax != null) {
       filteredCost = filterNumbers(this.app.data.cost, this.app.sorted.cost, this.costMin, this.costMax);
     }
 
+    // Set review filtered array if review range
     if (this.reviewMin != null && this.reviewMax != null) {
       filteredReview = filterNumbers(this.app.data.review, this.app.sorted.review, this.reviewMin, this.reviewMax);
     }
@@ -160,21 +220,21 @@ class SearchResult {
     let sorted;
 
     if (this.sort == "storeName") {
-      data[dataPointer++] = this.results;
+      data[dataPointer++] = this.results; // Add search results array because it is sorted alphabetically
 
       if (filteredType) data[dataPointer++] = filteredType;
       if (filteredCost) data[dataPointer++] = filteredCost;
       if (filteredReview) data[dataPointer++] = filteredReview;
 
     } else if (this.sort == "cost" && filteredCost) {
-      data[dataPointer++] = filteredCost;
+      data[dataPointer++] = filteredCost; // Add cost filtered array first because it is sorted by cost
       data[dataPointer++] = this.results;
 
       if (filteredType) data[dataPointer++] = filteredType;
       if (filteredReview) data[dataPointer++] = filteredReview;
 
     } else if (this.sort == "review" && filteredReview) {
-      data[dataPointer++] = filteredReview;
+      data[dataPointer++] = filteredReview; // Add review filtered array first because it is sorted by review
       data[dataPointer++] = this.results;
 
       if (filteredCost) data[dataPointer++] = filteredCost;
@@ -191,26 +251,26 @@ class SearchResult {
 
     let final = this.results;
 
-    if (dataPointer > 1) final = getIntersections(data, App.RESTAURANT_COUNT, sorted);
+    if (dataPointer > 1) final = getIntersections(data, App.RESTAURANT_COUNT, sorted); // Set final to intersections if there are any filters
     else if (dataPointer == 1) {
-      if (sorted) final = sortBy(data[0], App.RESTAURANT_COUNT, sorted);
-      else final = new Uint32Array(data[0]);
+      if (sorted) final = sortBy(data[0], App.RESTAURANT_COUNT, sorted); // Set final to sorted default results if sort is not alphabetical
+      else final = new Uint32Array(data[0]); // Set final to default results
     }
 
+    // Set final
     this.final = final;
     this.finalCount = final.length;
 
+    // Display changes
     this.updatePageCount();
     this.displayUpdate();
   }
 
   /**
    * Creates and displays information for a restaurant result based on its order and index.
-   * 
-   * @param {number} order - The order of the result to display.
-   * @param {number} index - The index of the restaurant in the original data.
-   * 
-   * @timecomplexity O(1) - The method creates UI elements and formats strings, all of which are constant time operations.
+   * @param order The order of the result to display.
+   * @param index The index of the restaurant in the original data.
+   * @timecomplexity O(1)
    */
   public createResultElement(order: number, index: number) {
     const info = this.app.createRestaurantInfo(index);
@@ -240,13 +300,12 @@ class SearchResult {
 
   /**
    * Loads the results for the current page and updates the UI.
-   * 
-   * @timecomplexity O(n) - Where n is the page size. The method loops through the page size to load results, hence linear time.
+   * @timecomplexity O(n), where n is the page size.
    */
   public displayUpdate() {
-    this.app.pageSizeTextbox.setValue(SearchResult.pageSize); // Update page size input.
-    this.app.pageTextbox.setValue(this.page + 1); // Update current page number (1-based index).
-    PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1.
+    this.app.pageSizeTextbox.setValue(this.pageSize); // Update page size input
+    this.app.pageTextbox.setValue(this.page + 1); // Update current page number
+    PAGE_COUNT.innerText = String(this.pageCount == 0 ? 1 : this.pageCount); // Display total pages, ensure at least 1
 
     if (this.descending) {
       SORT_DIRECTION.classList.add("descending");
@@ -257,16 +316,16 @@ class SearchResult {
       SORT_DIR_TEXT.innerText = "Ascending"
     }
 
-    SEARCH_RESULTS.innerHTML = ""; // Clear previous results.
+    SEARCH_RESULTS.innerHTML = ""; // Clear previous results
 
-    // Loop through the number of results per page and load them.
-    for (let i = 0; i < SearchResult.pageSize; i++) {
-      const change = this.page * SearchResult.pageSize + i; // Calculate the index for the current result.
-      const current = this.descending ? this.finalCount - 1 - change : change; // Adjust index based on sort order.
+    // Loop through the number of results per page and load them
+    for (let i = 0; i < this.pageSize; i++) {
+      const change = this.page*this.pageSize + i; // Calculate the index for the current result
+      const current = this.descending ? this.finalCount - 1 - change : change; // Adjust index based on sort order
 
-      if (current >= this.finalCount || current < 0) break; // Break if current index is out of bounds.
+      if (current >= this.finalCount || current < 0) break; // Break if current index is out of bounds
 
-      this.createResultElement(current, this.final[current]); // Load the restaurant info.
+      this.createResultElement(current, this.final[current]); // Load the restaurant info
     }
   }
 }

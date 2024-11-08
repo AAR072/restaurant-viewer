@@ -1,4 +1,4 @@
-// #region html elements
+// #region HTML elements
 const SEARCH_NAME_INPUT = document.getElementById("search-name") as HTMLInputElement;
 const SEARCH_ID_INPUT = document.getElementById("search-id") as HTMLInputElement;
 const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
@@ -57,20 +57,23 @@ interface SortedData {
   distSorted: Uint32Array; // Stores sorted distances
 }
 
-/**
- * Main application class which stores all global information related to the web app.
- */
+/** Main application class which stores all global information related to the web app. */
 class App {
   static RESTAURANT_COUNT: number = 100000;
-  static UNIT_SCALE: number = 20; // Scale of x and y data units (every increment of 1 represents 20 meters)
+  /** Scale of x and y data units (every increment of 1 represents 20 meters). */
+  static UNIT_SCALE: number = 20;
 
-  public data: Data; // Holds the original data.
-  public sorted: SortedData; // Holds the sorted data.
+  public data: Data; // Holds the original data
+  public sorted: SortedData; // Holds the sorted data
 
-  public locationX: number = 0; // User's current X location.
-  public locationY: number = 0; // User's current Y location.
+  /** User's x location. */
+  public locationX: number = 0;
+  /** User's y location. */
+  public locationY: number = 0;
 
-  public currentSearch: SearchResult; // Holds the current search result.
+  /** Search result instance to display results. */
+  public searchResult: SearchResult;
+  /** Display map instance to display map. */
   public displayMap: DisplayMap;
 
   public pathDropdown: Dropdown;
@@ -93,35 +96,37 @@ class App {
   /**
    * Initializes the App with the given data and sorts it accordingly.
    *
-   * @param {Data} data - The data to be processed and sorted.
+   * @param data - The data to be processed and sorted.
    * 
    * @timecomplexity O(n log n) - Sorting operations for each sortable field use merge sort, which has a time complexity of O(n log n). The initialization of the sorted object involves multiple sorts.
    */
   constructor(data: Data) {
-    this.data = data; // Store the original data.
+    this.data = data; // Store the original data
 
-    // Initialize the sorted data with sorted arrays and corresponding order arrays.
+    // Initialize the sorted data with sorted arrays and corresponding order arrays
     this.sorted = {
-      ID: sortStrings(data.ID), // Sort IDs.
-      storeName: sortStrings(data.storeName), // Sort store names.
-      cuisines: [],
-      type: [], // Initialize type dictionary.
-      cost: sortNumbers(data.cost), // Sort costs.
-      review: sortNumbers(data.review), // Sort reviews.
-      x: sortNumbers(data.x), // Sort x coordinates.
-      y: sortNumbers(data.y), // Sort y coordinates.
+      ID: sortStrings(data.ID), // Sort IDs
+      storeName: sortStrings(data.storeName), // Sort store names
+      cuisines: [], // Array for cuisine types
+      type: [], // 2d array for restaurants for each cuisine type
+      cost: sortNumbers(data.cost), // Sort costs
+      review: sortNumbers(data.review), // Sort reviews
+      x: sortNumbers(data.x), // Sort x coordinates
+      y: sortNumbers(data.y), // Sort y coordinates
 
-      distData: new Float32Array(App.RESTAURANT_COUNT), // Array for distances.
-      distSorted: new Uint32Array(App.RESTAURANT_COUNT), // Array for sorted distances.
+      distData: new Float32Array(App.RESTAURANT_COUNT), // Array for distances
+      distSorted: new Uint32Array(App.RESTAURANT_COUNT), // Array for sorted distances
     };
 
-    // Creating our components
-    this.loadTypes();
+    this.loadTypes(); // Load cuisine type arrays
 
+    // Create location textboxes
     this.locationXTextbox = new ScalingTextbox(LOCATION_X, 0);
     this.locationYTextbox = new ScalingTextbox(LOCATION_Y, 0);
 
-    this.updateDistances();
+    this.updateDistances(); // Set and sort distances
+
+    // Create all custom functionality UI components
 
     this.pathDropdown = new Dropdown(PATH_DROPDOWN);
     this.filterDropdown = new Dropdown(FILTER_DROPDOWN);
@@ -144,19 +149,21 @@ class App {
     this.destXTextbox = new ScalingTextbox(DESTINATION_X, 0, 0);
     this.destYTextbox = new ScalingTextbox(DESTINATION_Y, 0, 0);
     this.budgetTextbox = new ScalingTextbox(FRUGAL_BUDGET_SPAN, 0, 10);
-    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 9);
+    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
 
-    // Initialize the current search with store names and an empty query.
-    this.currentSearch = new SearchResult(this, this.sorted.storeName);
+    // Initialize the search result and display map instances
+    this.searchResult = new SearchResult(this);
     this.displayMap = new DisplayMap(this);
 
-    this.initInput(); // Set up input handling for searches.
+    this.initInput(); // Set up input handling for searches
   }
 
-  /*
+  /**
+   * Creates an option in the type filter select element.
+   * @param name The name of the option.
    * @timecomplexity O(1)
    */
-  public createTypeOption(name: string) {
+  private createTypeOption(name: string) {
     const option = document.createElement("option");
     option.innerText = name;
     option.value = name;
@@ -165,10 +172,10 @@ class App {
   }
 
   /**
-   * Loads restaurant types into the sorted data structure. 
-   * This method iterates over all restaurants and organizes them by their types.
-   * 
-   * @timecomplexity O(n) - The method loops through `App.restaurantCount`, performing constant time operations for each restaurant.
+   * Gets the index of the cuisine name.
+   * @param cuisineName The name of the cuisine type.
+   * @returns The index of the cuisine type in the cuisines array, -1 if it does not exist.
+   * @timecomplexity O(n), where n is the number of cuisines which is always constant so O(1)
    */
   public getCuisineTypeIndex(cuisineName: string): number {
     for (let i = 0; i < this.sorted.cuisines.length; i++) {
@@ -179,12 +186,16 @@ class App {
   }
 
   /**
+   * Gets the array of restaurants which have a common cuisine type.
+   * @returns The array of restaurants for a cuisine type.
    * @timecomplexity O(1)
    */
   public getCuisineTypeArr(cuisineName: string): number[] {
     return this.sorted.type[this.getCuisineTypeIndex(cuisineName)];
   }
+
   /**
+   * Loops through the restaurants, creates the cuisine types and sorts restaurants into a 2d array based on cuisine type.
    * @timecomplexity O(n)
    */
   public loadTypes() {
@@ -192,11 +203,11 @@ class App {
     let cuisinePointer = 0;
 
     for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
-      const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names.
-      const type = this.data.type[index]; // Retrieve the type of the restaurant using the index.
+      const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names
+      const type = this.data.type[index]; // Retrieve the type of the restaurant using the index
       let typeIndex = this.getCuisineTypeIndex(type);
 
-      // If the type doesn't exist in the sorted type object, initialize it as an empty array.
+      // If the type doesn't exist in the sorted type object, initialize it as an empty array
       if (typeIndex < 0) {
         typeIndex = cuisinePointer++;
 
@@ -208,34 +219,36 @@ class App {
         this.createTypeOption(type);
       }
 
-      // Store the original index of the restaurant under its type in the sorted structure.
+      // Store the original index of the restaurant under its type in the sorted structure
       this.sorted.type[typeIndex][typePointers[typeIndex]++] = index;
     }
   }
 
   /**
-   * Updates distances based on the current location.
-   * 
-   * @timecomplexity O(n) - The distance calculation iterates over the list of restaurants, resulting in a linear time complexity.
+   * Updates distances and sorted distances based on the current user location.
+   * @timecomplexity O(n log n) - Sorting at the end has O(n log n) time complexity.
    */
   public updateDistances() {
+    // Update location textboxes with new location values
     this.locationXTextbox.setValue(this.locationX*App.UNIT_SCALE);
     this.locationYTextbox.setValue(this.locationY*App.UNIT_SCALE);
+
+    // Calculate distances for all restaurants
     for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
       this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
     }
 
-    sortNumbers(this.sorted.distData, this.sorted.distSorted);
+    sortNumbers(this.sorted.distData, this.sorted.distSorted); // Sort new distances
   }
 
   /**
    * Changes the user's current location to the specified coordinates (x, y).
    * This method updates the location and recalculates distances to restaurants.
    *
-   * @param {number} x - The new X coordinate of the user's location.
-   * @param {number} y - The new Y coordinate of the user's location.
+   * @param x - The new X coordinate of the user's location.
+   * @param y - The new Y coordinate of the user's location.
    * 
-   * @timecomplexity O(n) - The method updates the location and calls `updateDistance()`, which is assumed to iterate through the restaurant list, resulting in a linear time complexity.
+   * @timecomplexity O(n log n) - The method updates the location and calls `updateDistance()` which has O(n log n) time complexity.
    */
   public changeLocation(x: number, y: number) {
     this.locationX = x; // Update the X location.
@@ -244,6 +257,12 @@ class App {
     this.updateDistances(); // Recalculate distances based on the new location.
   }
 
+  /**
+   * Universal function for creating a div with all restaurant info for a given restaurant index.
+   * @param index The restaurant index.
+   * @returns The new info div containing all of the restaurant info.
+   * @timecomplexity O(1)
+   */
   public createRestaurantInfo(index: number) {
     const div = document.createElement("div");
 
@@ -278,14 +297,11 @@ class App {
   }
 
   /**
-   * Initializes the input handling for search queries.
-   * 
+   * Initializes all the event listeners and HTML element related inputs for the app.
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
-  initInput() {
-    // TESTING_BUTTON.addEventListener("click", () => {
-    //   tests(document.getElementById("testing-div"));
-    // });
+  private initInput() {
+    // Update search results when search button is pressed
 
     const searchCallback = () => {
       const nameInput = SEARCH_NAME_INPUT.value;
@@ -295,34 +311,9 @@ class App {
 
       if (nameInput == "" && idInput == "" && isNaN(xInput) && isNaN(yInput)) return;
 
-      const total: Uint32Array[] = [];
-      let totalPointer = 0;
-      let alreadySorted = false;
-
-      if (nameInput != "") {
-        total[totalPointer++] = filterStrings(this.data.storeName, this.sorted.storeName, nameInput);
-        alreadySorted = true;
-      }
-
-      if (idInput != "") total[totalPointer++] = filterStrings(this.data.ID, this.sorted.ID, idInput);
-      if (!isNaN(xInput)) total[totalPointer++] = filterNumbers(this.data.x, this.sorted.x, xInput, xInput);
-      if (!isNaN(yInput)) total[totalPointer++] = filterNumbers(this.data.y, this.sorted.y, yInput, yInput);
-
-      let results
-
-      if (totalPointer == 1) {
-        if (alreadySorted) results = total[0];
-          else results = sortBy(total[0], App.RESTAURANT_COUNT, this.sorted.storeName);
-
-      } else if (totalPointer > 1) {
-        results = getIntersections(total, App.RESTAURANT_COUNT, alreadySorted ? undefined : this.sorted.storeName);
-
-      } else {
-        results = new Uint32Array(0);
-      }
-
-      this.currentSearch = new SearchResult(this, results);
+      this.searchResult.setSearch(nameInput, idInput, xInput, yInput);
       this.displayMap.clearPath();
+      FRUGAL_RESULT.classList.remove("show");
     }
 
     SEARCH_BUTTON.addEventListener("click", searchCallback);
@@ -339,69 +330,78 @@ class App {
       if (event.key == "Enter") searchCallback();
     });
 
+    // Clear search results to show all results when button pressed
     SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
       SEARCH_NAME_INPUT.value = "";
       SEARCH_ID_INPUT.value = "";
       SEARCH_X_INPUT.value = "";
       SEARCH_Y_INPUT.value = "";
 
-      this.currentSearch = new SearchResult(this, this.sorted.storeName);
+      this.searchResult.clearSearch();
       this.displayMap.clearPath();
+      FRUGAL_RESULT.classList.remove("show");
     });
 
+    // Filter search result cuisine type
     TYPE_SELECT.addEventListener("input", () => {
-      this.currentSearch.setTypeFilter(TYPE_SELECT.value);
+      this.searchResult.setTypeFilter(TYPE_SELECT.value);
     });
 
+    // Filter cost by range slider
     this.costSlider.addListener((min: number, max: number, fullRange: boolean) => {
       if (fullRange) {
-        this.currentSearch.setCostRange(null, null);
+        this.searchResult.setCostRange(null, null);
 
         return;
       }
 
-      this.currentSearch.setCostRange(min, max);
+      this.searchResult.setCostRange(min, max);
     });
 
+    // Filter review by range slider
     this.reviewSlider.addListener((min: number, max: number, fullRange: boolean) => {
       if (fullRange) {
-        this.currentSearch.setReviewRange(null, null);
+        this.searchResult.setReviewRange(null, null);
 
         return;
       }
 
-      this.currentSearch.setReviewRange(min, max);
+      this.searchResult.setReviewRange(min, max);
     });
 
+    // Change selected sort for search result
     SORT_SELECT.addEventListener("input", () => {
-      this.currentSearch.changeSort(SORT_SELECT.value as SortFieldType);
+      this.searchResult.changeSort(SORT_SELECT.value as SortFieldType);
     });
 
+    // Change sort direction for search result
     SORT_DIRECTION.addEventListener("click", () => {
-      this.currentSearch.toggleDirection();
+      this.searchResult.toggleDirection();
     });
 
+    // Change page size
     this.pageSizeTextbox.addListener(() => {
-      if (this.pageSizeTextbox.value != null) this.currentSearch.changePageSize(this.pageSizeTextbox.value);
+      if (this.pageSizeTextbox.value != null) this.searchResult.changePageSize(this.pageSizeTextbox.value);
     });
 
+    // Go to next page
     NEXT_PAGE_BUTTON.addEventListener("click", () => {
-      this.currentSearch.incrementPage(1);
+      this.searchResult.incrementPage(1);
     });
 
+    // Go to previous page
     PREV_PAGE_BUTTON.addEventListener("click", () => {
-      this.currentSearch.incrementPage(-1);
+      this.searchResult.incrementPage(-1);
     });
 
+    // Set exact page
     this.pageTextbox.addListener(() => {
-      if (this.pageTextbox.value != null) this.currentSearch.setPage(this.pageTextbox.value);
+      if (this.pageTextbox.value != null) this.searchResult.setPage(this.pageTextbox.value);
     });
 
-    let resultCount: number = 0;
-
-    FRUGAL_RESULT.hidden = true;
-
+    // Go frugal
     FRUGAL_BUTTON.addEventListener("click", () => {
+      // Get destination and budget inputs
       const destX = this.destXTextbox.value/App.UNIT_SCALE;
       const destY = this.destYTextbox.value/App.UNIT_SCALE;
       const budget = this.budgetTextbox.value;
@@ -414,12 +414,15 @@ class App {
       const path = result.path;
       const results = new Uint32Array(4);
 
-      for (let i = 0; i < 4; i++) {
-        results[i] = path[i + 1].id;
+      // Add restaurants on path to array
+      for (let i = 0; i < path.length - 2; i++) {
+        results[i] = path[i + 1].index!;
       }
 
-      this.currentSearch = new SearchResult(this, results);
-      this.displayMap.setPath(path, result.distance);
+      this.searchResult.setResults(results); // Set search results to restaurants on path
+      this.displayMap.setPath(path, result.distance); // Set path to render on map
+
+      // Display go frugal info
 
       FRUGAL_RESULT.classList.add("show");
       FRUGAL_COST.innerText = "$" + (result.distance*App.UNIT_SCALE/1000*0.5).toFixed(2);
@@ -427,24 +430,19 @@ class App {
 
       if (result.possible) FRUGAL_SUCCESS.classList.remove("unsuccessful");
       else FRUGAL_SUCCESS.classList.add("unsuccessful");
-
-      resultCount++;
-
-      window.setTimeout(() => {
-        resultCount--;
-
-        if (resultCount == 0) FRUGAL_RESULT.classList.remove("show");
-      }, 3000)
     });
 
+    // Disable saving fuel when 0 types are selected
     this.fuelSaveChecklist.addListener((value: string[] | null) => {
       if (!value || value.length < 1) SAVE_FUEL_BUTTON.disabled = true;
-        else SAVE_FUEL_BUTTON.disabled = false;
+      else SAVE_FUEL_BUTTON.disabled = false;
     });
 
     SAVE_FUEL_BUTTON.disabled = true;
 
+    // Saving fuel
     SAVE_FUEL_BUTTON.addEventListener("click", () => {
+      // Get destination inputs and selected cuisine inputs
       const destX = this.destXTextbox.value/App.UNIT_SCALE;
       const destY = this.destYTextbox.value/App.UNIT_SCALE;
       const selected = this.fuelSaveChecklist.value!;
@@ -453,14 +451,16 @@ class App {
       const path = result.path;
       const results = [];
 
+      // Add restaurants on path to array
       for (let i = 1; i < path.length - 1; i++) {
-        results[i] = path[i].id;
+        results[i] = path[i].index!;
       }
 
-      this.currentSearch = new SearchResult(this, new Uint32Array(results));
-      this.displayMap.setPath(path, result.distance);
+      this.searchResult.setResults(new Uint32Array(results)); // Set restaurants on path as search result
+      this.displayMap.setPath(path, result.distance); // Set map path to render
     });
 
+    // Change user x location
     this.locationXTextbox.addListener(() => {
       const value = this.locationXTextbox.value/App.UNIT_SCALE;
 
@@ -471,6 +471,7 @@ class App {
       this.updateDistances();
     });
 
+    // Change user y location
     this.locationYTextbox.addListener(() => {
       const value = this.locationYTextbox.value/App.UNIT_SCALE;
 
@@ -481,6 +482,7 @@ class App {
       this.updateDistances();
     });
 
+    // Center map to user location
     LOCATION_CENTER.addEventListener("click", () => {
       this.displayMap.animateCamera(this.locationX, this.locationY);
     });

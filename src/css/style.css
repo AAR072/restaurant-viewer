@@ -275,8 +275,11 @@ button:hover, select:hover {
 
 /*#region Filter*/
 .filter-container {
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
   padding: 20px;
+  gap: 8px;
 }
 
 .double-slider {

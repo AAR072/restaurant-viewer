@@ -2,8 +2,10 @@
  * Returns the intersection of multiple sorted `Uint32Array` arrays. 
  * It finds common elements that appear in all input arrays.
  *
- * @param {...Uint32Array[]} data - An arbitrary number of sorted `Uint32Array` arrays to intersect.
- * @returns {Uint32Array} A new `Uint32Array` containing the elements common to all input arrays.
+ * @param data - An arbitrary number of sorted `Uint32Array` arrays to intersect.
+ * @param indexRange - The range of values for the hash table.
+ * @param sortBy - An optional parameter used to sort the intersected values based on their order in another array.
+ * @returns A new `Uint32Array` containing the elements common to all input arrays.
  * 
  * @timecomplexity O(n * m) - Where `n` is the length of the largest array and `m` is the number of arrays. We iterate through all elements of each array (O(n * m)) and use a hash table for lookup (O(1)).
  */
@@ -73,16 +75,14 @@ function getIntersections(data: (Uint32Array | number[])[], indexRange: number, 
   return new Uint32Array(duplicates);
 }
 
-// Modularize sort/hash logic for sortBy and getIntersections
-
 /**
  * Sorts the elements of the `indices` array according to the order defined by `sortedIndices`. 
  * It returns a new `Uint32Array` with elements of `indices` sorted based on their appearance in `sortedIndices`.
  *
- * @param {Uint32Array | number[]} indices - The array of indices to be sorted.
- * @param {number} indexRange - The size of the range that elements in `indices` and `sortedIndices` can take. This value helps initialize the hash table.
- * @param {Uint32Array} sortedIndices - The reference array which defines the desired order of the `indices` array elements.
- * @returns {Uint32Array} A new `Uint32Array` with elements of `indices` sorted based on `sortedIndices`.
+ * @param indices - The array of indices to be sorted.
+ * @param indexRange - The size of the range that elements in `indices` and `sortedIndices` can take. This value helps initialize the hash table.
+ * @param sortedIndices - The reference array which defines the desired order of the `indices` array elements.
+ * @returns A new `Uint32Array` with elements of `indices` sorted based on `sortedIndices`.
  * 
  * @timecomplexity O(n + m) - Where `n` is the length of the `indices` array and `m` is the length of `sortedIndices`. The hash table lookup for each element is O(1).
  */
