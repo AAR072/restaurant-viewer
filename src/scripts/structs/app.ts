@@ -37,6 +37,9 @@ const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButt
 const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
 const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
 const LOCATION_CENTER = document.getElementById("location-center") as HTMLButtonElement;
+
+const TESTING_BUTTON = document.getElementById("testing-button") as HTMLButtonElement;
+const TESTING_DIV = document.getElementById("testing-div") as HTMLDivElement;
 // #endregion
 
 /**

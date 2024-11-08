@@ -649,3 +649,9 @@ button:hover, select:hover {
   color: var(--warning-color);
 }
 /*#endregion*/
+#testing-div {
+  overflow: auto;
+}
+#run-tests {
+  display:flex;
+}
