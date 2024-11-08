@@ -1,3 +1,8 @@
+// The solution this code follows is found at https://stackoverflow.com/questions/74008336/find-the-shortest-path-in-a-graph-which-visits-all-node-types
+// This was responsible for the idea of how to do the bonuses
+
+
+
 /**
  * Gets all combinations of length four from an array 
  * @param {any[]} arr. Our array of strings we want to form combinations with
@@ -299,7 +304,7 @@ function findMinimumDistanceAnywhere(graph: Graph, startId: number): { distance:
 
   // Reverse the path to get it from start to end
   ptr = 0;
-let temp;
+  let temp;
   for (let i = 0; i < path.length / 2; i++) {
     temp = path[i];
     path[i] = path[path.length - 1 - i];
