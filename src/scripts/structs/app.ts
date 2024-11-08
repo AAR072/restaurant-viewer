@@ -42,10 +42,7 @@ const TESTING_BUTTON = document.getElementById("testing-button") as HTMLButtonEl
 const TESTING_DIV = document.getElementById("testing-div") as HTMLDivElement;
 // #endregion
 
-/**
- * Stores all sorted/mutated data
- * 
- */
+/** Stores all sorted/mutated data. */
 interface SortedData {
   ID: Uint32Array; // Sorted array of IDs.
   storeName: Uint32Array; // Sorted array of store names.
