@@ -721,6 +721,10 @@ class DisplayMap {
       mouseY = null;
     });
 
+    document.addEventListener("wheel", (event: WheelEvent) => {
+      if (event.ctrlKey) event.preventDefault();
+    }, {passive: false});
+
     MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
       this.changeZoom(event.deltaY);
       this.clearInfo();
