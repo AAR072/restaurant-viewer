@@ -1,4 +1,4 @@
-type ChecklistCallback = (selections: string[] | null) => any;
+type ChecklistCallback = (selections: string[] | null) => void;
 
 /** Holds functionality for a checklist, including a default any option and an option limit. */
 class Checklist {
@@ -25,15 +25,20 @@ class Checklist {
    * @param maxOptions Optional parameter for option limit.
    * @timecomplexity O(1)
    */
-  constructor(public element: HTMLDivElement, options: string[], anyOption: boolean, public maxOptions?: number) {
-    element.className = "checklist-container";
+  constructor(
+    public element: HTMLDivElement,
+    options: string[],
+    anyOption: boolean,
+    public maxOptions?: number
+  ) {
+    element.className = 'checklist-container';
 
     // Create any option checkbox if specified
     if (anyOption) {
-      this.anyOption = this.createCheckbox("Any");
+      this.anyOption = this.createCheckbox('Any');
       this.anyOption.checked = true;
 
-      this.anyOption.addEventListener("input", () => {
+      this.anyOption.addEventListener('input', () => {
         this.update();
       });
     }
@@ -45,7 +50,7 @@ class Checklist {
     this.checked = new Array(this.checkCount);
 
     // Create options
-    for (let i = 0; i < this.optionCount; i++) {
+    for (let i: number = 0; i < this.optionCount; i++) {
       this.createOption(i);
     }
 
@@ -59,14 +64,16 @@ class Checklist {
    * @timecomplexity O(1)
    */
   private createCheckbox(display: string): HTMLInputElement {
-    const container = document.createElement("div");
-    container.className = "checklist-option";
-    
-    const label = document.createElement("label");
+    const container: HTMLDivElement = document.createElement('div');
+    container.className = 'checklist-option';
+
+    const label: HTMLLabelElement = document.createElement('label');
     label.innerText = display;
 
-    const checkbox = document.createElement("input") as HTMLInputElement;
-    checkbox.type = "checkbox";
+    const checkbox: HTMLInputElement = document.createElement(
+      'input'
+    ) as HTMLInputElement;
+    checkbox.type = 'checkbox';
 
     container.appendChild(checkbox);
     container.appendChild(label);
@@ -81,15 +88,16 @@ class Checklist {
    * @param index The index of the option being checked/changed.
    * @timecomplexity O(1)
    */
-  private checkOption(index: number) {
-    const isChecked = this.optionInputs[index].checked;
+  private checkOption(index: number): void {
+    const isChecked: boolean = this.optionInputs[index].checked;
 
     if (isChecked) {
-      if (this.anyOption && this.anyOption.checked) this.anyOption.checked = false; // Unchecks "any" option if currently checked
+      if (this.anyOption && this.anyOption.checked) {
+        this.anyOption.checked = false;
+      } // Unchecks "any" option if currently checked
 
       this.checked[index] = true;
       this.checkCount++;
-
     } else {
       this.checked[index] = false;
       this.checkCount--;
@@ -102,26 +110,27 @@ class Checklist {
    * Update the checkbox display, value and fire the callback with the updated value.
    * @timecomplexity O(1)
    */
-  private update() {
-    if (this.anyOption && this.anyOption.checked) { // Set value to null if "any" option is checked
+  private update(): void {
+    if (this.anyOption && this.anyOption.checked) {
+      // Set value to null if "any" option is checked
       this.value = null;
-
-    } else { // Set value to checked options
+    } else {
+      // Set value to checked options
       const selected: string[] = new Array(this.checkCount);
       let selectPointer: number = 0;
 
-      if (this.maxOptions && this.checkCount >= this.maxOptions) { // Fill selected array and disable non checked checkboxes to prevent limit being exceeded
-        for (let i = 0; i < this.optionCount; i++) {
+      if (this.maxOptions && this.checkCount >= this.maxOptions) {
+        // Fill selected array and disable non checked checkboxes to prevent limit being exceeded
+        for (let i: number = 0; i < this.optionCount; i++) {
           if (this.checked[i]) {
             selected[selectPointer++] = this.optionNames[i];
-
           } else {
             this.optionInputs[i].disabled = true;
           }
         }
-
       } else {
-        for (let i = 0; i < this.optionCount; i++) { // Fill selected array and enable all checkboxes
+        for (let i: number = 0; i < this.optionCount; i++) {
+          // Fill selected array and enable all checkboxes
           if (this.checked[i]) selected[selectPointer++] = this.optionNames[i];
 
           this.optionInputs[i].disabled = false;
@@ -139,14 +148,16 @@ class Checklist {
    * @param index The index of the option.
    * @timecomplexity O(1)
    */
-  private createOption(index: number) {
-    const name = this.optionNames[index];
+  private createOption(index: number): void {
+    const name: string = this.optionNames[index];
 
-    const checkbox = this.createCheckbox(name.substring(0, 1).toUpperCase() + name.substring(1));
+    const checkbox: HTMLInputElement = this.createCheckbox(
+      name.substring(0, 1).toUpperCase() + name.substring(1)
+    );
 
     this.optionInputs[index] = checkbox;
-    
-    checkbox.addEventListener("input", () => {
+
+    checkbox.addEventListener('input', () => {
       this.checkOption(index);
     });
   }
@@ -155,7 +166,7 @@ class Checklist {
    * Adds a listener callback to be called when the checklist is updated.
    * @param callback The listener callback.
    */
-  public addListener(callback: ChecklistCallback) {
+  public addListener(callback: ChecklistCallback): void {
     this.callback = callback;
   }
 }

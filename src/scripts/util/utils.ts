@@ -41,7 +41,7 @@ function clamp(n: number, min: number, max: number): number {
  * @returns The absolute value of `n`.
  * @timecomplexity O(1)
  */
-function abs(n: number) {
+function abs(n: number): number {
   return n < 0 ? -n : n;
 }
 
@@ -53,9 +53,9 @@ function abs(n: number) {
  * @timecomplexity O(1)
  */
 function floor(n: number, b: number = 1): number {
-  const r = n % b;
+  const r: number = n % b;
 
-  if (n < 0) return r == 0 ? n : n - r - b;
+  if (n < 0) return r === 0 ? n : n - r - b;
   else return n - r;
 }
 
@@ -67,9 +67,9 @@ function floor(n: number, b: number = 1): number {
  * @timecomplexity O(1)
  */
 function ceil(n: number, b: number = 1): number {
-  const r = n % b;
+  const r: number = n % b;
 
-  if (n > 0) return r == 0 ? n : n - r + b;
+  if (n > 0) return r === 0 ? n : n - r + b;
   else return n - r;
 }
 
@@ -81,11 +81,10 @@ function ceil(n: number, b: number = 1): number {
  * @timecomplexity O(1)
  */
 function round(n: number, b: number = 1): number {
-  const r = abs(n % b);
+  const r: number = abs(n % b);
 
-  if (r < b/2) {
+  if (r < b / 2) {
     return floor(n, b);
-
   } else {
     return ceil(n, b);
   }
@@ -99,7 +98,7 @@ function round(n: number, b: number = 1): number {
  * @timecomplexity O(1)
  */
 function circleMod(n: number, base: number): number {
-  if (base == 0) return 0;
+  if (base === 0) return 0;
 
   n %= base;
 
@@ -116,7 +115,7 @@ function circleMod(n: number, base: number): number {
  * @timecomplexity O(1)
  */
 function getDistance(x0: number, y0: number, x1: number, y1: number): number {
-  return Math.sqrt((x0 - x1)**2 + (y0 - y1)**2);
+  return Math.sqrt((x0 - x1) ** 2 + (y0 - y1) ** 2);
 }
 
 /**
@@ -126,8 +125,8 @@ function getDistance(x0: number, y0: number, x1: number, y1: number): number {
  * @returns The geometric sum of the series.
  * @timecomplexity O(1)
  */
-function geoSeries(r: number, n: number) {
-  return (r**n - 1)/(r - 1);
+function geoSeries(r: number, n: number): number {
+  return (r ** n - 1) / (r - 1);
 }
 
 /**
@@ -138,6 +137,6 @@ function geoSeries(r: number, n: number) {
  * @returns The lerped value.
  * @timecomplexity O(1)
  */
-function lerp(n0: number, n1: number, t: number) {
-  return n0 + (n1 - n0)*t;
+function lerp(n0: number, n1: number, t: number): number {
+  return n0 + (n1 - n0) * t;
 }

@@ -1,4 +1,4 @@
-type DSCallback = (min: number, max: number, fullRange: boolean) => any;
+type DSCallback = (min: number, max: number, fullRange: boolean) => void;
 
 /** Holds double slider functionality for a div element containing all relevant elements. */
 class DoubleSlider {
@@ -33,19 +33,29 @@ class DoubleSlider {
     public rangeMax: number,
     public decimalPlaces: number
   ) {
-    const progress = element.querySelector(".progress") as HTMLDivElement;
-    const minSlider = element.querySelector(".min-range") as HTMLInputElement;
-    const maxSlider = element.querySelector(".max-range") as HTMLInputElement;
-    const minTextDisplay = element.querySelector(".slider-min-text") as HTMLSpanElement;
-    const maxTextDisplay = element.querySelector(".slider-max-text") as HTMLSpanElement;
-    const minTextSpan = minTextDisplay.querySelector("span")!;
-    const maxTextSpan = maxTextDisplay.querySelector("span")!;
+    const progress: HTMLDivElement = element.querySelector(
+      '.progress'
+    ) as HTMLDivElement;
+    const minSlider: HTMLInputElement = element.querySelector(
+      '.min-range'
+    ) as HTMLInputElement;
+    const maxSlider: HTMLInputElement = element.querySelector(
+      '.max-range'
+    ) as HTMLInputElement;
+    const minTextDisplay: HTMLSpanElement = element.querySelector(
+      '.slider-min-text'
+    ) as HTMLSpanElement;
+    const maxTextDisplay: HTMLSpanElement = element.querySelector(
+      '.slider-max-text'
+    ) as HTMLSpanElement;
+    const minTextSpan: HTMLSpanElement = minTextDisplay.querySelector('span')!;
+    const maxTextSpan: HTMLSpanElement = maxTextDisplay.querySelector('span')!;
 
     // Create scaling textboxes for the slider
     this.minTextbox = new ScalingTextbox(minTextSpan, decimalPlaces);
     this.maxTextbox = new ScalingTextbox(maxTextSpan, decimalPlaces);
 
-    this.interval = 10**-decimalPlaces; // i.e. decimalPlaces = 1, interval = 0.1 or decimalPlaces = 2, interval = 0.01
+    this.interval = 10 ** -decimalPlaces; // i.e. decimalPlaces = 1, interval = 0.1 or decimalPlaces = 2, interval = 0.01
 
     minSlider.min = maxSlider.min = rangeMin.toString();
     minSlider.max = maxSlider.max = rangeMax.toString();
@@ -57,19 +67,27 @@ class DoubleSlider {
     this.minTextDisplay = minTextDisplay;
     this.maxTextDisplay = maxTextDisplay;
 
-    minSlider.addEventListener("input", () => {
-      this.updateSlider(parseFloat(minSlider.value), parseFloat(maxSlider.value), true);
+    minSlider.addEventListener('input', () => {
+      this.updateSlider(
+        parseFloat(minSlider.value),
+        parseFloat(maxSlider.value),
+        true
+      );
     });
 
-    maxSlider.addEventListener("input", () => {
-      this.updateSlider(parseFloat(minSlider.value), parseFloat(maxSlider.value), false);
+    maxSlider.addEventListener('input', () => {
+      this.updateSlider(
+        parseFloat(minSlider.value),
+        parseFloat(maxSlider.value),
+        false
+      );
     });
 
-    minSlider.addEventListener("mouseup", () => {
+    minSlider.addEventListener('mouseup', () => {
       this.fireListener();
     });
 
-    maxSlider.addEventListener("mouseup", () => {
+    maxSlider.addEventListener('mouseup', () => {
       this.fireListener();
     });
 
@@ -92,7 +110,7 @@ class DoubleSlider {
    * @returns The percentage between minimum and maximum.
    */
   private getRangePct(value: number): number {
-    return (value - this.rangeMin)/(this.rangeMax - this.rangeMin);
+    return (value - this.rangeMin) / (this.rangeMax - this.rangeMin);
   }
 
   /**
@@ -102,7 +120,7 @@ class DoubleSlider {
    * @param min True if it is the first slider (minimum slider), false if it is the second (maximum slider).
    * @timecomplexity O(1)
    */
-  private updateSlider(minVal: number, maxVal: number, min: boolean) {
+  private updateSlider(minVal: number, maxVal: number, min: boolean): void {
     // Ensure min does not exceed max and max does not go under min
     if (min) minVal = getMin(minVal, maxVal - this.interval);
     else maxVal = getMax(maxVal, minVal + this.interval);
@@ -114,8 +132,8 @@ class DoubleSlider {
     this.min = minVal;
     this.max = maxVal;
 
-    const pctLeft = this.getRangePct(minVal)*100;
-    const pctRight = (1 - this.getRangePct(maxVal))*100;
+    const pctLeft: number = this.getRangePct(minVal) * 100;
+    const pctRight: number = (1 - this.getRangePct(maxVal)) * 100;
 
     this.minTextbox.setValue(minVal);
     this.maxTextbox.setValue(maxVal);
@@ -124,20 +142,26 @@ class DoubleSlider {
     this.maxSlider.value = maxVal.toString();
 
     // Position progress bar between min and max
-    this.progress.style.left = pctLeft + "%";
-    this.progress.style.right = pctRight + "%";
+    this.progress.style.left = pctLeft + '%';
+    this.progress.style.right = pctRight + '%';
 
     // Position text displays above corresponding slider thumbsticks
-    this.minTextDisplay.style.left = pctLeft + "%";
-    this.maxTextDisplay.style.right = pctRight + "%";
+    this.minTextDisplay.style.left = pctLeft + '%';
+    this.maxTextDisplay.style.right = pctRight + '%';
   }
 
   /**
    * Fires the listener callback with the min and max values, as well as whether or not the slider has not been changed (full range).
    * @timecomplexity O(1)
    */
-  private fireListener() {
-    if (this.eventCallback) this.eventCallback(this.min, this.max, (this.min == this.rangeMin && this.max == this.rangeMax));
+  private fireListener(): void {
+    if (this.eventCallback) {
+      this.eventCallback(
+        this.min,
+        this.max,
+        this.min === this.rangeMin && this.max === this.rangeMax
+      );
+    }
   }
 
   /**
@@ -145,7 +169,7 @@ class DoubleSlider {
    * @param callback The listener callback.
    * @timecomplexity O(1)
    */
-  public addListener(callback: DSCallback) {
+  public addListener(callback: DSCallback): void {
     this.eventCallback = callback;
   }
 }

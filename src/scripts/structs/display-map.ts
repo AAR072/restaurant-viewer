@@ -1,16 +1,30 @@
 // #region HTML elements
-const MAP_CONTAINER = document.getElementById("map-container") as HTMLDivElement;
-const MAP_CANVAS = document.getElementById("map-canvas") as HTMLCanvasElement;
-const MAP_GRID_SCALE = document.getElementById("map-grid-scale") as HTMLSpanElement;
+const MAP_CONTAINER: HTMLDivElement = document.getElementById(
+  'map-container'
+) as HTMLDivElement;
+const MAP_CANVAS: HTMLCanvasElement = document.getElementById(
+  'map-canvas'
+) as HTMLCanvasElement;
+const MAP_GRID_SCALE: HTMLSpanElement = document.getElementById(
+  'map-grid-scale'
+) as HTMLSpanElement;
 
-const MAP_INFO = document.getElementById("map-info") as HTMLDivElement;
-const MAP_INFO_POS = document.getElementById("map-info-pos") as HTMLParagraphElement;
-const MAP_SET_LOCATION = document.getElementById("map-set-location") as HTMLButtonElement;
-const MAP_SET_DEST = document.getElementById("map-set-dest") as HTMLButtonElement;
+const MAP_INFO: HTMLDivElement = document.getElementById(
+  'map-info'
+) as HTMLDivElement;
+const MAP_INFO_POS: HTMLParagraphElement = document.getElementById(
+  'map-info-pos'
+) as HTMLParagraphElement;
+const MAP_SET_LOCATION: HTMLButtonElement = document.getElementById(
+  'map-set-location'
+) as HTMLButtonElement;
+const MAP_SET_DEST: HTMLButtonElement = document.getElementById(
+  'map-set-dest'
+) as HTMLButtonElement;
 // #endregion
 
-const LOCATION_ICON = new Image();
-LOCATION_ICON.src = "assets/location-icon.png";
+const LOCATION_ICON: HTMLImageElement = new Image();
+LOCATION_ICON.src = 'assets/location-icon.png';
 
 /**
  * Generates a constant pseudo-random value for constant inputs.
@@ -20,9 +34,10 @@ LOCATION_ICON.src = "assets/location-icon.png";
  * @timecomplexity O(1)
  */
 function constantRandom(seed: number, index: number): number {
-  const hash = (seed ^ (index*0x5bd1e995) ^ (seed << 16)) >>> 0;
+  // 0x5bd1e995 gives nice looking output but it's lowkey sketchy - Ali
+  const hash: number = (seed ^ (index * 0x5bd1e995) ^ (seed << 16)) >>> 0;
 
-  return (hash & 3);
+  return hash & 3;
 }
 
 /**
@@ -33,20 +48,20 @@ function constantRandom(seed: number, index: number): number {
  * @timecomplexity O(1)
  */
 function randomQuadSplit(count: number, seed: number): Uint32Array {
-  const portions = new Uint32Array(4);
-  const portion = floor(count/4);
-  let remainder = count % 4;
+  const portions: Uint32Array = new Uint32Array(4);
+  const portion: number = floor(count / 4);
+  let remainder: number = count % 4;
 
   // Add the quarter portions to the array (initially not randomly distributed).
-  for (let i = 0; i < 4; i++) {
+  for (let i: number = 0; i < 4; i++) {
     portions[i] = portion + (remainder > 0 ? 1 : 0);
     remainder--;
   }
 
   // Go through the array and randomly swap values with one another.
-  for (let i = 0; i < 4; i++) {
-    const newIndex = (i + constantRandom(seed, i)) % 4;
-    const temp = portions[i];
+  for (let i: number = 0; i < 4; i++) {
+    const newIndex: number = (i + constantRandom(seed, i)) % 4;
+    const temp: number = portions[i];
 
     portions[i] = portions[newIndex];
     portions[newIndex] = temp;
@@ -123,8 +138,11 @@ class MapAnimation {
    * @timecomplexity O(1)
    */
   private getTimeProgress(): number {
-    if (this.progress > 0.5) return 1/2*((this.progress - 1)*2)**3 + 1;
-    else return 1/2*(this.progress*2)**3;
+    if (this.progress > 0.5) {
+      return (1 / 2) * ((this.progress - 1) * 2) ** 3 + 1;
+    } else {
+      return (1 / 2) * (this.progress * 2) ** 3;
+    }
   }
 
   /**
@@ -132,13 +150,13 @@ class MapAnimation {
    * @param time Current timestamp used to calculate delta time.
    * @timecomplexity O(1)
    */
-  private animationStep(time: number) {
+  private animationStep(time: number): void {
     if (!this.active) return;
 
-    const deltaTime = (time - this.lastTime)/1000;
+    const deltaTime: number = (time - this.lastTime) / 1000;
 
     this.lastTime = time;
-    this.progress += deltaTime/this.duration;
+    this.progress += deltaTime / this.duration;
 
     if (this.progress >= 1) {
       this.progress = 1;
@@ -156,7 +174,7 @@ class MapAnimation {
    * Stops the animation.
    * @timecomplexity O(1)
    */
-  public cancel() {
+  public cancel(): void {
     this.active = false;
   }
 }
@@ -221,7 +239,7 @@ class DisplayMap {
    * @timecomplexity O(n)
    */
   constructor(public app: App) {
-    this.context = MAP_CANVAS.getContext("2d")!;
+    this.context = MAP_CANVAS.getContext('2d')!;
 
     this.mapRect = new Rectangle(
       app.data.x[app.sorted.x[0]],
@@ -241,8 +259,7 @@ class DisplayMap {
     this.initInput();
 
     if (!LOCATION_ICON.complete) {
-      LOCATION_ICON.onload = () => this.render();
-
+      LOCATION_ICON.onload = (): void => this.render();
     } else {
       this.render();
     }
@@ -256,17 +273,17 @@ class DisplayMap {
    * @timecomplexity O(1)
    */
   private getQuadLeaf(x: number, y: number): number {
-    const gridX = floor(x/this.qtLeafSizeX); // Round x coordinate to leaf grid
-    const gridY = floor(y/this.qtLeafSizeY); // Round y coordinate to leaf grid
+    const gridX: number = floor(x / this.qtLeafSizeX); // Round x coordinate to leaf grid
+    const gridY: number = floor(y / this.qtLeafSizeY); // Round y coordinate to leaf grid
 
-    let index = 0;
+    let index: number = 0;
 
     // Interleave gridX and gridY bits to find quad leaf index
-    for (let i = 0; i < DisplayMap.QT_SUBDIVISIONS; i++) {
-      const xBit = (gridX >> i) & 1;
-      const yBit = (gridY >> i) & 1;
+    for (let i: number = 0; i < DisplayMap.QT_SUBDIVISIONS; i++) {
+      const xBit: number = (gridX >> i) & 1;
+      const yBit: number = (gridY >> i) & 1;
 
-      index |= (xBit << (2*i)) | (yBit << (2*i + 1));
+      index |= (xBit << (2 * i)) | (yBit << (2 * i + 1));
     }
 
     return index;
@@ -276,20 +293,23 @@ class DisplayMap {
    * Loads all of the quad tree rectangles and the restaurants contained in each leaf.
    * @timecomplexity O(n)
    */
-  private loadQuadTree() {
+  private loadQuadTree(): void {
     this.qtSize = geoSeries(4, DisplayMap.QT_SUBDIVISIONS + 1);
-    this.qtLeaves = 4**DisplayMap.QT_SUBDIVISIONS;
+    this.qtLeaves = 4 ** DisplayMap.QT_SUBDIVISIONS;
     this.quadTree = new Array(this.qtSize);
     this.qtRestaurants = new Array(this.qtLeaves);
-    this.qtLeafSizeX = this.mapRect.w/(1 << DisplayMap.QT_SUBDIVISIONS);
-    this.qtLeafSizeY = this.mapRect.h/(1 << DisplayMap.QT_SUBDIVISIONS);
+    this.qtLeafSizeX = this.mapRect.w / (1 << DisplayMap.QT_SUBDIVISIONS);
+    this.qtLeafSizeY = this.mapRect.h / (1 << DisplayMap.QT_SUBDIVISIONS);
 
     this.subdivideQuads(this.mapRect); // O(1) since subdivision count is constant
 
-    const restaurantPointers = new Uint32Array(this.qtLeaves);
+    const restaurantPointers: Uint32Array = new Uint32Array(this.qtLeaves);
 
-    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
-      const index = this.getQuadLeaf(this.app.data.x[i], this.app.data.y[i]);
+    for (let i: number = 0; i < App.RESTAURANT_COUNT; i++) {
+      const index: number = this.getQuadLeaf(
+        this.app.data.x[i],
+        this.app.data.y[i]
+      );
 
       if (!this.qtRestaurants[index]) this.qtRestaurants[index] = [];
 
@@ -304,18 +324,22 @@ class DisplayMap {
    * @param count The amount of subdivisions left.
    * @timecomplexity O(4^n)
    */
-  private subdivideQuads(quad: Rectangle, index: number = 0, count: number = DisplayMap.QT_SUBDIVISIONS) {
+  private subdivideQuads(
+    quad: Rectangle,
+    index: number = 0,
+    count: number = DisplayMap.QT_SUBDIVISIONS
+  ): void {
     if (count < 0) return;
 
-    const midX = (quad.x0 + quad.x1)/2;
-    const midY = (quad.y0 + quad.y1)/2;
+    const midX: number = (quad.x0 + quad.x1) / 2;
+    const midY: number = (quad.y0 + quad.y1) / 2;
 
     this.quadTree[index] = quad;
 
-    const bottomLeft = new Rectangle(quad.x0, midX, quad.y0, midY);
-    const bottomRight = new Rectangle(midX, quad.x1, quad.y0, midY);
-    const topLeft = new Rectangle(quad.x0, midX, midY, quad.y1);
-    const topRight = new Rectangle(midX, quad.x1, midY, quad.y1);
+    const bottomLeft: Rectangle = new Rectangle(quad.x0, midX, quad.y0, midY);
+    const bottomRight: Rectangle = new Rectangle(midX, quad.x1, quad.y0, midY);
+    const topLeft: Rectangle = new Rectangle(quad.x0, midX, midY, quad.y1);
+    const topRight: Rectangle = new Rectangle(midX, quad.x1, midY, quad.y1);
 
     index *= 4;
     count--;
@@ -327,20 +351,26 @@ class DisplayMap {
   }
 
   /**
-   * 
+   *
    * @param target The target rectangle in which all quads inside are found.
    * @param desiredDepth The desired depth of the quads found inside the target.
    * @param quadList The array in which valid quads are inserted into.
    * @param index The current quad' index.
    * @param depth The current quad's depth.
-   * @returns 
+   * @returns
    */
-  private getQuadsInside(target: Rectangle, desiredDepth: number, quadList: number[], index: number = 0, depth: number = 0) {
-    const quad = this.quadTree[index];
+  private getQuadsInside(
+    target: Rectangle,
+    desiredDepth: number,
+    quadList: number[],
+    index: number = 0,
+    depth: number = 0
+  ): void {
+    const quad: Rectangle = this.quadTree[index];
 
     if (!target.intersects(quad)) return; // Break if the quad does not intersect the target rectangle
 
-    if (depth == desiredDepth) {
+    if (depth === desiredDepth) {
       quadList[quadList.length] = index;
 
       return;
@@ -364,15 +394,21 @@ class DisplayMap {
    * @param restList The list of restaurants selected in the quad.
    * @timecomplexity O(4^n), where n is the difference between `depth` and `QT_SUBDIVISIONS`.
    */
-  private getRestaurantsInQuad(index: number, depth: number, restCount: number, restList: number[]) {
+  private getRestaurantsInQuad(
+    index: number,
+    depth: number,
+    restCount: number,
+    restList: number[]
+  ): void {
     if (restCount <= 0) return;
 
     // Add the necessary amount of restaurants to the array once leaf quad is reached
-    if (depth == DisplayMap.QT_SUBDIVISIONS) {
-      const quadRestaurants = this.qtRestaurants[index - this.qtSize + this.qtLeaves];
-      const restLen = quadRestaurants.length;
+    if (depth === DisplayMap.QT_SUBDIVISIONS) {
+      const quadRestaurants: number[] =
+        this.qtRestaurants[index - this.qtSize + this.qtLeaves];
+      const restLen: number = quadRestaurants.length;
 
-      for (let i = 0; i < restCount; i++) {
+      for (let i: number = 0; i < restCount; i++) {
         if (i >= restLen) break;
 
         restList[restList.length] = quadRestaurants[i];
@@ -381,7 +417,7 @@ class DisplayMap {
       return;
     }
 
-    const parts = randomQuadSplit(restCount, index); // Get randomly distributed portions of the required restaurants left
+    const parts: Uint32Array = randomQuadSplit(restCount, index); // Get randomly distributed portions of the required restaurants left
 
     index *= 4;
     depth++;
@@ -398,9 +434,9 @@ class DisplayMap {
    * @param rect The DOM Rect of the map canvas
    * @timecomplexity O(1)
    */
-  private setDimensions(rect: DOMRectReadOnly) {
-    const width = rect.width;
-    const height = rect.height;
+  private setDimensions(rect: DOMRectReadOnly): void {
+    const width: number = rect.width;
+    const height: number = rect.height;
 
     MAP_CANVAS.width = width;
     MAP_CANVAS.height = height;
@@ -408,16 +444,16 @@ class DisplayMap {
     this.width = width;
     this.height = height;
     this.bounds = rect;
-    this.aspectRatio = width/height;
+    this.aspectRatio = width / height;
   }
 
   /**
    * Sets the range and scale ratio of the display map based on the zoom and the height of the map canvas.
    * @timecomplexity O(1)
    */
-  private setRangeScale() {
-    this.range = 2**this.zoom;
-    this.scaleRatio = this.height/(this.range*2);
+  private setRangeScale(): void {
+    this.range = 2 ** this.zoom;
+    this.scaleRatio = this.height / (this.range * 2);
   }
 
   /**
@@ -426,7 +462,7 @@ class DisplayMap {
    * @param deltaY The change in camera y position
    * @timecomplexity O(1)
    */
-  public panCamera(deltaX: number, deltaY: number) {
+  public panCamera(deltaX: number, deltaY: number): void {
     this.clearAnimation();
 
     this.cameraX += deltaX;
@@ -440,10 +476,14 @@ class DisplayMap {
    * @param delta Amount to change the zoom by.
    * @timecomplexity O(1)
    */
-  public changeZoom(delta: number) {
+  public changeZoom(delta: number): void {
     this.clearAnimation();
 
-    this.zoom = clamp(this.zoom + delta*DisplayMap.ZOOM_SPEED, DisplayMap.MIN_ZOOM, DisplayMap.MAX_ZOOM);
+    this.zoom = clamp(
+      this.zoom + delta * DisplayMap.ZOOM_SPEED,
+      DisplayMap.MIN_ZOOM,
+      DisplayMap.MAX_ZOOM
+    );
 
     this.setRangeScale();
     this.render();
@@ -456,12 +496,16 @@ class DisplayMap {
    * @param goalZoom The goal zoom level, defaulting to the minimum zoom.
    * @timecomplexity O(1)
    */
-  public animateCamera(goalX: number, goalY: number, goalZoom: number = DisplayMap.MIN_ZOOM) {
+  public animateCamera(
+    goalX: number,
+    goalY: number,
+    goalZoom: number = DisplayMap.MIN_ZOOM
+  ): void {
     this.clearAnimation();
 
-    const initialX = this.cameraX;
-    const initialY = this.cameraY;
-    const initialZoom = this.zoom;
+    const initialX: number = this.cameraX;
+    const initialY: number = this.cameraY;
+    const initialZoom: number = this.zoom;
 
     this.animation = new MapAnimation((t: number) => {
       this.cameraX = lerp(initialX, goalX, t);
@@ -476,7 +520,7 @@ class DisplayMap {
    * Cancels and clears the currently active animation if existing.
    * @timecomplexity O(1)
    */
-  public clearAnimation() {
+  public clearAnimation(): void {
     if (this.animation) {
       this.animation.cancel();
       this.animation = null;
@@ -487,9 +531,9 @@ class DisplayMap {
    * Animates the camera to the position of the restaurant, specified by `index`, on the map.
    * @param index The index of the restaurant.
    */
-  public viewRestaurant(index: number) {
-    const x = this.app.data.x[index];
-    const y = this.app.data.y[index];
+  public viewRestaurant(index: number): void {
+    const x: number = this.app.data.x[index];
+    const y: number = this.app.data.y[index];
 
     this.animateCamera(x, y);
   }
@@ -500,8 +544,8 @@ class DisplayMap {
    * @param dist The total distance of the path.
    * @timecomplexity O(1)
    */
-  public setPath(path: TNode[], dist: number) {
-    const last = path[path.length - 1];
+  public setPath(path: TNode[], dist: number): void {
+    const last: TNode = path[path.length - 1];
 
     this.currentPath = path;
     this.currentPathDist = dist;
@@ -513,7 +557,7 @@ class DisplayMap {
    * Clears the current path if existing and renders the change.
    * @timecomplexity O(1)
    */
-  public clearPath() {
+  public clearPath(): void {
     if (this.currentPath && this.currentPathDist) {
       this.currentPath = null;
       this.currentPathDist = null;
@@ -531,7 +575,14 @@ class DisplayMap {
    * @param width Pixel width of the line.
    * @timecomplexity O(1)
    */
-  private drawLine(x0: number, y0: number, x1: number, y1: number, style: string, width: number) {
+  private drawLine(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    style: string,
+    width: number
+  ): void {
     this.context.beginPath();
     this.context.moveTo(x0, y0);
     this.context.lineTo(x1, y1);
@@ -549,9 +600,9 @@ class DisplayMap {
    * @param style Fill style of the circle.
    * @timecomplexity O(1)
    */
-  public drawCircle(x: number, y: number, r: number, style: string) {
+  public drawCircle(x: number, y: number, r: number, style: string): void {
     this.context.beginPath();
-    this.context.arc(x, y, r, 0, Math.PI*2);
+    this.context.arc(x, y, r, 0, Math.PI * 2);
 
     this.context.fillStyle = style;
     this.context.fill();
@@ -566,7 +617,13 @@ class DisplayMap {
    * @param font The font and size of the text.
    * @timecomplexity O(1)
    */
-  public drawText(text: string, x: number, y: number, style: string, font: string) {
+  public drawText(
+    text: string,
+    x: number,
+    y: number,
+    style: string,
+    font: string
+  ): void {
     this.context.fillStyle = style;
     this.context.font = font;
     this.context.fillText(text, x, y);
@@ -581,66 +638,67 @@ class DisplayMap {
    */
   private getScreenPos(x: number, y: number): number[] {
     return [
-      this.width/2 + (x - this.cameraX)*this.scaleRatio,
-      this.height/2 - (y - this.cameraY)*this.scaleRatio
-    ]
+      this.width / 2 + (x - this.cameraX) * this.scaleRatio,
+      this.height / 2 - (y - this.cameraY) * this.scaleRatio
+    ];
   }
 
   /**
    * Renders grid lines, restaurants markers, current path, and current location onto the map canvas.
    * @timecomplexity O(1), since `QT_SUBDIVISIONS` is constant.
    */
-  public render() {
+  public render(): void {
     this.context.clearRect(0, 0, this.width, this.height);
 
-    const screenRect = new Rectangle(
-      this.cameraX - this.range*this.aspectRatio,
-      this.cameraX + this.range*this.aspectRatio,
-      this.cameraY - this.range, 
+    const screenRect: Rectangle = new Rectangle(
+      this.cameraX - this.range * this.aspectRatio,
+      this.cameraX + this.range * this.aspectRatio,
+      this.cameraY - this.range,
       this.cameraY + this.range
     );
 
-    const gridScale = 2**floor(Math.log2(this.range/DisplayMap.GRID_RANGE_FACTOR)); // Get unit scale of grid squares based on zoom level
+    const gridScale: number =
+      2 ** floor(Math.log2(this.range / DisplayMap.GRID_RANGE_FACTOR)); // Get unit scale of grid squares based on zoom level
 
     // Round to nearest grid lines
-    const gridXMin = ceil(screenRect.x0, gridScale);
-    const gridXMax = floor(screenRect.x1, gridScale);
-    const gridYMin = ceil(screenRect.y0, gridScale);
-    const gridYMax = floor(screenRect.y1, gridScale);
+    const gridXMin: number = ceil(screenRect.x0, gridScale);
+    const gridXMax: number = floor(screenRect.x1, gridScale);
+    const gridYMin: number = ceil(screenRect.y0, gridScale);
+    const gridYMax: number = floor(screenRect.y1, gridScale);
 
-    MAP_GRID_SCALE.innerText = (gridScale*App.UNIT_SCALE).toString();
+    MAP_GRID_SCALE.innerText = (gridScale * App.UNIT_SCALE).toString();
 
     // Draw vertical grid lines
-    for (let x = gridXMin; x <= gridXMax; x += gridScale) {
-      const screenX = this.width/2 + (x - this.cameraX)*this.scaleRatio;
+    for (let x: number = gridXMin; x <= gridXMax; x += gridScale) {
+      const screenX: number =
+        this.width / 2 + (x - this.cameraX) * this.scaleRatio;
 
-      let style = "rgba(255, 255, 255, 0.1)";
-      let lineWidth = 1;
+      let style: string = 'rgba(255, 255, 255, 0.1)';
+      let lineWidth: number = 1;
 
-      if (x == 0) {
-        style = "rgba(255, 255, 255, 0.25)";
+      if (x === 0) {
+        style = 'rgba(255, 255, 255, 0.25)';
         lineWidth = 2;
-
-      } else if (x % (gridScale*4) == 0) {
-        style = "rgba(255, 255, 255, 0.25)";
+      } else if (x % (gridScale * 4) === 0) {
+        style = 'rgba(255, 255, 255, 0.25)';
       }
 
       this.drawLine(screenX, 0, screenX, this.height, style, lineWidth);
     }
 
     // Draw horizontal grid lines
-    for (let y = gridYMin; y <= gridYMax; y += gridScale) {
-      const screenY = this.height/2 - (y - this.cameraY)*this.scaleRatio;
+    for (let y: number = gridYMin; y <= gridYMax; y += gridScale) {
+      const screenY: number =
+        this.height / 2 - (y - this.cameraY) * this.scaleRatio;
 
-      let style = "rgba(255, 255, 255, 0.1)";
-      let lineWidth = 1;
+      let style: string = 'rgba(255, 255, 255, 0.1)';
+      let lineWidth: number = 1;
 
-      if (y == 0) {
-        style = "rgba(255, 255, 255, 0.25)";
+      if (y === 0) {
+        style = 'rgba(255, 255, 255, 0.25)';
         lineWidth = 2;
-
-      } else if (y % (gridScale*4) == 0) {
-        style = "rgba(255, 255, 255, 0.25)";
+      } else if (y % (gridScale * 4) === 0) {
+        style = 'rgba(255, 255, 255, 0.25)';
       }
 
       this.drawLine(0, screenY, this.width, screenY, style, lineWidth);
@@ -648,30 +706,46 @@ class DisplayMap {
 
     if (this.currentPath && this.currentPathDist) {
       // Draw current path nodes and lines between them
-      for (let i = 0; i < this.currentPath.length; i++) {
-        const [x0, y0] = this.getScreenPos(this.currentPath[i].x, this.currentPath[i].y);
+      for (let i: number = 0; i < this.currentPath.length; i++) {
+        const [x0, y0] = this.getScreenPos(
+          this.currentPath[i].x,
+          this.currentPath[i].y
+        );
 
         if (i < this.currentPath.length - 1) {
-          const [x1, y1] = this.getScreenPos(this.currentPath[i + 1].x, this.currentPath[i + 1].y);
+          const [x1, y1] = this.getScreenPos(
+            this.currentPath[i + 1].x,
+            this.currentPath[i + 1].y
+          );
 
-          this.drawLine(x0, y0, x1, y1, "white", 5);
-
+          this.drawLine(x0, y0, x1, y1, 'white', 5);
         } else {
-          this.drawText(`Path Distance: ${round(this.currentPathDist*App.UNIT_SCALE)}m`, x0 + 14, y0, "rgb(150, 150, 150)", "12px Ubuntu");
+          this.drawText(
+            `Path Distance: ${round(this.currentPathDist * App.UNIT_SCALE)}m`,
+            x0 + 14,
+            y0,
+            'rgb(150, 150, 150)',
+            '12px Ubuntu'
+          );
         }
 
-        if (i == 0 || i == this.currentPath.length - 1) {
-          this.drawCircle(x0, y0, 12, "#edab00");
+        if (i === 0 || i === this.currentPath.length - 1) {
+          this.drawCircle(x0, y0, 12, '#edab00');
         } else {
-          this.drawCircle(x0, y0, 10, "#259afa");
+          this.drawCircle(x0, y0, 10, '#259afa');
         }
       }
     }
 
     // Calculate the zoom depth logarithmically based the size of the visible range relative to the screen, affecting the amount of restaurants displayed
-    const zoomDepth = Math.log2(this.mapRect.h/this.range) + DisplayMap.DISPLAY_COUNT_FACTOR;
-    const quadDepth = clamp(floor(zoomDepth), 0, DisplayMap.QT_SUBDIVISIONS); // Calculate depth of quads to include
-    const restCount = floor(4**(zoomDepth - quadDepth)); // Get amount of restaurants to display per quad based on remainder of depth
+    const zoomDepth: number =
+      Math.log2(this.mapRect.h / this.range) + DisplayMap.DISPLAY_COUNT_FACTOR;
+    const quadDepth: number = clamp(
+      floor(zoomDepth),
+      0,
+      DisplayMap.QT_SUBDIVISIONS
+    ); // Calculate depth of quads to include
+    const restCount: number = floor(4 ** (zoomDepth - quadDepth)); // Get amount of restaurants to display per quad based on remainder of depth
 
     const quadList: number[] = [];
     const restList: number[] = [];
@@ -680,25 +754,43 @@ class DisplayMap {
 
     this.getQuadsInside(screenRect, quadDepth, quadList); // Add quads on screen to quad list array
 
-    for (let i = 0; i < quadList.length; i++) {
-      const index = quadList[i];
+    for (let i: number = 0; i < quadList.length; i++) {
+      const index: number = quadList[i];
 
       this.getRestaurantsInQuad(index, quadDepth, restCount, restList); // Add restaurants in quad to restaurant array
     }
 
     // Draw all restaurants in restaurants array
-    for (let i = 0; i < restList.length; i++) {
-      const restIndex = restList[i];
-      const [screenX, screenY] = this.getScreenPos(this.app.data.x[restIndex], this.app.data.y[restIndex]);
+    for (let i: number = 0; i < restList.length; i++) {
+      const restIndex: number = restList[i];
+      const [screenX, screenY] = this.getScreenPos(
+        this.app.data.x[restIndex],
+        this.app.data.y[restIndex]
+      );
 
       // Position marker marker above restaurant position and text to the right of the marker
-      this.context.drawImage(LOCATION_ICON, screenX - LOCATION_ICON.width/2, screenY - LOCATION_ICON.height, LOCATION_ICON.width, LOCATION_ICON.height);
-      this.drawText(this.app.data.storeName[restIndex], screenX + LOCATION_ICON.width/2 + 4, screenY - LOCATION_ICON.width/2, "rgb(150, 150, 150", "16px Ubuntu");
+      this.context.drawImage(
+        LOCATION_ICON,
+        screenX - LOCATION_ICON.width / 2,
+        screenY - LOCATION_ICON.height,
+        LOCATION_ICON.width,
+        LOCATION_ICON.height
+      );
+      this.drawText(
+        this.app.data.storeName[restIndex],
+        screenX + LOCATION_ICON.width / 2 + 4,
+        screenY - LOCATION_ICON.width / 2,
+        'rgb(150, 150, 150',
+        '16px Ubuntu'
+      );
     }
 
     // Draw user location
-    const [userScreenX, userScreenY] = this.getScreenPos(this.app.locationX, this.app.locationY);
-    this.drawCircle(userScreenX, userScreenY, 12,"#15ff0d");
+    const [userScreenX, userScreenY] = this.getScreenPos(
+      this.app.locationX,
+      this.app.locationY
+    );
+    this.drawCircle(userScreenX, userScreenY, 12, '#15ff0d');
   }
 
   /**
@@ -708,9 +800,13 @@ class DisplayMap {
    * @param top The amount of pixels vertically from the top left corner of the map canvas to position the element at.
    * @timecomplexity O(1)
    */
-  private positionMapElement(element: HTMLDivElement, left: number, top: number) {
-    const divWidth = element.offsetWidth;
-    const divHeight = element.offsetHeight;
+  private positionMapElement(
+    element: HTMLDivElement,
+    left: number,
+    top: number
+  ): void {
+    const divWidth: number = element.offsetWidth;
+    const divHeight: number = element.offsetHeight;
 
     // Clamp values so that they do not exceed screen size
     left = clamp(left, 0, this.width);
@@ -720,22 +816,20 @@ class DisplayMap {
 
     if (left + divWidth > this.width) {
       left -= divWidth;
-      element.classList.add("right");
-
+      element.classList.add('right');
     } else {
-      element.classList.remove("right");
+      element.classList.remove('right');
     }
 
     if (top + divHeight > this.height) {
       top -= divHeight;
-      element.classList.add("bottom");
-
+      element.classList.add('bottom');
     } else {
-      element.classList.remove("bottom");
+      element.classList.remove('bottom');
     }
 
-    element.style.left = left + "px";
-    element.style.top = top + "px";
+    element.style.left = left + 'px';
+    element.style.top = top + 'px';
   }
 
   /**
@@ -745,11 +839,15 @@ class DisplayMap {
    * @param top Distance from top to position info at.
    * @timecomplexity O(1)
    */
-  private displayRestaurantInfo(index: number, left: number, top: number) {
-    const info = this.app.createRestaurantInfo(index);
+  private displayRestaurantInfo(
+    index: number,
+    left: number,
+    top: number
+  ): void {
+    const info: HTMLDivElement = this.app.createRestaurantInfo(index);
 
-    const div = document.createElement("div");
-    div.className = "map-info";
+    const div: HTMLDivElement = document.createElement('div');
+    div.className = 'map-info';
     div.appendChild(info);
 
     MAP_CONTAINER.appendChild(div);
@@ -762,7 +860,7 @@ class DisplayMap {
    * Clears currently displayed restaurant info if existent.
    * @timecomplexity O(1)
    */
-  private clearInfo() {
+  private clearInfo(): void {
     if (this.infoDisplay) {
       this.infoDisplay.remove();
       this.infoDisplay = null;
@@ -775,13 +873,13 @@ class DisplayMap {
    * @param top Distance from top to position info at.
    * @timecomplexity O(1)
    */
-  private displayPositionInfo(left: number, top: number) {
+  private displayPositionInfo(left: number, top: number): void {
     // Getting real unit x and y positions based on pixels
-    const x = (left - this.width/2)/this.scaleRatio + this.cameraX;
-    const y = (this.height/2 - top)/this.scaleRatio + this.cameraY;
+    const x: number = (left - this.width / 2) / this.scaleRatio + this.cameraX;
+    const y: number = (this.height / 2 - top) / this.scaleRatio + this.cameraY;
 
     MAP_INFO.hidden = false;
-    MAP_INFO_POS.innerText = `(${round(x*App.UNIT_SCALE)}m, ${round(y*App.UNIT_SCALE)}m)`;
+    MAP_INFO_POS.innerText = `(${round(x * App.UNIT_SCALE)}m, ${round(y * App.UNIT_SCALE)}m)`;
 
     this.positionInfoX = x;
     this.positionInfoY = y;
@@ -792,7 +890,7 @@ class DisplayMap {
    * Clears currently displayed positional info if existent.
    * @timecomplexity O(1)
    */
-  private clearPositionInfo() {
+  private clearPositionInfo(): void {
     MAP_INFO.hidden = true;
 
     this.positionInfoX = null;
@@ -806,17 +904,23 @@ class DisplayMap {
    * @returns The index of the restaurant within range, or -1 if none exist.
    */
   private getClickedLocation(mouseX: number, mouseY: number): number {
-    const visible = this.visibleRests;
+    const visible: number[] = this.visibleRests;
 
     if (visible) {
-      for (let i = 0; i < visible.length; i++) {
-        const index = visible[i];
-        const [screenX, screenY] = this.getScreenPos(this.app.data.x[index], this.app.data.y[index]);
-        const diffX = abs(mouseX - screenX);
-        const diffY = abs(mouseY - screenY + LOCATION_ICON.height/2);
+      for (let i: number = 0; i < visible.length; i++) {
+        const index: number = visible[i];
+        const [screenX, screenY] = this.getScreenPos(
+          this.app.data.x[index],
+          this.app.data.y[index]
+        );
+        const diffX: number = abs(mouseX - screenX);
+        const diffY: number = abs(mouseY - screenY + LOCATION_ICON.height / 2);
 
         // Check if the difference between the mouse and the restaurant icon is within the icon's size
-        if (diffX <= LOCATION_ICON.width/2 && diffY <= LOCATION_ICON.height/2) {
+        if (
+          diffX <= LOCATION_ICON.width / 2 &&
+          diffY <= LOCATION_ICON.height / 2
+        ) {
           return index;
         }
       }
@@ -829,98 +933,115 @@ class DisplayMap {
    * Initializes all event listeners and similar things related to the elements of the map.
    * @timecomplexity O(1)
    */
-  private initInput() {
+  private initInput(): void {
     let mouseX: number | null;
     let mouseY: number | null;
 
     new ResizeObserver(() => {
       this.setDimensions(MAP_CANVAS.getBoundingClientRect());
       this.render();
-
     }).observe(MAP_CANVAS);
 
-    document.addEventListener("contextmenu", (event: MouseEvent) => {
+    document.addEventListener('contextmenu', (event: MouseEvent) => {
       event.preventDefault();
     });
 
-    MAP_CANVAS.addEventListener("mousedown", (event: MouseEvent) => {
+    MAP_CANVAS.addEventListener('mousedown', (event: MouseEvent) => {
       mouseX = event.clientX;
       mouseY = event.clientY;
 
-      MAP_CANVAS.classList.add("drag");
+      MAP_CANVAS.classList.add('drag');
 
       this.clearInfo();
       this.clearPositionInfo();
     });
 
-    MAP_CANVAS.addEventListener("mousemove", (event: MouseEvent) => {
-      if (mouseX && mouseY) { // Mouse is clicked down and camera can be dragged
-        const diffX = event.clientX - mouseX;
-        const diffY = event.clientY - mouseY;
+    MAP_CANVAS.addEventListener('mousemove', (event: MouseEvent) => {
+      if (mouseX && mouseY) {
+        // Mouse is clicked down and camera can be dragged
+        const diffX: number = event.clientX - mouseX;
+        const diffY: number = event.clientY - mouseY;
 
         mouseX = event.clientX;
         mouseY = event.clientY;
 
-        const scaleRatio = this.height/(this.range*2);
+        const scaleRatio: number = this.height / (this.range * 2);
 
-        this.panCamera(-diffX/scaleRatio, diffY/scaleRatio);
+        this.panCamera(-diffX / scaleRatio, diffY / scaleRatio);
+      } else {
+        // Display pointer cursor when hovering over restaurant icons
+        const hoveredPlace: number = this.getClickedLocation(
+          event.clientX - this.bounds.left,
+          event.clientY - this.bounds.top
+        );
 
-      } else { // Display pointer cursor when hovering over restaurant icons
-        const hoveredPlace = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
-
-        if (hoveredPlace > 0) MAP_CANVAS.classList.add("hover");
-        else MAP_CANVAS.classList.remove("hover");
+        if (hoveredPlace > 0) MAP_CANVAS.classList.add('hover');
+        else MAP_CANVAS.classList.remove('hover');
       }
     });
 
-    MAP_CANVAS.addEventListener("mouseup", (event: MouseEvent) => {
-      if (event.button == 0) { // Display restaurant info if restaurant has been clicked
-        const clickedRest = this.getClickedLocation(event.clientX - this.bounds.left, event.clientY - this.bounds.top)
+    MAP_CANVAS.addEventListener('mouseup', (event: MouseEvent) => {
+      if (event.button === 0) {
+        // Display restaurant info if restaurant has been clicked
+        const clickedRest: number = this.getClickedLocation(
+          event.clientX - this.bounds.left,
+          event.clientY - this.bounds.top
+        );
 
         if (clickedRest > 0) {
-          const [screenX, screenY] = this.getScreenPos(this.app.data.x[clickedRest], this.app.data.y[clickedRest]);
+          const [screenX, screenY] = this.getScreenPos(
+            this.app.data.x[clickedRest],
+            this.app.data.y[clickedRest]
+          );
 
           this.displayRestaurantInfo(clickedRest, screenX, screenY);
         }
-
-      } else if (event.button == 2) { // Display position info if right clicked
-        this.displayPositionInfo(event.clientX - this.bounds.left, event.clientY - this.bounds.top);
+      } else if (event.button === 2) {
+        // Display position info if right clicked
+        this.displayPositionInfo(
+          event.clientX - this.bounds.left,
+          event.clientY - this.bounds.top
+        );
       }
     });
 
-    document.addEventListener("mouseup", (event: MouseEvent) => {
-      MAP_CANVAS.classList.remove("drag");
+    document.addEventListener('mouseup', (event: MouseEvent) => {
+      MAP_CANVAS.classList.remove('drag');
 
       mouseX = null;
       mouseY = null;
 
-      if (event.button == 2) event.preventDefault();
+      if (event.button === 2) event.preventDefault();
     });
 
     // Prevent zooming in
-    document.addEventListener("wheel", (event: WheelEvent) => {
-      if (event.ctrlKey) event.preventDefault();
-    }, {passive: false});
+    document.addEventListener(
+      'wheel',
+      (event: WheelEvent) => {
+        if (event.ctrlKey) event.preventDefault();
+      },
+      {passive: false}
+    );
 
-    MAP_CANVAS.addEventListener("wheel", (event: WheelEvent) => {
+    MAP_CANVAS.addEventListener('wheel', (event: WheelEvent) => {
       this.changeZoom(event.deltaY);
 
       this.clearInfo();
       this.clearPositionInfo();
     });
 
-    MAP_SET_LOCATION.addEventListener("click", () => {
+    MAP_SET_LOCATION.addEventListener('click', () => {
       // Set user location when the position info set location button has been pressed
       if (this.positionInfoX && this.positionInfoY) {
         this.app.changeLocation(this.positionInfoX, this.positionInfoY);
       }
     });
 
-    MAP_SET_DEST.addEventListener("click", () => {
+    MAP_SET_DEST.addEventListener('click', () => {
       // Set path search destination coordinates when the position info set dest button has been pressed
       if (this.positionInfoX && this.positionInfoY) {
-        this.app.destXTextbox.setValue(this.positionInfoX*App.UNIT_SCALE);
-        this.app.destYTextbox.setValue(this.positionInfoY*App.UNIT_SCALE);
+        this.app.destXTextbox.setValue(this.positionInfoX * App.UNIT_SCALE);
+        this.app.destYTextbox.setValue(this.positionInfoY * App.UNIT_SCALE);
         this.app.pathDropdown.down();
       }
     });

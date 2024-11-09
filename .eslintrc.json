@@ -5,8 +5,7 @@
     "filenames/match-regex": "off",
 
     // Formatting and Braces
-    "curly": ["error", "multi-line", "consistent"],
-    "brace-style": ["error", "1tbs", { "allowSingleLine": true }],
+    "curly": ["error", "multi-line"],
     "semi": ["error", "always"],
 
     // Function Arguments (4-space indentation on line wrap, no rule available here, so manual review is needed)
@@ -15,7 +14,7 @@
     "camelcase": ["error", { "properties": "never" }],
     "@typescript-eslint/naming-convention": [
       "error",
-      { "selector": "variable", "format": ["camelCase"] },
+      { "selector": "variable", "format": ["camelCase", "UPPER_CASE"] },
       { "selector": "function", "format": ["camelCase"] },
       { "selector": "class", "format": ["PascalCase"] },
       { "selector": "interface", "format": ["PascalCase"] },
@@ -48,12 +47,20 @@
         "message": "Use TypeScript's private modifier instead of # syntax for private fields."
       }
     ],
+    "@typescript-eslint/no-inferrable-types": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "off",
 
     // Trailing Commas
-    "comma-dangle": ["error", "never"],
-
-    // Comments - JSDoc Redundancy
-    "require-jsdoc": "off",
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "comma-dangle": [
+      "error",
+      {
+        "arrays": "never",
+        "objects": "never",
+        "imports": "never",
+        "exports": "never",
+        "functions": "never"
+      }
+    ]
   }
 }

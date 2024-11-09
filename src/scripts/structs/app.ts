@@ -1,45 +1,109 @@
 // #region HTML elements
-const SEARCH_NAME_INPUT = document.getElementById("search-name") as HTMLInputElement;
-const SEARCH_ID_INPUT = document.getElementById("search-id") as HTMLInputElement;
-const SEARCH_X_INPUT = document.getElementById("search-x") as HTMLInputElement;
-const SEARCH_Y_INPUT = document.getElementById("search-y") as HTMLInputElement;
-const SEARCH_BUTTON = document.getElementById("search-button") as HTMLButtonElement;
-const SEARCH_CLEAR_BUTTON = document.getElementById("search-clear") as HTMLButtonElement;
+const SEARCH_NAME_INPUT: HTMLInputElement = document.getElementById(
+  'search-name'
+) as HTMLInputElement;
+const SEARCH_ID_INPUT: HTMLInputElement = document.getElementById(
+  'search-id'
+) as HTMLInputElement;
+const SEARCH_X_INPUT: HTMLInputElement = document.getElementById(
+  'search-x'
+) as HTMLInputElement;
+const SEARCH_Y_INPUT: HTMLInputElement = document.getElementById(
+  'search-y'
+) as HTMLInputElement;
+const SEARCH_BUTTON: HTMLButtonElement = document.getElementById(
+  'search-button'
+) as HTMLButtonElement;
+const SEARCH_CLEAR_BUTTON: HTMLButtonElement = document.getElementById(
+  'search-clear'
+) as HTMLButtonElement;
 
-const TYPE_SELECT = document.getElementById("type-filter") as HTMLSelectElement;
-const COST_RANGE = document.getElementById("cost-range") as HTMLDivElement;
-const REVIEW_RANGE = document.getElementById("review-range") as HTMLDivElement;
+const TYPE_SELECT: HTMLSelectElement = document.getElementById(
+  'type-filter'
+) as HTMLSelectElement;
+const COST_RANGE: HTMLDivElement = document.getElementById(
+  'cost-range'
+) as HTMLDivElement;
+const REVIEW_RANGE: HTMLDivElement = document.getElementById(
+  'review-range'
+) as HTMLDivElement;
 
-const SORT_SELECT = document.getElementById("sort-select") as HTMLSelectElement;
-const SORT_DIRECTION = document.getElementById("sort-direction") as HTMLButtonElement;
+const SORT_SELECT: HTMLSelectElement = document.getElementById(
+  'sort-select'
+) as HTMLSelectElement;
+const SORT_DIRECTION: HTMLButtonElement = document.getElementById(
+  'sort-direction'
+) as HTMLButtonElement;
 
-const PAGE_SIZE_SPAN = document.getElementById("page-size") as HTMLSpanElement;
-const NEXT_PAGE_BUTTON = document.getElementById("next-page") as HTMLButtonElement;
-const PREV_PAGE_BUTTON = document.getElementById("prev-page") as HTMLButtonElement;
-const PAGE_NUMBER_SPAN = document.getElementById("page-number-input") as HTMLSpanElement;
-const PAGE_COUNT = document.getElementById("page-count") as HTMLSpanElement;
+const PAGE_SIZE_SPAN: HTMLSpanElement = document.getElementById(
+  'page-size'
+) as HTMLSpanElement;
+const NEXT_PAGE_BUTTON: HTMLButtonElement = document.getElementById(
+  'next-page'
+) as HTMLButtonElement;
+const PREV_PAGE_BUTTON: HTMLButtonElement = document.getElementById(
+  'prev-page'
+) as HTMLButtonElement;
+const PAGE_NUMBER_SPAN: HTMLSpanElement = document.getElementById(
+  'page-number-input'
+) as HTMLSpanElement;
+const PAGE_COUNT: HTMLSpanElement = document.getElementById(
+  'page-count'
+) as HTMLSpanElement;
 
-const PATH_DROPDOWN = document.getElementById("path-dropdown") as HTMLDivElement;
-const FILTER_DROPDOWN = document.getElementById("filter-dropdown") as HTMLDivElement;
+const PATH_DROPDOWN: HTMLDivElement = document.getElementById(
+  'path-dropdown'
+) as HTMLDivElement;
+const FILTER_DROPDOWN: HTMLDivElement = document.getElementById(
+  'filter-dropdown'
+) as HTMLDivElement;
 
-const DESTINATION_X = document.getElementById("path-dest-x") as HTMLSpanElement;
-const DESTINATION_Y = document.getElementById("path-dest-y") as HTMLSpanElement;
+const DESTINATION_X: HTMLSpanElement = document.getElementById(
+  'path-dest-x'
+) as HTMLSpanElement;
+const DESTINATION_Y: HTMLSpanElement = document.getElementById(
+  'path-dest-y'
+) as HTMLSpanElement;
 
-const FRUGAL_BUDGET_SPAN = document.getElementById("frugal-budget") as HTMLSpanElement;
-const FRUGAL_BUTTON = document.getElementById("frugal-button") as HTMLButtonElement;
-const FRUGAL_RESULT = document.getElementById("frugal-result") as HTMLDivElement;
-const FRUGAL_COST = document.getElementById("frugal-cost") as HTMLSpanElement;
-const FRUGAL_SUCCESS = document.getElementById("frugal-success") as HTMLSpanElement;
+const FRUGAL_BUDGET_SPAN: HTMLSpanElement = document.getElementById(
+  'frugal-budget'
+) as HTMLSpanElement;
+const FRUGAL_BUTTON: HTMLButtonElement = document.getElementById(
+  'frugal-button'
+) as HTMLButtonElement;
+const FRUGAL_RESULT: HTMLDivElement = document.getElementById(
+  'frugal-result'
+) as HTMLDivElement;
+const FRUGAL_COST: HTMLSpanElement = document.getElementById(
+  'frugal-cost'
+) as HTMLSpanElement;
+const FRUGAL_SUCCESS: HTMLSpanElement = document.getElementById(
+  'frugal-success'
+) as HTMLSpanElement;
 
-const SAVE_FUEL_CHECKLIST = document.getElementById("save-fuel-checklist") as HTMLDivElement;
-const SAVE_FUEL_BUTTON = document.getElementById("save-fuel-button") as HTMLButtonElement;
+const SAVE_FUEL_CHECKLIST: HTMLDivElement = document.getElementById(
+  'save-fuel-checklist'
+) as HTMLDivElement;
+const SAVE_FUEL_BUTTON: HTMLButtonElement = document.getElementById(
+  'save-fuel-button'
+) as HTMLButtonElement;
 
-const LOCATION_X = document.getElementById("location-x") as HTMLSpanElement;
-const LOCATION_Y = document.getElementById("location-y") as HTMLSpanElement;
-const LOCATION_CENTER = document.getElementById("location-center") as HTMLButtonElement;
+const LOCATION_X: HTMLSpanElement = document.getElementById(
+  'location-x'
+) as HTMLSpanElement;
+const LOCATION_Y: HTMLSpanElement = document.getElementById(
+  'location-y'
+) as HTMLSpanElement;
+const LOCATION_CENTER: HTMLButtonElement = document.getElementById(
+  'location-center'
+) as HTMLButtonElement;
 
-const TESTING_BUTTON = document.getElementById("testing-button") as HTMLButtonElement;
-const TESTING_DIV = document.getElementById("testing-div") as HTMLDivElement;
+const TESTING_BUTTON: HTMLButtonElement = document.getElementById(
+  'testing-button'
+) as HTMLButtonElement;
+const TESTING_DIV: HTMLDivElement = document.getElementById(
+  'testing-div'
+) as HTMLDivElement;
 // #endregion
 
 /** Stores all sorted/mutated data. */
@@ -97,7 +161,7 @@ class App {
    * Initializes the App with the given data and sorts it accordingly.
    *
    * @param data - The data to be processed and sorted.
-   * 
+   *
    * @timecomplexity O(n log n) - Sorting operations for each sortable field use merge sort, which has a time complexity of O(n log n). The initialization of the sorted object involves multiple sorts.
    */
   constructor(data: Data) {
@@ -115,7 +179,7 @@ class App {
       y: sortNumbers(data.y), // Sort y coordinates
 
       distData: new Float32Array(App.RESTAURANT_COUNT), // Array for distances
-      distSorted: new Uint32Array(App.RESTAURANT_COUNT), // Array for sorted distances
+      distSorted: new Uint32Array(App.RESTAURANT_COUNT) // Array for sorted distances
     };
 
     this.loadTypes(); // Load cuisine type arrays
@@ -131,13 +195,15 @@ class App {
     this.pathDropdown = new Dropdown(PATH_DROPDOWN);
     this.filterDropdown = new Dropdown(FILTER_DROPDOWN);
 
-    this.costSlider = new DoubleSlider(COST_RANGE,
+    this.costSlider = new DoubleSlider(
+      COST_RANGE,
       this.data.cost[this.sorted.cost[0]],
       this.data.cost[this.sorted.cost[App.RESTAURANT_COUNT - 1]],
       2
     );
 
-    this.reviewSlider = new DoubleSlider(REVIEW_RANGE,
+    this.reviewSlider = new DoubleSlider(
+      REVIEW_RANGE,
       this.data.review[this.sorted.review[0]],
       this.data.review[this.sorted.review[App.RESTAURANT_COUNT - 1]],
       1
@@ -149,7 +215,12 @@ class App {
     this.destXTextbox = new ScalingTextbox(DESTINATION_X, 0, 0);
     this.destYTextbox = new ScalingTextbox(DESTINATION_Y, 0, 0);
     this.budgetTextbox = new ScalingTextbox(FRUGAL_BUDGET_SPAN, 0, 10);
-    this.fuelSaveChecklist = new Checklist(SAVE_FUEL_CHECKLIST, this.sorted.cuisines, false, 6);
+    this.fuelSaveChecklist = new Checklist(
+      SAVE_FUEL_CHECKLIST,
+      this.sorted.cuisines,
+      false,
+      6
+    );
 
     // Initialize the search result and display map instances
     this.searchResult = new SearchResult(this);
@@ -163,8 +234,8 @@ class App {
    * @param name The name of the option.
    * @timecomplexity O(1)
    */
-  private createTypeOption(name: string) {
-    const option = document.createElement("option");
+  private createTypeOption(name: string): void {
+    const option: HTMLOptionElement = document.createElement('option');
     option.innerText = name;
     option.value = name;
 
@@ -178,8 +249,8 @@ class App {
    * @timecomplexity O(n), where n is the number of cuisines which is always constant so O(1)
    */
   public getCuisineTypeIndex(cuisineName: string): number {
-    for (let i = 0; i < this.sorted.cuisines.length; i++) {
-      if (this.sorted.cuisines[i] == cuisineName) return i;
+    for (let i: number = 0; i < this.sorted.cuisines.length; i++) {
+      if (this.sorted.cuisines[i] === cuisineName) return i;
     }
 
     return -1;
@@ -198,14 +269,14 @@ class App {
    * Loops through the restaurants, creates the cuisine types and sorts restaurants into a 2d array based on cuisine type.
    * @timecomplexity O(n)
    */
-  public loadTypes() {
+  public loadTypes(): void {
     const typePointers: number[] = [];
-    let cuisinePointer = 0;
+    let cuisinePointer: number = 0;
 
-    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
-      const index = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names
-      const type = this.data.type[index]; // Retrieve the type of the restaurant using the index
-      let typeIndex = this.getCuisineTypeIndex(type);
+    for (let i: number = 0; i < App.RESTAURANT_COUNT; i++) {
+      const index: number = this.sorted.storeName[i]; // Get the original index of the restaurant from the sorted store names
+      const type: string = this.data.type[index]; // Retrieve the type of the restaurant using the index
+      let typeIndex: number = this.getCuisineTypeIndex(type);
 
       // If the type doesn't exist in the sorted type object, initialize it as an empty array
       if (typeIndex < 0) {
@@ -228,14 +299,19 @@ class App {
    * Updates distances and sorted distances based on the current user location.
    * @timecomplexity O(n log n) - Sorting at the end has O(n log n) time complexity.
    */
-  public updateDistances() {
+  public updateDistances(): void {
     // Update location textboxes with new location values
-    this.locationXTextbox.setValue(this.locationX*App.UNIT_SCALE);
-    this.locationYTextbox.setValue(this.locationY*App.UNIT_SCALE);
+    this.locationXTextbox.setValue(this.locationX * App.UNIT_SCALE);
+    this.locationYTextbox.setValue(this.locationY * App.UNIT_SCALE);
 
     // Calculate distances for all restaurants
-    for (let i = 0; i < App.RESTAURANT_COUNT; i++) {
-      this.sorted.distData[i] = getDistance(this.locationX, this.locationY, data.x[i], data.y[i]);
+    for (let i: number = 0; i < App.RESTAURANT_COUNT; i++) {
+      this.sorted.distData[i] = getDistance(
+        this.locationX,
+        this.locationY,
+        data.x[i],
+        data.y[i]
+      );
     }
 
     sortNumbers(this.sorted.distData, this.sorted.distSorted); // Sort new distances
@@ -247,10 +323,10 @@ class App {
    *
    * @param x - The new X coordinate of the user's location.
    * @param y - The new Y coordinate of the user's location.
-   * 
+   *
    * @timecomplexity O(n log n) - The method updates the location and calls `updateDistance()` which has O(n log n) time complexity.
    */
-  public changeLocation(x: number, y: number) {
+  public changeLocation(x: number, y: number): void {
     this.locationX = x; // Update the X location.
     this.locationY = y; // Update the Y location.
     this.displayMap.render();
@@ -263,27 +339,27 @@ class App {
    * @returns The new info div containing all of the restaurant info.
    * @timecomplexity O(1)
    */
-  public createRestaurantInfo(index: number) {
-    const div = document.createElement("div");
+  public createRestaurantInfo(index: number): HTMLDivElement {
+    const div: HTMLDivElement = document.createElement('div');
 
-    const idSpan = document.createElement("p");
+    const idSpan: HTMLDivElement = document.createElement('p');
     idSpan.innerHTML = `<strong>ID:</strong> ${this.data.ID[index]}`;
 
-    const nameSpan = document.createElement("p");
+    const nameSpan: HTMLParagraphElement = document.createElement('p');
     nameSpan.innerHTML = `<strong>Name:</strong> ${this.data.storeName[index]}`;
 
-    const typeSpan = document.createElement("p");
+    const typeSpan: HTMLParagraphElement = document.createElement('p');
     typeSpan.innerHTML = `<strong>Type:</strong> ${this.data.type[index]}`;
 
-    const costSpan = document.createElement("p");
+    const costSpan: HTMLParagraphElement = document.createElement('p');
     costSpan.innerHTML = `<strong>Cost:</strong> $${this.data.cost[index].toFixed(2)}`;
-    costSpan.className = "cost-color";
+    costSpan.className = 'cost-color';
 
-    const reviewSpan = document.createElement("p");
+    const reviewSpan: HTMLParagraphElement = document.createElement('p');
     reviewSpan.innerHTML = `<strong>Review:</strong> &#9733;${this.data.review[index].toFixed(1)}`;
-    reviewSpan.className = "review-color";
+    reviewSpan.className = 'review-color';
 
-    const positionSpan = document.createElement("p");
+    const positionSpan: HTMLParagraphElement = document.createElement('p');
     positionSpan.innerHTML = `<strong>Position:</strong> (${this.data.x[index] * App.UNIT_SCALE}m, ${this.data.y[index] * App.UNIT_SCALE}m)`;
 
     div.appendChild(idSpan);
@@ -300,122 +376,146 @@ class App {
    * Initializes all the event listeners and HTML element related inputs for the app.
    * @timecomplexity O(1) - Setup tasks for input handling are constant time operations.
    */
-  private initInput() {
+  private initInput(): void {
     // Update search results when search button is pressed
 
-    const searchCallback = () => {
-      const nameInput = SEARCH_NAME_INPUT.value;
-      const idInput = SEARCH_ID_INPUT.value;
-      const xInput = parseInt(SEARCH_X_INPUT.value)/App.UNIT_SCALE;
-      const yInput = parseInt(SEARCH_Y_INPUT.value)/App.UNIT_SCALE;
+    const searchCallback: () => void = () => {
+      const nameInput: string = SEARCH_NAME_INPUT.value;
+      const idInput: string = SEARCH_ID_INPUT.value;
+      const xInput: number = parseInt(SEARCH_X_INPUT.value) / App.UNIT_SCALE;
+      const yInput: number = parseInt(SEARCH_Y_INPUT.value) / App.UNIT_SCALE;
 
-      if (nameInput == "" && idInput == "" && isNaN(xInput) && isNaN(yInput)) return;
+      if (
+        nameInput === '' &&
+        idInput === '' &&
+        isNaN(xInput) &&
+        isNaN(yInput)
+      ) {
+        return;
+      }
 
       this.searchResult.setSearch(nameInput, idInput, xInput, yInput);
       this.displayMap.clearPath();
-      FRUGAL_RESULT.classList.remove("show");
-    }
+      FRUGAL_RESULT.classList.remove('show');
+    };
 
-    SEARCH_BUTTON.addEventListener("click", searchCallback);
+    SEARCH_BUTTON.addEventListener('click', searchCallback);
 
-    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key == "Enter") searchCallback();
+    SEARCH_NAME_INPUT.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') searchCallback();
     });
 
-    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key == "Enter") searchCallback();
+    SEARCH_NAME_INPUT.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') searchCallback();
     });
 
-    SEARCH_NAME_INPUT.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (event.key == "Enter") searchCallback();
+    SEARCH_NAME_INPUT.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter') searchCallback();
     });
 
     // Clear search results to show all results when button pressed
-    SEARCH_CLEAR_BUTTON.addEventListener("click", () => {
-      SEARCH_NAME_INPUT.value = "";
-      SEARCH_ID_INPUT.value = "";
-      SEARCH_X_INPUT.value = "";
-      SEARCH_Y_INPUT.value = "";
+    SEARCH_CLEAR_BUTTON.addEventListener('click', () => {
+      SEARCH_NAME_INPUT.value = '';
+      SEARCH_ID_INPUT.value = '';
+      SEARCH_X_INPUT.value = '';
+      SEARCH_Y_INPUT.value = '';
 
       this.searchResult.clearSearch();
       this.displayMap.clearPath();
-      FRUGAL_RESULT.classList.remove("show");
+      FRUGAL_RESULT.classList.remove('show');
     });
 
     // Filter search result cuisine type
-    TYPE_SELECT.addEventListener("input", () => {
+    TYPE_SELECT.addEventListener('input', () => {
       this.searchResult.setTypeFilter(TYPE_SELECT.value);
     });
 
     // Filter cost by range slider
-    this.costSlider.addListener((min: number, max: number, fullRange: boolean) => {
-      if (fullRange) {
-        this.searchResult.setCostRange(null, null);
+    this.costSlider.addListener(
+      (min: number, max: number, fullRange: boolean) => {
+        if (fullRange) {
+          this.searchResult.setCostRange(null, null);
 
-        return;
+          return;
+        }
+
+        this.searchResult.setCostRange(min, max);
       }
-
-      this.searchResult.setCostRange(min, max);
-    });
+    );
 
     // Filter review by range slider
-    this.reviewSlider.addListener((min: number, max: number, fullRange: boolean) => {
-      if (fullRange) {
-        this.searchResult.setReviewRange(null, null);
+    this.reviewSlider.addListener(
+      (min: number, max: number, fullRange: boolean) => {
+        if (fullRange) {
+          this.searchResult.setReviewRange(null, null);
 
-        return;
+          return;
+        }
+
+        this.searchResult.setReviewRange(min, max);
       }
-
-      this.searchResult.setReviewRange(min, max);
-    });
+    );
 
     // Change selected sort for search result
-    SORT_SELECT.addEventListener("input", () => {
+    SORT_SELECT.addEventListener('input', () => {
       this.searchResult.changeSort(SORT_SELECT.value as SortFieldType);
     });
 
     // Change sort direction for search result
-    SORT_DIRECTION.addEventListener("click", () => {
+    SORT_DIRECTION.addEventListener('click', () => {
       this.searchResult.toggleDirection();
     });
 
     // Change page size
     this.pageSizeTextbox.addListener(() => {
-      if (this.pageSizeTextbox.value != null) this.searchResult.changePageSize(this.pageSizeTextbox.value);
+      if (this.pageSizeTextbox.value !== null) {
+        this.searchResult.changePageSize(this.pageSizeTextbox.value);
+      }
     });
 
     // Go to next page
-    NEXT_PAGE_BUTTON.addEventListener("click", () => {
+    NEXT_PAGE_BUTTON.addEventListener('click', () => {
       this.searchResult.incrementPage(1);
     });
 
     // Go to previous page
-    PREV_PAGE_BUTTON.addEventListener("click", () => {
+    PREV_PAGE_BUTTON.addEventListener('click', () => {
       this.searchResult.incrementPage(-1);
     });
 
     // Set exact page
     this.pageTextbox.addListener(() => {
-      if (this.pageTextbox.value != null) this.searchResult.setPage(this.pageTextbox.value);
+      if (this.pageTextbox.value !== null) {
+        this.searchResult.setPage(this.pageTextbox.value);
+      }
     });
 
     // Go frugal
-    FRUGAL_BUTTON.addEventListener("click", () => {
+    FRUGAL_BUTTON.addEventListener('click', () => {
       // Get destination and budget inputs
-      const destX = this.destXTextbox.value/App.UNIT_SCALE;
-      const destY = this.destYTextbox.value/App.UNIT_SCALE;
-      const budget = this.budgetTextbox.value;
+      const destX: number = this.destXTextbox.value / App.UNIT_SCALE;
+      const destY: number = this.destYTextbox.value / App.UNIT_SCALE;
+      const budget: number = this.budgetTextbox.value;
 
-      const result = goFrugal(
-        this.data.x, this.data.y, this.data.type, this.locationX, this.locationY,
-        getCombinations(this.sorted.cuisines), budget, this.sorted.distSorted, destX, destY
-      );
+      const result: {distance: number; path: TNode[]; possible: boolean} =
+        goFrugal(
+          this.data.x,
+          this.data.y,
+          this.data.type,
+          this.locationX,
+          this.locationY,
+          getCombinations(this.sorted.cuisines),
+          budget,
+          this.sorted.distSorted,
+          destX,
+          destY
+        );
 
-      const path = result.path;
-      const results = new Uint32Array(4);
+      const path: TNode[] = result.path;
+      const results: Uint32Array = new Uint32Array(4);
 
       // Add restaurants on path to array
-      for (let i = 0; i < path.length - 2; i++) {
+      for (let i: number = 0; i < path.length - 2; i++) {
         results[i] = path[i + 1].index!;
       }
 
@@ -424,12 +524,13 @@ class App {
 
       // Display go frugal info
 
-      FRUGAL_RESULT.classList.add("show");
-      FRUGAL_COST.innerText = "$" + (result.distance*App.UNIT_SCALE/1000*0.5).toFixed(2);
-      FRUGAL_SUCCESS.innerText = `Fuel Cost ${result.possible ? "Within" : "Exceeds"} Budget`;
+      FRUGAL_RESULT.classList.add('show');
+      FRUGAL_COST.innerText =
+        '$' + (((result.distance * App.UNIT_SCALE) / 1000) * 0.5).toFixed(2);
+      FRUGAL_SUCCESS.innerText = `Fuel Cost ${result.possible ? 'Within' : 'Exceeds'} Budget`;
 
-      if (result.possible) FRUGAL_SUCCESS.classList.remove("unsuccessful");
-      else FRUGAL_SUCCESS.classList.add("unsuccessful");
+      if (result.possible) FRUGAL_SUCCESS.classList.remove('unsuccessful');
+      else FRUGAL_SUCCESS.classList.add('unsuccessful');
     });
 
     // Disable saving fuel when 0 types are selected
@@ -441,31 +542,41 @@ class App {
     SAVE_FUEL_BUTTON.disabled = true;
 
     // Saving fuel
-    SAVE_FUEL_BUTTON.addEventListener("click", () => {
+    SAVE_FUEL_BUTTON.addEventListener('click', () => {
       // Get destination inputs and selected cuisine inputs
-      const destX = this.destXTextbox.value/App.UNIT_SCALE;
-      const destY = this.destYTextbox.value/App.UNIT_SCALE;
-      const selected = this.fuelSaveChecklist.value!;
+      const destX: number = this.destXTextbox.value / App.UNIT_SCALE;
+      const destY: number = this.destYTextbox.value / App.UNIT_SCALE;
+      const selected: string[] = this.fuelSaveChecklist.value!;
 
-      const result = savingFuel(selected, this.data.x, this.data.y, this.data.type, this.locationX, this.locationY, destX, destY, this.sorted.distSorted);
-      const path = result.path;
-      const results = [];
+      const result: {distance: number; path: TNode[]} = savingFuel(
+        selected,
+        this.data.x,
+        this.data.y,
+        this.data.type,
+        this.locationX,
+        this.locationY,
+        destX,
+        destY,
+        this.sorted.distSorted
+      );
+      const path: TNode[] = result.path;
+      const results: number[] = [];
 
       // Add restaurants on path to array
-      for (let i = 0; i < path.length - 2; i++) {
+      for (let i: number = 0; i < path.length - 2; i++) {
         results[i] = path[i + 1].index!;
       }
 
       this.searchResult.setResults(new Uint32Array(results)); // Set restaurants on path as search result
       this.displayMap.setPath(path, result.distance); // Set map path to render
-      FRUGAL_RESULT.classList.remove("show");
+      FRUGAL_RESULT.classList.remove('show');
     });
 
     // Change user x location
     this.locationXTextbox.addListener(() => {
-      const value = this.locationXTextbox.value/App.UNIT_SCALE;
+      const value: number = this.locationXTextbox.value / App.UNIT_SCALE;
 
-      if (this.locationX == value) return;
+      if (this.locationX === value) return;
 
       this.locationX = value;
 
@@ -474,9 +585,9 @@ class App {
 
     // Change user y location
     this.locationYTextbox.addListener(() => {
-      const value = this.locationYTextbox.value/App.UNIT_SCALE;
+      const value: number = this.locationYTextbox.value / App.UNIT_SCALE;
 
-      if (this.locationY == value) return;
+      if (this.locationY === value) return;
 
       this.locationY = value;
 
@@ -484,12 +595,12 @@ class App {
     });
 
     // Center map to user location
-    LOCATION_CENTER.addEventListener("click", () => {
+    LOCATION_CENTER.addEventListener('click', () => {
       this.displayMap.animateCamera(this.locationX, this.locationY);
     });
 
     // Do tests
-    TESTING_BUTTON.addEventListener("click", () => {
+    TESTING_BUTTON.addEventListener('click', () => {
       tests(TESTING_DIV);
     });
   }

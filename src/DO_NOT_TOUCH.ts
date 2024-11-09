@@ -3,7 +3,7 @@ function loadJSON(filePath: string): any {
   // Load json file;
   const json: string | null = loadTextFileAjaxSync(
     filePath,
-    "application/json"
+    'application/json'
   );
 
   if (json) {
@@ -16,14 +16,14 @@ function loadJSON(filePath: string): any {
 // Load text with Ajax synchronously: takes path to file and optional MIME type
 function loadTextFileAjaxSync(filePath: string, mimeType: any): string | null {
   const xmlhttp: XMLHttpRequest = new XMLHttpRequest();
-  xmlhttp.open("GET", filePath, false);
-  if (mimeType != null) {
+  xmlhttp.open('GET', filePath, false);
+  if (mimeType !== null) {
     if (xmlhttp.overrideMimeType) {
       xmlhttp.overrideMimeType(mimeType);
     }
   }
   xmlhttp.send();
-  if (xmlhttp.status == 200 && xmlhttp.readyState == 4) {
+  if (xmlhttp.status === 200 && xmlhttp.readyState === 4) {
     return xmlhttp.responseText;
   } else {
     // TODO Throw exception

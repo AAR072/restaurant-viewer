@@ -1,23 +1,29 @@
 // #region HTML elements
-const AUTO_CLEAR_CHECKBOX = document.getElementById("auto-performance-clear") as HTMLInputElement;
-const CLEAR_ALL_BUTTON = document.getElementById("clear-performance-log") as HTMLButtonElement;
-const PERFORMANCE_CONTAINER = document.getElementById("performance-log-container") as HTMLDivElement;
+const AUTO_CLEAR_CHECKBOX: HTMLInputElement = document.getElementById(
+  'auto-performance-clear'
+) as HTMLInputElement;
+const CLEAR_ALL_BUTTON: HTMLButtonElement = document.getElementById(
+  'clear-performance-log'
+) as HTMLButtonElement;
+const PERFORMANCE_CONTAINER: HTMLDivElement = document.getElementById(
+  'performance-log-container'
+) as HTMLDivElement;
 // #endregion
 
-const LOG_TASK_DURATION = 5000; // Amount of time before a log task is removed.
-const LOG_TASK_FADE_DURATION = 1000; // The duration of the log task fade animation
+const LOG_TASK_DURATION: number = 5000; // Amount of time before a log task is removed.
+const LOG_TASK_FADE_DURATION: number = 1000; // The duration of the log task fade animation
 
 const timeouts: number[] = [];
-let timeoutPointer = 0;
+let timeoutPointer: number = 0;
 
 /**
  * Fades out and eventually removes the specified task element.
  * @param element The task element to be removed.
  * @timecomplexity O(1)
  */
-function clearTask(element: HTMLDivElement) {
-  element.style.marginBottom = (-element.clientHeight - 10) + "px";
-  element.classList.add("fade-out");
+function clearTask(element: HTMLDivElement): void {
+  element.style.marginBottom = -element.clientHeight - 10 + 'px';
+  element.classList.add('fade-out');
 
   window.setTimeout(() => {
     element.remove();
@@ -29,10 +35,9 @@ function clearTask(element: HTMLDivElement) {
  * @param element The element in which the timer is applied.
  * @timecomplexity O(1)
  */
-function createTimeout(element: HTMLDivElement) {
+function createTimeout(element: HTMLDivElement): void {
   timeouts[timeoutPointer++] = window.setTimeout(() => {
     clearTask(element);
-
   }, LOG_TASK_DURATION);
 }
 
@@ -45,26 +50,27 @@ function createTimeout(element: HTMLDivElement) {
  * @example
  * logTask("Example Task", 5000, "This task involved setting up a project.");
  */
-function logTask(name: string, time: number, description: string) {
-  const logItem = document.createElement("div");
-  logItem.className = "log-task";
+function logTask(name: string, time: number, description: string): void {
+  const logItem: HTMLDivElement = document.createElement('div');
+  logItem.className = 'log-task';
 
-  const nameSpan = document.createElement("p");
-  nameSpan.className = "task-title";
+  const nameSpan: HTMLDivElement = document.createElement('p');
+  nameSpan.className = 'task-title';
   nameSpan.innerText = name;
 
-  const descSpan = document.createElement("p");
+  const descSpan: HTMLDivElement = document.createElement('p');
   descSpan.innerText = description;
 
-  const timeSpan = document.createElement("p");
+  const timeSpan: HTMLParagraphElement = document.createElement('p');
   timeSpan.innerHTML = `<bold>Task Duration:<bold> ${time.toFixed(2)}ms`;
 
-  const dateSpan = document.createElement("p");
-  dateSpan.innerHTML = "<bold>Logged At:<bold> " + new Date().toLocaleTimeString(); // make it show milliseconds
+  const dateSpan: HTMLParagraphElement = document.createElement('p');
+  dateSpan.innerHTML =
+    '<bold>Logged At:<bold> ' + new Date().toLocaleTimeString(); // make it show milliseconds
 
-  const deleteButton = document.createElement("button");
-  deleteButton.className = "log-clear";
-  deleteButton.innerText = "Clear";
+  const deleteButton: HTMLButtonElement = document.createElement('button');
+  deleteButton.className = 'log-clear';
+  deleteButton.innerText = 'Clear';
 
   logItem.appendChild(nameSpan);
   logItem.appendChild(descSpan);
@@ -74,21 +80,22 @@ function logTask(name: string, time: number, description: string) {
 
   PERFORMANCE_CONTAINER.appendChild(logItem);
 
-  deleteButton.addEventListener("click", () => {
+  deleteButton.addEventListener('click', () => {
     clearTask(logItem);
   });
 
   if (AUTO_CLEAR_CHECKBOX.checked) createTimeout(logItem);
 }
 
-AUTO_CLEAR_CHECKBOX.addEventListener("input", () => {
-  if (AUTO_CLEAR_CHECKBOX.checked) { // Creates timeouts for all log tasks if checked
-    for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
+AUTO_CLEAR_CHECKBOX.addEventListener('input', () => {
+  if (AUTO_CLEAR_CHECKBOX.checked) {
+    // Creates timeouts for all log tasks if checked
+    for (let i: number = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
       createTimeout(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
     }
-
-  } else { // Clears all timeouts and empties timeout array when unchecked
-    for (let i = 0; i < timeoutPointer; i++) {
+  } else {
+    // Clears all timeouts and empties timeout array when unchecked
+    for (let i: number = 0; i < timeoutPointer; i++) {
       window.clearTimeout(timeouts[i]);
     }
 
@@ -97,9 +104,9 @@ AUTO_CLEAR_CHECKBOX.addEventListener("input", () => {
   }
 });
 
-CLEAR_ALL_BUTTON.addEventListener("click", () => {
+CLEAR_ALL_BUTTON.addEventListener('click', () => {
   // Clears all log tasks inside of the container
-  for (let i = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
+  for (let i: number = 0; i < PERFORMANCE_CONTAINER.children.length; i++) {
     clearTask(PERFORMANCE_CONTAINER.children[i] as HTMLDivElement);
   }
 });

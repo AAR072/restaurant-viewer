@@ -11,19 +11,24 @@ class Dropdown {
    * @timecomplexity O(1)
    */
   constructor(public element: HTMLDivElement) {
-    const button = element.querySelector(".dropdown-button") as HTMLButtonElement;
-    const content = element.querySelector(".dropdown-content") as HTMLDivElement;
+    const button: HTMLButtonElement = element.querySelector(
+      '.dropdown-button'
+    ) as HTMLButtonElement;
+    const content: HTMLDivElement = element.querySelector(
+      '.dropdown-content'
+    ) as HTMLDivElement;
 
     this.content = content;
     this.updateHeight();
 
-    element.classList.add("hide");
+    element.classList.add('hide');
 
-    button.addEventListener("click", () => {
-      if (Dropdown.currentDropdown == this) { // If the dropdown is already down then hide it
+    button.addEventListener('click', () => {
+      if (Dropdown.currentDropdown === this) {
+        // If the dropdown is already down then hide it
         this.up();
-
-      } else { // Otherwise drop down
+      } else {
+        // Otherwise drop down
         this.down();
       }
     });
@@ -33,18 +38,18 @@ class Dropdown {
    * Updates and defines the height of the dropdown content so that it can be animated.
    * @timecomplexity O(1)
    */
-  private updateHeight() {
-    this.content.style.height = (this.content.scrollHeight) + "px";
+  private updateHeight(): void {
+    this.content.style.height = this.content.scrollHeight + 'px';
   }
 
   /**
    * Hides the dropdown.
    * @timecomplexity O(1)
    */
-  public up() {
+  public up(): void {
     this.updateHeight();
-    this.element.classList.add("hide");
-    
+    this.element.classList.add('hide');
+
     Dropdown.currentDropdown = null;
   }
 
@@ -52,11 +57,11 @@ class Dropdown {
    * Drops down the dropdown and hides the currently visible dropdown.
    * @timecomplexity O(1)
    */
-  public down() {
+  public down(): void {
     if (Dropdown.currentDropdown) Dropdown.currentDropdown.up();
 
     this.updateHeight();
-    this.element.classList.remove("hide");
+    this.element.classList.remove('hide');
 
     Dropdown.currentDropdown = this;
   }

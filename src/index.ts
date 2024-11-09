@@ -9,6 +9,6 @@ interface Data {
   y: number[];
 }
 
-const data: Data = loadJSON("DO_NOT_TOUCH/data.json") as Data; // Load data from JSON file.
+const data: Data = loadJSON('DO_NOT_TOUCH/data.json') as Data; // Load data from JSON file.
 
-const app = new App(data); // Create app instance
+const app: App = new App(data); // Create app instance

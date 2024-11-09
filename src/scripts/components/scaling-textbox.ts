@@ -1,4 +1,4 @@
-type STCallback = () => any;
+type STCallback = () => void;
 
 /** Creates and holds custom textbox functionalities for a span element. */
 class ScalingTextbox {
@@ -13,34 +13,51 @@ class ScalingTextbox {
    * @param defaultVal The optional default value of the textbox upon instantiation.
    * @timecomplexity O(1)
    */
-  constructor(public element: HTMLSpanElement, public decimalPlaces: number, defaultVal?: number) {
-    element.className = "scaling-textbox";
-    element.contentEditable = "true";
+  constructor(
+    public element: HTMLSpanElement,
+    public decimalPlaces: number,
+    defaultVal?: number
+  ) {
+    element.className = 'scaling-textbox';
+    element.contentEditable = 'true';
 
-    element.addEventListener("keydown", (event: KeyboardEvent) => {
-      const key = event.key;
+    element.addEventListener('keydown', (event: KeyboardEvent) => {
+      const key: string = event.key;
 
-      if (key == "Enter") this.update(); // Update value if enter is pressed
-      else if (key == "Backspace" || key == "ArrowLeft" || key == "ArrowRight" || key == "-") return; // Allow input if any of these keys
-      else if (!isNaN(parseFloat(key))) return; // Allow input if it is a number
-      else if (key == "." && decimalPlaces > 0) return; // Allow period if decimals are included
+      if (key === 'Enter') {
+        this.update();
+      } // Update value if enter is pressed
+      else if (
+        key === 'Backspace' ||
+        key === 'ArrowLeft' ||
+        key === 'ArrowRight' ||
+        key === '-'
+      ) {
+        return;
+      } // Allow input if any of these keys
+      else if (!isNaN(parseFloat(key))) {
+        return;
+      } // Allow input if it is a number
+      else if (key === '.' && decimalPlaces > 0) {
+        return;
+      } // Allow period if decimals are included
 
       event.preventDefault();
     });
 
-    element.addEventListener("blur", () => {
+    element.addEventListener('blur', () => {
       this.update();
     });
 
-    if (defaultVal != null) this.setValue(defaultVal);
+    if (defaultVal !== undefined) this.setValue(defaultVal!);
   }
 
   /**
    * Reads and updates the value of the textbox and calls the current listener callback.
    * @timecomplexity O(1)
    */
-  private update() {
-    let value;
+  private update(): void {
+    let value: number;
 
     if (this.decimalPlaces > 0) value = parseFloat(this.element.innerText);
     else value = parseInt(this.element.innerText);
@@ -58,7 +75,7 @@ class ScalingTextbox {
    * @param callback The listener callback.
    * @timecomplexity O(1)
    */
-  public addListener(callback: STCallback) {
+  public addListener(callback: STCallback): void {
     this.listener = callback;
   }
 
@@ -67,17 +84,17 @@ class ScalingTextbox {
    * @param value The new value to set the textbox's value to.
    * @timecomplexity O(1)
    */
-  public setValue(value: number) {
+  public setValue(value: number): void {
     this.value = value;
     this.element.innerText = value.toFixed(this.decimalPlaces).toString();
 
     // Place cursor at end of span if currently inside the span
-    if (document.activeElement == this.element) {
-      const range = document.createRange();
+    if (document.activeElement === this.element) {
+      const range: Range = document.createRange();
       range.selectNodeContents(this.element);
       range.collapse(false);
 
-      const selection = window.getSelection()!;
+      const selection: Selection | null = window.getSelection()!;
       selection.removeAllRanges();
       selection.addRange(range);
     }
