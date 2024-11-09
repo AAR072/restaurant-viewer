@@ -20,8 +20,8 @@ Welcome to the **Restaurant Finder**! This application helps users search, brows
 
 ## Technologies Used
 
-- **Frontend**: HTML, CSS, and JavaScript for a responsive user interface.
-- **Backend**: JavaScript handles data processing and search functionality, optimized for quick response times.
+- **Frontend**: HTML, CSS, and TypeScript for a responsive user interface.
+- **Backend**: TypeScript handles data processing and search functionality, optimized for quick response times.
 - **Performance Tracking**: Logs the duration of each action using `performance.now()` for real-time performance monitoring.
 
 ## Installation
@@ -33,14 +33,7 @@ Welcome to the **Restaurant Finder**! This application helps users search, brows
 
 1. **Search for Restaurants**: Enter search criteria in the search bar to locate specific restaurants by ID, name, or coordinates.
 2. **View Details**: Scroll through or browse entries if multiple results match the search criteria.
-3. **Table View**: Access the secondary page to see a table view of all restaurants. Sort by each attribute (name, cost, type, etc.) for an overview and quick comparisons.
 
-## Complexity Analysis
-
-- **Search Function**: `O(n)`, iterates through each restaurant to find matches based on search parameters.
-- **Sorting**: `O(n log n)`, sorts results alphabetically by restaurant name when displaying results.
-- **Filter Function**: `O(n)`, iterates through the results to apply specified filters.
-  
 ## Development Notes
 
 - **Data Storage**: Restaurants are stored in parallel arrays for efficient access.
@@ -48,7 +41,7 @@ Welcome to the **Restaurant Finder**! This application helps users search, brows
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU License.
 
 
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/uyBfndVC)
