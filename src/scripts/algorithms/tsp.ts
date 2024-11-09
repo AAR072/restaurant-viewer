@@ -104,12 +104,14 @@ function euclideanDistance(TNode1: TNode, TNode2: TNode): number {
 function computeAllPairDistances(TNodes: TNode[]): number[][] {
   const n: number = TNodes.length;
   const dist: number[][] = [];
+  // Init the distance array with infinity
   for (let i: number = 0; i < n; i++) {
     dist[i] = [];
     for (let j: number = 0; j < n; j++) {
       dist[i][j] = Infinity;
     }
   }
+  // Get distances for every combination of nodes
   for (let i: number = 0; i < n; i++) {
     for (let j: number = 0; j < n; j++) {
       if (i !== j) {
@@ -393,7 +395,7 @@ function goFrugal(
   } else {
     speed = 500;
   }
-
+  // Turning data into usable arrays
   const sortedTypes: string[] = [];
   for (let i: number = 0; i < speed + 10; i++) {
     const index: number = sortedData[i];
@@ -402,7 +404,7 @@ function goFrugal(
     sortedTypes[i] = typesData[index];
     indices[i] = index;
   }
-
+  // creating the nodes from the data
   const tNodes: TNode[] = [{id: 0, x: currentX, y: currentY, type: 'START'}];
   for (let i: number = 1; i < speed; i++) {
     tNodes[i] = {
@@ -413,11 +415,13 @@ function goFrugal(
       index: indices[i - 1]
     };
   }
+  // creating the graph
   tNodes[speed] = {id: speed, x: endingX, y: endingY, type: 'END'};
   let graph: Graph = {
     tNodes: tNodes,
     categories: ['']
   };
+  // running the problem on every combination of categories
   const deepCopy: any = JSON.parse(JSON.stringify(combinations));
   const best: any = {distance: Infinity, path: [tNodes[0]], possible: false};
   for (let i: number = 0; i < deepCopy.length; i++) {
@@ -429,6 +433,7 @@ function goFrugal(
       best.distance = result.distance;
     }
   }
+  // return the best one
   if (best.distance === Infinity) {
     return {distance: Infinity, path: [], possible: false};
   }
@@ -493,6 +498,7 @@ function savingFuel(
     speed = 500;
   }
   // i is 110 because I am scared of random bugs when copying over
+  // Getting the actual data
   for (let i: number = 0; i < speed + 10; i++) {
     const index: number = sortedData[i];
     sortedX[i] = xData[index];
@@ -500,6 +506,7 @@ function savingFuel(
     sortedTypes[i] = typesData[index];
     indices[i] = index;
   }
+  // Storing the nodes
   const tNodes: TNode[] = [{id: 0, x: currentX, y: currentY, type: 'START'}];
   for (let i: number = 1; i < speed; i++) {
     tNodes[i] = {
@@ -515,6 +522,7 @@ function savingFuel(
     tNodes: tNodes,
     categories: deepCopy
   };
+  // Running the code
   const result: any = findMinimumDistanceToTypesAndEnd(graph, 0, speed);
   const t1: number = performance.now();
   logTask(
